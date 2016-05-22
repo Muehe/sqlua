@@ -120,7 +120,7 @@ class QuestList():
 			xx.append(q)
 		return xx
 
-	def printQuestFile(self, file="Zeug/qData.lua"):
+	def printQuestFile(self, file="sqlua/qData.lua"):
 		outfile = open(file, "w")
 		functionString = """DB_NAME, DB_NPC = 1, 1;
 DB_LEVEL, DB_OBJ = 2, 2;
@@ -269,7 +269,7 @@ end
 		outfile.write("};\n")
 		outfile.close();
 
-	def printShaguQuestFile(self, npcs, file="Zeug/questDB.lua"):
+	def printShaguQuestFile(self, npcs, file="sqlua/questDB.lua"):
 		outfile = open(file, "w")
 		outfile.write("questDB = {\n")
 		excluded = self.checkStartEnd()
