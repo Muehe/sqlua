@@ -139,7 +139,7 @@ Misc Functions
 # uncomment the three lines
 # copy and adjust them to the creature function in the same file
 # compile, run, close, check Server.log
-def getZonesFromLog(file="Zeug/Save_Server.log"):
+def getZonesFromLog(file="sqlua/Save_Server.log"):
 	print("Getting Zone Data...")
 	infile = open(file, mode='r', encoding="utf-8")
 	fileData = infile.read()
@@ -153,7 +153,7 @@ def getZonesFromLog(file="Zeug/Save_Server.log"):
 		cr.append([int(x[0]), int(x[1])])
 	ob = []
 	for x in objectZones:
-		cr.append([int(x[0]), int(x[1])])
+		ob.append([int(x[0]), int(x[1])])
 	print("Done.")
 	return [cr, ob]
 
@@ -615,7 +615,7 @@ def getFaction(bitfield):
 		factions += "H"
 	return factions
 
-def writeQuestLookupFile(quests, file="Zeug/questLookup.lua"):
+def writeQuestLookupFile(quests, file="sqlua/questLookup.lua"):
 	outfile = open(file, "w")
 	outfile.write("questLookup = {\n")
 
@@ -1105,7 +1105,7 @@ def sortItemTables(itemTables):
 
 	return drops
 
-def writeItemFile(items, file="Zeug/itemData.lua"):
+def writeItemFile(items, file="sqlua/itemData.lua"):
 	outfile = open(file, "w")
 
 	outfile.write("itemLookup = {\n")
