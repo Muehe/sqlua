@@ -129,18 +129,18 @@ class QuestList():
 		functionString = """DB_NAME, DB_NPC = 1, 1;
 DB_STARTS, DB_OBJ = 2, 2;
 DB_ENDS, DB_ITM = 3, 3;
-DB_MINLEVEL, DB_ZONES = 4, 4;
+DB_MIN_LEVEL, DB_ZONES = 4, 4;
 DB_LEVEL = 5;
-DB_REQRACE = 6;
-DB_REQCLASS = 7;
+DB_REQ_RACE = 6;
+DB_REQ_CLASS = 7;
 DB_OBJECTIVES = 8;
 DB_TRIGGER = 9;
-DB_REQNPCOROBJ = 10;
+DB_REQ_NPC_OR_OBJ = 10;
 function deleteFaction(str)
 	local before = WHDB_GetTableLength(qData);
 	for key, data in pairs(qData) do
-		if (data[DB_REQRACE] == "AH") or (data[DB_REQRACE] ~= str) then
-			data[DB_REQRACE] = nil;
+		if (data[DB_REQ_RACE] == "AH") or (data[DB_REQ_RACE] ~= str) then
+			data[DB_REQ_RACE] = nil;
 		else
 			qData[key] = nil;
 		end
@@ -162,9 +162,9 @@ function deleteClasses()
 	end
 	if playerClass then
 		for key, data in pairs(qData) do
-			if data[DB_REQCLASS] then
+			if data[DB_REQ_CLASS] then
 				local found = false;
-				for k, class in pairs(data[DB_REQCLASS]) do
+				for k, class in pairs(data[DB_REQ_CLASS]) do
 					if class == playerClass then
 						found = true;
 					end
