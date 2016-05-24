@@ -135,6 +135,7 @@ DB_REQRACE = 6;
 DB_REQCLASS = 7;
 DB_OBJECTIVES = 8;
 DB_TRIGGER = 9;
+DB_REQNPCOROBJ = 10;
 function deleteFaction(str)
 	local before = WHDB_GetTableLength(qData);
 	for key, data in pairs(qData) do
