@@ -231,15 +231,15 @@ end
 				outfile.write("nil,")
 			outfile.write("},")
 			outfile.write("{") #ends = 3
-			if (hasattr(quest, "creatureEnd")):
-				outfile.write("{") #npc = ends1
+			if (hasattr(quest, "creatureEnd")): #npc = ends1
+				outfile.write("{")
 				for npc in quest.creatureEnd:
 					outfile.write(str(npc)+",")
 				outfile.write("},")
 			else:
 				outfile.write("nil,")
-			if (hasattr(quest, "goEnd")):
-				outfile.write("{") #obj = ends2
+			if (hasattr(quest, "goEnd")): #obj = ends2
+				outfile.write("{")
 				for obj in quest.goEnd:
 					outfile.write(str(obj)+",")
 				outfile.write("},")
@@ -249,26 +249,42 @@ end
 			outfile.write(str(quest.MinLevel)+",") #minLevel = 4
 			outfile.write(str(quest.QuestLevel)+",") #level = 5
 			outfile.write("\""+self.getFactionString(quest.RequiredRaces)+"\",") #RequiredRaces = 6
-			if (hasattr(quest, "RequiredClasses")):
-				outfile.write("{") #RequiredClasses = 7
+			if (hasattr(quest, "RequiredClasses")): #RequiredClasses = 7
+				outfile.write("{")
 				for n in self.unpackBitMask(quest.RequiredClasses):
 					outfile.write(str(n)+",")
 				outfile.write("},")
 			else:
 				outfile.write("nil,")
-			if (hasattr(quest, "Objectives")) and (len(self.allQuests(Title = quest.Title)) > 1):
+			if (hasattr(quest, "Objectives")) and (len(self.allQuests(Title = quest.Title)) > 1): #objectives = 8
 				if quest.id == 4641:
 					quest.Objectives = quest.Objectives[0:-5]
-				outfile.write("\""+quest.Objectives+"\",") #objectives = 8
+				outfile.write("\""+quest.Objectives+"\",")
 			else:
 				outfile.write("nil,")
-			if (hasattr(quest, "triggerEnd")):
-				outfile.write("{") #trigger = 9
+			if (hasattr(quest, "triggerEnd")): #trigger = 9
+				outfile.write("{")
 				for tri in quest.triggerEnd:
 					outfile.write(str(tri)+",")
 				outfile.write("},")
 			else:
 				outfile.write("nil,")
+			outfile.write("{") #ReqCreatureOrGO = 10
+			if (hasattr(quest, "ReqCreatureId")): #npc = ReqCreatureOrGO1
+				outfile.write("{")
+				for npc in quest.ReqCreatureId:
+					outfile.write(str(npc[0])+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			if (hasattr(quest, "ReqGOId")): #obj = ReqCreatureOrGO2
+				outfile.write("{")
+				for obj in quest.ReqGOId:
+					outfile.write("{"+str(abs(obj[0]))+",\""+str(obj[1])+"\"},")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			outfile.write("},")
 			outfile.write("},\n")
 		outfile.write("};\n")
 		outfile.close();
