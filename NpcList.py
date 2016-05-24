@@ -6,9 +6,13 @@ class NpcList():
 		self.nList = []
 		tables = self.__getNpcTables(cursor)
 		print("Adding Npcs...")
+		count = len(tables[0])
 		for npc in tables[0]:
 			self.addNpc(npc, tables[1:])
-		print("Done.")
+			if ((count % 200) == 0):
+				print(str(count)+"...", end="")
+			count -= 1
+		print("\nDone.")
 
 	def addNpc(self, npc, tables):
 		self.nList.append(Npc(npc, tables))
@@ -16,7 +20,7 @@ class NpcList():
 	def findNpc(self, **kwargs):
 		return next(self.__iterNpc(**kwargs))
 
-	def allNpc(self, **kwargs):
+	def allNpcs(self, **kwargs):
 		return list(self.__iterNpc(**kwargs))
 
 	def allNpcsWith(self, *args):

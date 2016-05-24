@@ -1,4 +1,6 @@
 class Npc():
+	spawnErrors = [] # Holds IDs of NPCs without spawns
+	waypointErrors = []
 	def __init__(self, npc, tables):
 		self.id = npc[0]
 		self.name = self.escapeName(npc[1])
@@ -15,16 +17,20 @@ class Npc():
 				for waypoint in tables[3]:
 					if (waypoint[1] == spawn[4]):
 						self.waypoints.append((spawn[1], waypoint[2], waypoint[3]))
+		wpError = False
 		for waypoint in tables[4]:
 			if (waypoint[1] == self.id):
 				if (len(self.spawns) != 1):
-					print("Waypoint error. NPC: "+str(self.id))
+					if (not wpError):
+						wpError = True
 				else:
 					self.waypoints.append((self.spawns[0][0], waypoint[2], waypoint[3]))
 		if (self.spawns == []):
 			del self.spawns
-		if (self.waypoints == []):
+			Npc.spawnErrors.append(self.id)
+		if (self.waypoints == []) or wpError:
 			del self.waypoints
+			Npc.waypointErrors.append(self.id)
 
 	def __repr__(self):
 		return str(self.id)

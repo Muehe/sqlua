@@ -6,9 +6,13 @@ class QuestList():
 		self.qList = []
 		tables = self.__getQuestTables(cursor)
 		print("Adding Quests...")
+		count = len(tables[0])
 		for quest in tables[0]:
 			self.__addQuest(quest, tables[1:])
-		print("Done.")
+			if ((count % 200) == 0):
+				print(str(count)+"...", end="")
+			count -= 1
+		print("\nDone.")
 
 	def unpackBitMask(self, bitMask):
 		bits = []
@@ -123,13 +127,13 @@ class QuestList():
 	def printQuestFile(self, file="sqlua/qData.lua"):
 		outfile = open(file, "w")
 		functionString = """DB_NAME, DB_NPC = 1, 1;
-DB_LEVEL, DB_OBJ = 2, 2;
-DB_MINLEVEL, DB_ITM = 3, 3;
-DB_REQRACE = 4;
-DB_REQCLASS = 5;
-DB_OBJECTIVES = 6;
-DB_STARTS = 7;
-DB_ENDS = 8;
+DB_STARTS, DB_OBJ = 2, 2;
+DB_ENDS, DB_ITM = 3, 3;
+DB_MINLEVEL, DB_ZONES = 4, 4;
+DB_LEVEL = 5;
+DB_REQRACE = 6;
+DB_REQCLASS = 7;
+DB_OBJECTIVES = 8;
 DB_TRIGGER = 9;
 function deleteFaction(str)
 	local before = WHDB_GetTableLength(qData);
@@ -201,13 +205,52 @@ end
 		for quest in self.qList:
 			if quest in excluded:
 				continue
-			outfile.write("\t["+str(quest.id)+"] = {")
+			outfile.write("\t["+str(quest.id)+"] = {") #key
 			outfile.write("\""+quest.Title+"\",") #name = 1
-			outfile.write(str(quest.QuestLevel)+",") #level = 2
-			outfile.write(str(quest.MinLevel)+",") #minLevel = 3
-			outfile.write("\""+self.getFactionString(quest.RequiredRaces)+"\",") #RequiredRaces = 4
+			outfile.write("{") #starts = 2
+			if (hasattr(quest, "creatureStart")):
+				outfile.write("{") #npc = starts1
+				for npc in quest.creatureStart:
+					outfile.write(str(npc)+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			if (hasattr(quest, "goStart")):
+				outfile.write("{") #obj = starts2
+				for obj in quest.goStart:
+					outfile.write(str(obj)+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			if (hasattr(quest, "itemStart")):
+				outfile.write("{") #itm = starts3
+				for itm in quest.itemStart:
+					outfile.write(str(itm)+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			outfile.write("},")
+			outfile.write("{") #ends = 3
+			if (hasattr(quest, "creatureEnd")):
+				outfile.write("{") #npc = ends1
+				for npc in quest.creatureEnd:
+					outfile.write(str(npc)+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			if (hasattr(quest, "goEnd")):
+				outfile.write("{") #obj = ends2
+				for obj in quest.goEnd:
+					outfile.write(str(obj)+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			outfile.write("},")
+			outfile.write(str(quest.MinLevel)+",") #minLevel = 4
+			outfile.write(str(quest.QuestLevel)+",") #level = 5
+			outfile.write("\""+self.getFactionString(quest.RequiredRaces)+"\",") #RequiredRaces = 6
 			if (hasattr(quest, "RequiredClasses")):
-				outfile.write("{") #RequiredClasses = 5
+				outfile.write("{") #RequiredClasses = 7
 				for n in self.unpackBitMask(quest.RequiredClasses):
 					outfile.write(str(n)+",")
 				outfile.write("},")
@@ -216,48 +259,9 @@ end
 			if (hasattr(quest, "Objectives")) and (len(self.allQuests(Title = quest.Title)) > 1):
 				if quest.id == 4641:
 					quest.Objectives = quest.Objectives[0:-5]
-				outfile.write("\""+quest.Objectives+"\",") #objectives = 6
+				outfile.write("\""+quest.Objectives+"\",") #objectives = 8
 			else:
 				outfile.write("nil,")
-			outfile.write("{") #starts = 7
-			if (hasattr(quest, "creatureStart")):
-				outfile.write("{") #npc = 1
-				for npc in quest.creatureStart:
-					outfile.write(str(npc)+",")
-				outfile.write("},")
-			else:
-				outfile.write("nil,")
-			if (hasattr(quest, "goStart")):
-				outfile.write("{") #obj = 2
-				for obj in quest.goStart:
-					outfile.write(str(obj)+",")
-				outfile.write("},")
-			else:
-				outfile.write("nil,")
-			if (hasattr(quest, "itemStart")):
-				outfile.write("{") #itm = 3
-				for itm in quest.itemStart:
-					outfile.write(str(itm)+",")
-				outfile.write("},")
-			else:
-				outfile.write("nil,")
-			outfile.write("},")
-			outfile.write("{") #ends = 8
-			if (hasattr(quest, "creatureEnd")):
-				outfile.write("{") #npc = 1
-				for npc in quest.creatureEnd:
-					outfile.write(str(npc)+",")
-				outfile.write("},")
-			else:
-				outfile.write("nil,")
-			if (hasattr(quest, "goEnd")):
-				outfile.write("{") #obj = 1
-				for obj in quest.goEnd:
-					outfile.write(str(obj)+",")
-				outfile.write("},")
-			else:
-				outfile.write("nil,")
-			outfile.write("},")
 			if (hasattr(quest, "triggerEnd")):
 				outfile.write("{") #trigger = 9
 				for tri in quest.triggerEnd:
