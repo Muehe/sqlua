@@ -62,3 +62,64 @@ class NpcList():
 		print("Done.")
 
 		return [npc_tpl, npc, npc_start, npc_end, npc_mov, npc_mov_tpl]
+
+	def printNpcFile(self, file="sqlua/npcData.lua"):
+		outfile = open(file, "w")
+		outfile.write("npcData = {\n")
+		for npcId in sorted(self.nList):
+			npc = self.nList[npcId]
+			if (not hasattr(npc, "spawns")) and (not hasattr(npc, "waypoints")):
+				continue
+			zoneId = 0
+			lenSpawns = 0
+			outfile.write("["+str(npc.id)+"] = {'"+npc.name+"',"+str(npc.minlevelhealth)+","+str(npc.maxlevelhealth)+","+str(npc.minlevel)+","+str(npc.maxlevel)+","+str(npc.rank)+",")
+			if hasattr(npc, "spawns"):
+				outfile.write("{")
+				for zone in npc.spawns.cByZone:
+					if not zone in validZoneList:
+						if zoneId == 0:
+							zoneId = zone
+						outfile.write("["+str(zone)+"]={{-1, -1}},")
+						continue
+					if len(npc.spawns.cByZone[zone]) > lenSpawns:
+						lenSpawns = len(npc.spawns.cByZone[zone])
+						zoneId = zone
+					outfile.write("["+str(zone)+"]={")
+					for coords in npc.spawns.cByZone[zone]:
+						outfile.write("{"+str(coords[0])+","+str(coords[1])+"},")
+					outfile.write("},")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			if hasattr(npc, "waypoints"):
+				outfile.write("{")
+				for zone in npc.waypoints.cByZone:
+					if not zone in validZoneList:
+						if zoneId == 0:
+							zoneId = zone
+						outfile.write("["+str(zone)+"]={{-1, -1}},")
+						continue
+					outfile.write("["+str(zone)+"]={")
+					for coords in npc.waypoints.cByZone[zone]:
+						outfile.write("{"+str(coords[0])+","+str(coords[1])+"},")
+					outfile.write("},")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			outfile.write(str(zoneId)+",")
+			if hasattr(npc, "start"):
+				outfile.write("{")
+				for quest in npc.start:
+					outfile.write(str(quest)+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			if hasattr(npc, "end"):
+				outfile.write("{")
+				for quest in npc.end:
+					outfile.write(str(quest)+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
+			outfile.write("},\n")
+		outfile.write("}\n")

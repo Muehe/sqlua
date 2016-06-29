@@ -51,6 +51,18 @@ class Npc():
 			self.waypoints = CoordList(waypoints)
 		if(wpError):
 			Npc.waypointErrors.append(self.id)
+		self.start = []
+		for pair in tables[1]:
+			if pair[0] == self.id:
+				self.start.append(pair[1])
+		if self.start == []:
+			del self.start
+		self.end = []
+		for pair in tables[2]:
+			if pair[0] == self.id:
+				self.end.append(pair[1])
+		if self.end == []:
+			del self.end
 
 	def __repr__(self):
 		return str(self.id)

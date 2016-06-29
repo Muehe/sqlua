@@ -208,7 +208,7 @@ class Coord():
 		self.isMulti = False
 		for mapSet in mapBorders:
 			zone = int(mapSet[0])
-			if zoneId and zone != zoneId:
+			if zoneId in validZoneList and zone != zoneId:
 				continue
 			mId = int(mapSet[2])
 			x1 = float(mapSet[5])
