@@ -199,43 +199,43 @@ def getQuestTable(cursor):
 	quest_template = []
 	for a in cursor.fetchall():
 		quest_template.append(a)
-		
+
 	cursor.execute("SELECT id, quest FROM creature_involvedrelation")
 	creature_involvedrelation = []
 	for a in cursor.fetchall():
 		creature_involvedrelation.append(a)
-	
+
 	cursor.execute("SELECT id, quest FROM gameobject_involvedrelation")
 	gameobject_involvedrelation = []
 	for a in cursor.fetchall():
 		gameobject_involvedrelation.append(a)
-		
+
 	cursor.execute("SELECT id, quest FROM creature_questrelation")
 	creature_questrelation = []
 	for a in cursor.fetchall():
 		creature_questrelation.append(a)
-	
+
 	cursor.execute("SELECT id, quest FROM gameobject_questrelation")
 	gameobject_questrelation = []
 	for a in cursor.fetchall():
 		gameobject_questrelation.append(a)
-	
+
 	cursor.execute("SELECT entry, startquest FROM item_template")
 	item_questrelation = []
 	for a in cursor.fetchall():
 		item_questrelation.append(a)
-	
+
 	cursor.execute("SELECT id, quest FROM areatrigger_involvedrelation")
 	areatrigger_involvedrelation = []
 	for a in cursor.fetchall():
 		areatrigger_involvedrelation.append(a)
-	
+
 	print("Done.")
-	
+
 	print("Sorting quest related tables.")
 	quest_sort = sortQuestTable(quest_template, creature_involvedrelation, gameobject_involvedrelation, creature_questrelation, gameobject_questrelation, item_questrelation, areatrigger_involvedrelation)
 	print("Done.")
-	
+
 	return quest_sort
 
 def sortQuestTable(quest_template, creature_involvedrelation, gameobject_involvedrelation, creature_questrelation, gameobject_questrelation, item_questrelation, areatrigger_involvedrelation):
@@ -285,19 +285,19 @@ def sortQuestTable(quest_template, creature_involvedrelation, gameobject_involve
 		CompleteScript = quest[41]
 		SrcItemId = quest[42]
 		ZoneOrSort = quest[43]
-		
+
 		# RequiredSkills
 		if (RequiredSkill != 0):
 			RequiredSkills = [RequiredSkill, RequiredSkillValue]
 		else:
 			RequiredSkills = []
-		
+
 		# RequiredRep
 		if (RequiredMinRepFaction != 0) or (RequiredMaxRepFaction != 0):
 			RequiredRep = [RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue]
 		else:
 			RequiredRep = []
-		
+
 		# ReqItemIds
 		if (ReqItemId1 != 0) and (ReqItemId1 != SrcItemId):
 			ReqItemIds = [ReqItemId1]
@@ -309,7 +309,7 @@ def sortQuestTable(quest_template, creature_involvedrelation, gameobject_involve
 			ReqItemIds.append(ReqItemId3)
 		if (ReqItemId4 != 0) and (ReqItemId4 != SrcItemId):
 			ReqItemIds.append(ReqItemId4)
-		
+
 		# ReqSourceIds
 		if (ReqSourceId1 != 0):
 			ReqSourceIds = [ReqSourceId1]
@@ -321,7 +321,7 @@ def sortQuestTable(quest_template, creature_involvedrelation, gameobject_involve
 			ReqSourceIds.append(ReqSourceId3)
 		if (ReqSourceId4 != 0):
 			ReqSourceIds.append(ReqSourceId4)
-		
+
 		# ReqCreatureOrGOIds
 		if (ReqCreatureOrGOId1 != 0):
 			if (ReqCreatureOrGOId1 > 0):
@@ -342,7 +342,7 @@ def sortQuestTable(quest_template, creature_involvedrelation, gameobject_involve
 			ReqCreatureOrGOIds[0].append(ReqCreatureOrGOId4)
 		elif (ReqCreatureOrGOId4 < 0):
 			ReqCreatureOrGOIds[1].append(-ReqCreatureOrGOId4)
-		
+
 		# ReqSpellCasts
 		if (ReqSpellCast1 != 0):
 			ReqSpellCasts = [ReqSpellCast1]
@@ -354,7 +354,7 @@ def sortQuestTable(quest_template, creature_involvedrelation, gameobject_involve
 			ReqSpellCasts.append(ReqSpellCast3)
 		if (ReqSpellCast4 != 0):
 			ReqSpellCasts.append(ReqSpellCast4)
-		
+
 		# find quest start points
 		CreatureOrGOOrItemQuestStart = [[], [], []]
 		for x in creature_questrelation:
@@ -366,7 +366,7 @@ def sortQuestTable(quest_template, creature_involvedrelation, gameobject_involve
 		for x in item_questrelation:
 			if x[1] == entry:
 				CreatureOrGOOrItemQuestStart[2].append(x[0])
-		
+
 		# find quest end points
 		CreatureOrGOQuestEnd = [[], []]
 		for x in creature_involvedrelation:
@@ -375,12 +375,12 @@ def sortQuestTable(quest_template, creature_involvedrelation, gameobject_involve
 		for x in gameobject_involvedrelation:
 			if x[1] == entry:
 				CreatureOrGOQuestEnd[1].append(x[0])
-		
+
 		areatrigger = 0
 		for x in areatrigger_involvedrelation:
 			if x[1] == entry:
 				areatrigger = x[0]
-		
+
 		newQuest = [
 						entry,							# 0
 						Title,							# 1
@@ -817,7 +817,7 @@ def sortNPCTables(npc_table, npc_zones):
 	#npc_end = npc_table[3]
 	#npc_mov = npc_table[4]
 	#npc_mov_tpl = npc_table[5]
-	
+
 	print("Sort zone and spawn tables together...")
 	npcNew = [] # 0: id, 1: guid, 2: map, 3: x, 4: y, 5: zone
 	countdown = len(npc_table[1])
@@ -830,7 +830,7 @@ def sortNPCTables(npc_table, npc_zones):
 			print(str(countdown), end=",")
 		countdown -= 1
 	print("Done.")
-	
+
 	print("Merge everything else...")
 	npcs = []
 	countdown = len(npc_table[0])
@@ -842,15 +842,15 @@ def sortNPCTables(npc_table, npc_zones):
 		minlevelhealth = x[4]
 		maxlevelhealth = x[5]
 		rank = x[6]
-		
+
 		# get spawns for this npc
 		spawns = []
 		for y in npcNew:
 			# 0: id, 1: guid, 3: x, 4: y, 5: zone
 			if y[0] == entry:
 				spawns.append(calculateCoords(y))
-		
-		
+
+
 		spawnsSorted = []
 		zones = []
 		for y in spawns:
@@ -955,14 +955,24 @@ def getItemTables(cursor):
 	for a in cursor.fetchall():
 		obj_tpl.append(a)
 
-	cursor.execute("SELECT entry, LootId FROM creature_template") # PickpocketLootId and SkinningLootId might be good...
+	cursor.execute("SELECT entry, LootId, VendorTemplateId FROM creature_template") # PickpocketLootId and SkinningLootId might be good...
 	npc_tpl = []
 	for a in cursor.fetchall():
 		npc_tpl.append(a)
 
+	cursor.execute("SELECT entry, item, maxcount, incrtime FROM npc_vendor_template")
+	npc_vendor_tpl = []
+	for a in cursor.fetchall():
+		npc_vendor_tpl.append(a)
+
+	cursor.execute("SELECT entry, item, maxcount, incrtime FROM npc_vendor")
+	npc_vendor = []
+	for a in cursor.fetchall():
+		npc_vendor.append(a)
+
 	print("Done.")
 
-	return [item_tpl, npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl]
+	return [item_tpl, npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl, npc_vendor_tpl, npc_vendor]
 
 # entry, item, ChanceOrQuestChance, groupid, mincountOrRef
 def getRefGroup(refLootTable, entry, chance):
@@ -1078,7 +1088,7 @@ def sortItemTables(itemTables):
 	count = len(itemTables[0])
 	for item in itemTables[0]:
 		foundDrop = False
-		newItem = [item[0], item[1], [], [], []]
+		newItem = [item[0], item[1], [], [], [], []]
 		for npc in npcs:
 			foundChance = checkForItem(npc[1], item[0])
 			if foundChance:
@@ -1096,13 +1106,23 @@ def sortItemTables(itemTables):
 				if x[0] == item[0]:
 					newItem[4].append((itm[0], x[1]))
 					foundDrop = True
+		for itm in itemTables[8]:
+			if itm[1] == item[0]:
+				newItem[5].append((itm[0], itm[2], itm[3]))
+				foundDrop = True
+		for itm in itemTables[7]:
+			if itm[1] == item[0]:
+				for n in itemTables[5]:
+					if n[2] == itm[0]:
+						newItem[5].append((n[0], itm[2], itm[3]))
+						foundDrop = True
 		if foundDrop:
 			drops.append(newItem)
 		count -= 1
 		if count % 100 == 0:
 			print(count, end="... ")
 	print("\nDone.")
-
+#[item_tpl, npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl, npc_vendor_tpl, npc_vendor]
 	return drops
 
 def writeItemFile(items, file="sqlua/itemData.lua"):
@@ -1121,23 +1141,30 @@ def writeItemFile(items, file="sqlua/itemData.lua"):
 		name = escapeName(item[1])
 		outfile.write("\t["+str(id)+"] = {\n")
 
-		if item[2] != []:
-			outfile.write("\t\t['npcs'] = {")
-			for npc in item[2]:
-				outfile.write("{"+str(npc[0])+","+str(round(abs(npc[1]), 2))+"},")
-			outfile.write("},\n")
+		outfile.write("\t\t{")
+		for npc in item[2]:
+			outfile.write("{"+str(npc[0])+","+str(round(abs(npc[1]), 2))+"},")
+		outfile.write("},")
 
-		if item[3] != []:
-			outfile.write("\t\t['objects'] = {")
-			for object in item[3]:
-				outfile.write("{"+str(object[0])+","+str(round(abs(object[1]), 2))+"},")
-			outfile.write("},\n")
+		outfile.write("{")
+		for object in item[3]:
+			outfile.write("{"+str(object[0])+","+str(round(abs(object[1]), 2))+"},")
+		outfile.write("},")
 
-		if item[4] != []:
-			outfile.write("\t\t['items'] = {")
-			for itm in item[4]:
-				outfile.write("{"+str(itm[0])+","+str(round(abs(itm[1]), 2))+"},")
-			outfile.write("},\n")
+		outfile.write("{")
+		for itm in item[4]:
+			outfile.write("{"+str(itm[0])+","+str(round(abs(itm[1]), 2))+"},")
+		outfile.write("},")
+
+		outfile.write("{")
+		for itm in item[5]:
+			if itm[1] > 0:
+				outfile.write("{"+str(itm[0])+","+str(itm[1])+","+str(itm[2])+"},")
+			else:
+				outfile.write("{"+str(itm[0])+"},")
+		outfile.write("},\n")
+
+		outfile.write("\t\t\""+name+"\",\n")
 
 		outfile.write("\t},\n")
 	outfile.write("}")

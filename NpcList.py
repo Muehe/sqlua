@@ -3,7 +3,7 @@ from sqlua.Npc import *
 class NpcList():
 	"""Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
 	def __init__(self, cursor):
-		self.nList = []
+		self.nList = {}
 		tables = self.__getNpcTables(cursor)
 		print("Adding Npcs...")
 		count = len(tables[0])
@@ -15,7 +15,8 @@ class NpcList():
 		print("\nDone.")
 
 	def addNpc(self, npc, tables):
-		self.nList.append(Npc(npc, tables))
+		newNpc = Npc(npc, tables)
+		self.nList[newNpc.id] = newNpc
 
 	def findNpc(self, **kwargs):
 		return next(self.__iterNpc(**kwargs))
@@ -27,10 +28,10 @@ class NpcList():
 		return list(self.__iterNpcWith(*args))
 
 	def __iterNpcWith(self, *args):
-		return (npc for npc in self.nList if hasattr(npc, *args))
+		return (self.nList[npc] for npc in self.nList if hasattr(self.nList[npc], *args))
 
 	def __iterNpc(self, **kwargs):
-		return (npc for npc in self.nList if npc.match(**kwargs))
+		return (self.nList[npc] for npc in self.nList if self.nList[npc].match(**kwargs))
 
 	def __getNpcTables(self, cursor):
 		print("Selecting NPC related MySQL tables...")

@@ -397,7 +397,7 @@ def findZoneCheckCoords(npcDataOld, npcDataNew):
                 print("Non-Classic zone detected")
             break
 
-    
+
     match = False
     if (npcDataNew[-1] == []):
         zoneListNew = False
@@ -409,7 +409,7 @@ def findZoneCheckCoords(npcDataOld, npcDataNew):
             for zoneSet in zoneListNew:
                 z = [zoneSet[0], len(zoneSet[1])]
                 lengthSet.append(z)
-            
+
             x = 0
             lengthLongest = 0
             for zoneId, length in lengthSet:
@@ -444,9 +444,9 @@ def findZoneCheckCoords(npcDataOld, npcDataNew):
 def writeNpcFile(npcs, file="npcData.lua"):
     outfile = open(file, "w")
     outfile.write("npcData =\n{\n")
-    
+
     npcDataOld = getOldNPCData()
-    
+
     for npc in npcs:
         # this check is kind of useless, but better safe than sorry
         if (len(npc) == 10):
@@ -480,7 +480,7 @@ def writeNpcFile(npcs, file="npcData.lua"):
                     level = '??'
             else:
                 level = minlvl + " - " + maxlvl
-        
+
             if npc[6] == 1:
                 level = level + " Elite"
             elif npc[6] == 2:
@@ -489,7 +489,7 @@ def writeNpcFile(npcs, file="npcData.lua"):
                 level = level + " World Boss"
             elif npc[6] == 4:
                 level = level + " Rare"
-        
+
             if minlvlhp == maxlvlhp:
                 hp = minlvlhp
             else:
@@ -499,14 +499,14 @@ def writeNpcFile(npcs, file="npcData.lua"):
             outfile.write("\t\t['name'] = '" + name + "',\n")
             outfile.write("\t\t['level'] = '" + level +  "',\n")
             outfile.write("\t\t['hp'] = '" + hp + "',\n")
-        
+
             if quests[0] != []:
                 outfile.write("\t\t['starts'] = {")
                 for questId in quests[0]:
                     q = str(questId) + ","
                     outfile.write(q)
                 outfile.write("},\n")
-        
+
             if quests[1] != []:
                 outfile.write("\t\t['ends'] = {")
                 for questId in quests[1]:
@@ -515,7 +515,7 @@ def writeNpcFile(npcs, file="npcData.lua"):
                 outfile.write("},\n")
 
             outfile.write("\t\t['zone'] = " + str(zone) +  ",\n")
-            
+
             outfile.write("\t\t['zones'] =\n\t\t{\n")
             for zoneS in zoneList:
                 zoneId = "\t\t\t[" + str(zoneS[0]) + "] = {"
@@ -525,7 +525,7 @@ def writeNpcFile(npcs, file="npcData.lua"):
                     outfile.write(coord)
                 outfile.write("},\n")
             outfile.write("\t\t},\n")
-            
+
             if (waypoints):
                 outfile.write("\t\t['waypoints'] =\n\t\t{\n")
                 for zoneS in waypoints:
@@ -536,9 +536,9 @@ def writeNpcFile(npcs, file="npcData.lua"):
                         outfile.write(coord)
                     outfile.write("},\n")
                 outfile.write("\t\t},\n")
-            
+
             outfile.write("\t},\n")
-            
+
             print("Done.")
     outfile.write("}\n")
     print("Finished. Data added to", file)
@@ -578,7 +578,7 @@ def objectivesText(objectives):
 def checkSide(racemask):
     if (racemask == 0):
         return 3
-    
+
     alliance = False
     horde = False
     racem = racemask
@@ -841,7 +841,7 @@ def writeSavedQuestFile(file="qData.lua"):
 
     print("Writing file...")
     outfile.write("qData = \n{\n")
-    
+
     outfile.write("\t['Alliance'] =\n\t{\n")
     a = pickle.load(open("savea.p", "rb"))
     writeFaction(a, outfile)
@@ -853,7 +853,7 @@ def writeSavedQuestFile(file="qData.lua"):
     outfile.write("\t['Common'] =\n\t{\n")
     b = pickle.load(open("saveb.p", "rb"))
     writeFaction(b, outfile)
-    
+
     outfile.write("}\n")
     outfile.close()
     print("Finished!")
@@ -868,7 +868,7 @@ def writeQuestFile(questsANew, questsHNew, questsBNew, file="qData.lua"):
 
     print("Writing file...")
     outfile.write("qData = \n{\n")
-    
+
     outfile.write("\t['Alliance'] =\n\t{\n")
     a = getAllWHComments(questsA)
     pickle.dump(a, open("savea.p", "wb"))
@@ -884,7 +884,7 @@ def writeQuestFile(questsANew, questsHNew, questsBNew, file="qData.lua"):
     b = getAllWHComments(questsB)
     pickle.dump(b, open("saveb.p", "wb"))
     writeFaction(b, outfile)
-    
+
     outfile.write("}\n")
     outfile.close()
     print("Finished!")
@@ -979,7 +979,7 @@ def sortedObjects(obj_tbl):
 def writeObjFile(objs, file="objData.lua"):
     outfile = open(file, "w")
     outfile.write("objData =\n{\n")
-    
+
     for obj in objs:
         objid = str(obj[0])
         if obj[2] == []:
@@ -987,27 +987,27 @@ def writeObjFile(objs, file="objData.lua"):
             if obj[3] != [] or obj[4] != []:
                 print("Error: has quests <------------------------")
             continue
-        
+
         print("Adding", objid, end='... ')
         name = escapeName(str(obj[1]))
 
         outfile.write("\t[" + objid + "] =\n\t{\n")
         outfile.write("\t\t['name'] = '" + name + "',\n")
-        
+
         if obj[3] != []:
             outfile.write("\t\t['starts'] = {")
             for questId in obj[3]:
                 q = str(questId) + ","
                 outfile.write(q)
             outfile.write("},\n")
-        
+
         if obj[4] != []:
             outfile.write("\t\t['ends'] = {")
             for questId in obj[4]:
                 q = str(questId) + ","
                 outfile.write(q)
             outfile.write("},\n")
-            
+
         outfile.write("\t\t['zones'] =\n\t\t{\n")
         for zones in obj[2]:
             zoneId = "\t\t\t[" + str(zones[0]) + "] = {"
@@ -1017,9 +1017,9 @@ def writeObjFile(objs, file="objData.lua"):
                 outfile.write(coord)
             outfile.write("},\n")
         outfile.write("\t\t},\n")
-            
+
         outfile.write("\t},\n")
-            
+
         print("Done.")
     outfile.write("}\n")
     print("Finished. Data added to", file)

@@ -1,3 +1,5 @@
+from sqlua.CoordList import *
+
 class Npc():
 	spawnErrors = [] # Holds IDs of NPCs without spawns
 	waypointErrors = []
@@ -9,27 +11,29 @@ class Npc():
 		self.minlevelhealth = npc[4]
 		self.maxlevelhealth = npc[5]
 		self.rank = npc[6]
-		self.spawns = []
-		self.waypoints = []
+		spawns = []
+		waypoints = []
 		for spawn in tables[0]:
 			if (spawn[0] == self.id):
-				self.spawns.append((spawn[1], spawn[2], spawn[3]))
+				spawns.append((spawn[1], spawn[2], spawn[3]))
 				for waypoint in tables[3]:
 					if (waypoint[1] == spawn[4]):
-						self.waypoints.append((spawn[1], waypoint[2], waypoint[3]))
+						waypoints.append((spawn[1], waypoint[2], waypoint[3]))
 		wpError = False
 		for waypoint in tables[4]:
 			if (waypoint[1] == self.id):
-				if (len(self.spawns) != 1):
+				if (spawns == []):
 					if (not wpError):
 						wpError = True
 				else:
-					self.waypoints.append((self.spawns[0][0], waypoint[2], waypoint[3]))
-		if (self.spawns == []):
-			del self.spawns
+					waypoints.append((spawns[0][0], waypoint[2], waypoint[3]))
+		if (spawns == []):
 			Npc.spawnErrors.append(self.id)
-		if (self.waypoints == []) or wpError:
-			del self.waypoints
+		else:
+			self.spawns = CoordList(spawns)
+		if (waypoints != []):
+			self.waypoints = CoordList(waypoints)
+		if(wpError):
 			Npc.waypointErrors.append(self.id)
 
 	def __repr__(self):

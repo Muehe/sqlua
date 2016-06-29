@@ -1,14 +1,22 @@
 from sqlua.Quest import *
+import re
 
 class QuestList():
 	"""Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
 	def __init__(self, cursor):
-		self.qList = []
+		self.qList = {}
 		tables = self.__getQuestTables(cursor)
+		infile = open("sqlua/AreaTrigger.dbc.CSV", "r")
+		a = infile.read()
+		infile.close()
+		b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),", a)
+		areaTrigger = []
+		for x in b:
+			areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5]), float(x[6]), float(x[7]), float(x[8]), float(x[9])))
 		print("Adding Quests...")
 		count = len(tables[0])
 		for quest in tables[0]:
-			self.__addQuest(quest, tables[1:])
+			self.__addQuest(quest, tables[1:], areaTrigger)
 			if ((count % 200) == 0):
 				print(str(count)+"...", end="")
 			count -= 1
@@ -28,33 +36,34 @@ class QuestList():
 				bits.insert(0, -x)
 		return bits
 
-	"""only used by constructor"""
-	def __addQuest(self, quest, tables):
-		self.qList.append(Quest(quest, tables))
+	def __addQuest(self, quest, tables, areaTrigger):
+		"""only used by constructor"""
+		newQuest = Quest(quest, tables, areaTrigger)
+		self.qList[newQuest.id] = newQuest
 
-	"""find one quest by keyword = value, ..."""
 	def findQuest(self, **kwargs):
+		"""find one quest by keyword = value, ..."""
 		return next(self.__iterQuest(**kwargs))
 
-	"""find all quests by keyword = value, ..."""
 	def allQuests(self, **kwargs):
+		"""find all quests by keyword = value, ..."""
 		return list(self.__iterQuest(**kwargs))
 
-	"""find all quests by keyword, ..."""
 	def allQuestsWith(self, *args):
+		"""find all quests by keyword, ..."""
 		return list(self.__iterQuestWith(*args))
 
 	def __iterQuestWith(self, *args):
-		return (quest for quest in self.qList if hasattr(quest, *args))
+		return (self.qList[quest] for quest in self.qList if hasattr(self.qList[quest], *args))
 
 	def __iterQuest(self, **kwargs):
-		return (quest for quest in self.qList if quest.match(**kwargs))
+		return (self.qList[quest] for quest in self.qList if self.qList[quest].match(**kwargs))
 
-	"""only used by constructor"""
 	def __getQuestTables(self, cursor):
+		"""only used by constructor"""
 		print("Selecting quest related MySQL tables...")
 		# SrcItemId needed to check for spell_script_target (type and targetEntry) via item_template.spellId
-		cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4 FROM quest_template")
+		cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText FROM quest_template")
 		quest_template = []
 		for a in cursor.fetchall():
 			quest_template.append(a)
@@ -91,21 +100,21 @@ class QuestList():
 
 	def checkStartEnd(self):
 		"""Find quests with missing start or end points.
-		Returns a list of all objects in qList missing either.
+		Returns a list of all quest objects in qList missing either.
 		"""
 		cs = self.allQuestsWith('creatureStart')
 		gs = self.allQuestsWith('goStart')
 		its = self.allQuestsWith('itemStart')
 		xs = []
 		for q in self.qList:
-			if (q not in cs) and (q not in gs) and (q not in its):
-				xs.append(q)
+			if (self.qList[q] not in cs) and (self.qList[q] not in gs) and (self.qList[q] not in its):
+				xs.append(self.qList[q])
 		ge = self.allQuestsWith('goEnd')
 		ce = self.allQuestsWith('creatureEnd')
 		xe = []
 		for q in self.qList:
-			if (q not in ce) and (q not in ge):
-				xe.append(q)
+			if (self.qList[q] not in ce) and (self.qList[q] not in ge):
+				xe.append(self.qList[q])
 		xx = []
 		for q in xs:
 			if (q in xe):
@@ -126,17 +135,10 @@ class QuestList():
 
 	def printQuestFile(self, file="sqlua/qData.lua"):
 		outfile = open(file, "w")
-		functionString = """DB_NAME, DB_NPC = 1, 1;
-DB_STARTS, DB_OBJ = 2, 2;
-DB_ENDS, DB_ITM = 3, 3;
-DB_MIN_LEVEL, DB_ZONES = 4, 4;
-DB_LEVEL = 5;
-DB_REQ_RACE = 6;
-DB_REQ_CLASS = 7;
-DB_OBJECTIVES = 8;
-DB_TRIGGER = 9;
-DB_REQ_NPC_OR_OBJ = 10;
-function deleteFaction(str)
+		functionString = """function deleteFaction(str)
+	if (WHDB_Settings.dbMode) then
+		return;
+	end
 	local before = WHDB_GetTableLength(qData);
 	for key, data in pairs(qData) do
 		if (data[DB_REQ_RACE] == "AH") or (data[DB_REQ_RACE] ~= str) then
@@ -149,7 +151,7 @@ function deleteFaction(str)
 	WHDB_Debug_Print(2, before-after.." opposite faction quests deleted");
 end
 function deleteClasses()
-	if not WHDB_Settings.class then
+	if (not WHDB_Settings.class) or (WHDB_Settings.dbMode) then
 		return;
 	end
 	local before = WHDB_GetTableLength(qData);
@@ -203,7 +205,8 @@ end
 		outfile.write(functionString)
 		outfile.write("qData = {\n")
 		excluded = self.checkStartEnd()
-		for quest in self.qList:
+		for id in sorted(self.qList):
+			quest = self.qList[id]
 			if quest in excluded:
 				continue
 			outfile.write("\t["+str(quest.id)+"] = {") #key
@@ -264,28 +267,46 @@ end
 			else:
 				outfile.write("nil,")
 			if (hasattr(quest, "triggerEnd")): #trigger = 9
-				outfile.write("{")
-				for tri in quest.triggerEnd:
-					outfile.write(str(tri)+",")
-				outfile.write("},")
+				outfile.write("{\""+quest.triggerEnd[0]+"\",{")
+				for tri in quest.triggerEnd[1].cByZone:
+					outfile.write("["+str(tri)+"]={")
+					for c in quest.triggerEnd[1].cByZone[tri]:
+						outfile.write("{"+str(c[0])+","+str(c[1])+"},")
+					outfile.write("},")
+				outfile.write("}},")
 			else:
 				outfile.write("nil,")
-			outfile.write("{") #ReqCreatureOrGO = 10
-			if (hasattr(quest, "ReqCreatureId")): #npc = ReqCreatureOrGO1
+			outfile.write("{") #ReqCreatureOrGOOrItm = 10
+			if (hasattr(quest, "ReqCreatureId")): #npc = ReqCreatureOrGOOrItm1
 				outfile.write("{")
 				for npc in quest.ReqCreatureId:
-					outfile.write(str(npc[0])+",")
+					outfile.write("{"+str(npc[0])+",")
+					if (npc[1] != ''):
+						outfile.write("\""+npc[1]+"\"},")
+					else:
+						outfile.write("nil},")
 				outfile.write("},")
 			else:
 				outfile.write("nil,")
-			if (hasattr(quest, "ReqGOId")): #obj = ReqCreatureOrGO2
+			if (hasattr(quest, "ReqGOId")): #obj = ReqCreatureOrGOOrItm2
 				outfile.write("{")
 				for obj in quest.ReqGOId:
 					outfile.write("{"+str(abs(obj[0]))+",\""+str(obj[1])+"\"},")
 				outfile.write("},")
 			else:
 				outfile.write("nil,")
+			if (hasattr(quest, "ReqSourceId")): #itm = ReqCreatureOrGOOrItm3
+				outfile.write("{")
+				for itm in quest.ReqSourceId:
+					outfile.write(str(itm)+",")
+				outfile.write("},")
+			else:
+				outfile.write("nil,")
 			outfile.write("},")
+			if (hasattr(quest, "SrcItemId")): #SrcItemId = 11
+				outfile.write(str(quest.SrcItemId)+",")
+			else:
+				outfile.write("nil,")
 			outfile.write("},\n")
 		outfile.write("};\n")
 		outfile.close();

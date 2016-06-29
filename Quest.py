@@ -1,5 +1,7 @@
-class Quest:
-	def __init__(self, quest, tables):
+from sqlua.CoordList import *
+
+class Quest():
+	def __init__(self, quest, tables, areaTrigger):
 		self.id = quest[0]
 		self.MinLevel = quest[1]
 		self.QuestLevel = quest[2]
@@ -65,35 +67,35 @@ class Quest:
 			del self.ReqSourceId
 		self.ReqCreatureId = []
 		if (quest[29] > 0):
-			self.ReqCreatureId.append((quest[29], quest[45]))
+			self.ReqCreatureId.append((quest[29], self.escapeName(quest[45])))
 		if (quest[30] > 0):
-			self.ReqCreatureId.append((quest[30], quest[46]))
+			self.ReqCreatureId.append((quest[30], self.escapeName(quest[46])))
 		if (quest[31] > 0):
-			self.ReqCreatureId.append((quest[31], quest[47]))
+			self.ReqCreatureId.append((quest[31], self.escapeName(quest[47])))
 		if (quest[32] > 0):
-			self.ReqCreatureId.append((quest[32], quest[48]))
+			self.ReqCreatureId.append((quest[32], self.escapeName(quest[48])))
 		if (self.ReqCreatureId == []):
 			del self.ReqCreatureId
 		self.ReqGOId = []
 		if (quest[29] < 0):
-			self.ReqGOId.append((quest[29], quest[45]))
+			self.ReqGOId.append((quest[29], self.escapeName(quest[45])))
 		if (quest[30] < 0):
-			self.ReqGOId.append((quest[30], quest[46]))
+			self.ReqGOId.append((quest[30], self.escapeName(quest[46])))
 		if (quest[31] < 0):
-			self.ReqGOId.append((quest[31], quest[47]))
+			self.ReqGOId.append((quest[31], self.escapeName(quest[47])))
 		if (quest[32] < 0):
-			self.ReqGOId.append((quest[32], quest[48]))
+			self.ReqGOId.append((quest[32], self.escapeName(quest[48])))
 		if (self.ReqGOId == []):
 			del self.ReqGOId
 		self.ReqSpellCast = []
 		if (quest[33] != 0):
-			self.ReqSpellCast.append((quest[33], quest[29]))
+			self.ReqSpellCast.append((quest[33], quest[29], self.escapeName(quest[45])))
 		if (quest[34] != 0):
-			self.ReqSpellCast.append((quest[34], quest[30]))
+			self.ReqSpellCast.append((quest[34], quest[30], self.escapeName(quest[46])))
 		if (quest[35] != 0):
-			self.ReqSpellCast.append((quest[35], quest[31]))
+			self.ReqSpellCast.append((quest[35], quest[31], self.escapeName(quest[47])))
 		if (quest[36] != 0):
-			self.ReqSpellCast.append((quest[36], quest[32]))
+			self.ReqSpellCast.append((quest[36], quest[32], self.escapeName(quest[48])))
 		if (self.ReqSpellCast == []):
 			del self.ReqSpellCast
 		if (quest[37] != 0):
@@ -135,15 +137,26 @@ class Quest:
 		if (self.itemStart == []):
 			del self.itemStart
 		self.triggerEnd = []
+		triggers = []
 		for (triggerId, questId) in tables[5]:
 			if (questId == self.id):
-				self.triggerEnd.append(triggerId)
-		if (self.triggerEnd == []):
+				for trigger in areaTrigger:
+					if trigger[0] == triggerId:
+						triggers.append(trigger[1:])
+		if (triggers == []):
 			del self.triggerEnd
+		else:
+			text = ""
+			if quest[49] == '':
+				text = self.Objectives
+			else:
+				text = self.escapeName(quest[49])
+			self.triggerEnd = (text, CoordList(triggers))
 		for locales in tables[6]:
 			if locales[0] == self.id:
-				self.nameDE = locales[1]
-				self.objectivesDE = locales[1]
+				self.nameDE = self.escapeName(locales[1])
+				if (locales[2]):
+					self.objectivesDE = self.objectivesText(locales[2])
 
 	def __repr__(self):
 		return str(self.id)

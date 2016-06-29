@@ -21,4 +21,4 @@ Now you are ready to use the functions and classes. E.g. use:
  * ```q = QuestList(cursor)``` to generate a list holding all quests in the DB.
  * ```vars(q.allQuests(Title = "The Defias Brotherhood"))``` to see the properties of all quests with this name.
  * ```defiasChain = q.allQuests(Title = "The Defias Brotherhood")``` to get a list of Quest() objects with this name.
- * ```q.printQuestFile("sqlua/questDB.lua")``` to generate a DB file. 
+ * ```q.printQuestFile("sqlua/questDB.lua")``` to generate a DB file.
