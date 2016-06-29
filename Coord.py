@@ -8,6 +8,7 @@ Data Definitions
 
 """
 
+"""(zoneId, minLevel, maxLevel)"""
 zoneLevelList = [(1, 1, 10),
                  (3, 35, 45),
                  (4, 45, 55),
@@ -54,6 +55,8 @@ zoneLevelList = [(1, 1, 10),
                  (1637, 1, 60),
                  (1638, 1, 60),
                  (1657, 1, 60)]
+
+"""(zoneId, zoneName, mapId, minX, maxX, minY, maxY)"""
 mapBorders = [(1, 'Dun Morogh', 0, 1802.08325195313, -3122.91650390625, -3877.08325195313, -7160.41650390625),
 			  (3, 'Badlands', 0, -2079.16650390625, -4566.66650390625, -5889.5830078125, -7547.91650390625),
 			  (4, 'Blasted Lands', 0, -1241.66662597656, -4591.66650390625, -10566.666015625, -12800),
@@ -100,6 +103,8 @@ mapBorders = [(1, 'Dun Morogh', 0, 1802.08325195313, -3122.91650390625, -3877.08
 			  (1637, 'Orgrimmar', 1, -3680.60107421875, -5083.20556640625, 2273.87719726563, 1338.46057128906),
 			  (1638, 'Thunder Bluff', 1, 516.666625976563, -527.083312988281, -849.999938964844, -1545.83325195313),
 			  (1657, 'Darnassus', 1, 2938.36279296875, 1880.02954101563, 10238.31640625, 9532.5869140625)]
+
+"""(zoneId, name, mapId)"""
 instanceIds = [(209, 'Shadowfang Keep', 33),
 			   (491, 'Razorfen Kraul', 47),
 			   (717, 'Stormwind Stockade', 34),
@@ -151,9 +156,10 @@ instanceIds = [(209, 'Shadowfang Keep', 33),
 
 continentBorders = [(5, 'Eastern Kingdoms', 0, 16000, -19199.900390625, 7466.60009765625, -16000),
 					(6, 'Kalimdor', 1, 17066.599609375, -19733.2109375, 12799.900390625, -11733.2998046875)]
-
+"""These zoneIds are on the world map."""
 validZoneList = [1, 3, 4, 8, 10, 11, 12, 14, 15, 16, 17, 28, 33, 36, 38, 40, 41, 44, 45, 46, 47, 51, 85, 130, 139, 141, 148, 215, 267, 331, 357, 361, 400, 405, 406, 440, 490, 493, 618, 1377, 1497, 1519, 1537, 1637, 1638, 1657]
 
+"""Key for zoneIds that are subzones of an instance."""
 instanceKey = [	(1581, 40),
 				(796, 85),
 				(2557, 357),
@@ -187,12 +193,15 @@ instanceKey = [	(1581, 40),
 """
 
 ######################################
-NPC functions
+Coord class
 ######################################
 
 
 """
+
 class Coord():
+    """This class takes a (x,y) point from the continent maps and creates a dictionary of all possible zone (x,y) coordinates.
+       If the map/zone belongs to an instance a dummy is added."""
 	def __init__(self, mapId, x, y):
 		self.pointList = {}
 		self.isInstance = False
@@ -223,70 +232,3 @@ class Coord():
 		for c in self.pointList:
 			points += "("+str(c)+": "+str(self.pointList[c])+")"
 		return points
-
-"""
-def calculateWorldInstanceCoords(zoneId, x, y):
-	for mapSet in mapBorders:
-		zone = int(mapSet[0])
-		mId = int(mapSet[2])
-		x1 = float(mapSet[5])
-		x2 = float(mapSet[6])
-		y1 = float(mapSet[3])
-		y2 = float(mapSet[4])
-		for instance in instanceKey:
-			if instance[0] == zoneId:
-				zoneX = instance[1]
-				for mapSet2 in mapBorders:
-					if (mapSet2[0] == zoneX)and (x < x1) and (x > x2) and (y < y1) and (y > y2):
-						xCoord = round(abs((x-x1)/(x2-x1)*100), 2)
-						yCoord = round(abs((y-y1)/(y2-y1)*100), 2)
-						return (zoneX, yCoord, xCoord)
-
-	return False
-
-def calculateCoords(point): # 0: id, 1: guid, 2: map, 3: x, 4: y, 5: zone
-	for mapSet in mapBorders:
-		zone = mapSet[0]
-		mapId = mapSet[2]
-		x1 = mapSet[5]
-		x2 = mapSet[6]
-		y1 = mapSet[3]
-		y2 = mapSet[4]
-		if (mapId == point[2]) and (point[3] < x1) and (point[3] > x2) and (point[4] < y1) and (point[4] > y2) and (zone == point[5]):
-			xCoord = round(abs((point[3]-x1)/(x2-x1)*100), 2)
-			yCoord = round(abs((point[4]-y1)/(y2-y1)*100), 2)
-			z = (zone, yCoord, xCoord)
-			return z
-
-	for instance in instanceIds:
-		zoneId = int(instance[0])
-		mapId = int(instance[2])
-		# test for zoneId here instead?
-		if (mapId == point[2]):
-			z = [zoneId, -1, -1]
-			return z
-		elif (zoneId == point[5]) and ((point[2] == 0) or (point[2] == 1)):
-			z = calculateWorldInstanceCoords(point[5], point[3], point[4])
-			if z:
-				return z
-			else:
-				print("Instance error for", end=": ")
-				print(point)
-				return False
-	""""""
-	for continent in continentBorders:
-		cId = int(continent[2])
-		if (mapId == cId):
-			zone = int(continent[0])
-			x1 = float(continent[5])
-			x2 = float(continent[6])
-			y1 = float(continent[3])
-			y2 = float(continent[4])
-			xCoord = round(abs((x-x1)/(x2-x1)*100), 2)
-			yCoord = round(abs((y-y1)/(y2-y1)*100), 2)
-			z = [zone, yCoord, xCoord]
-			zones.append(z)
-	""""""
-	print("Error with coordinates for", end=":")
-	print(point)
-	return False"""
