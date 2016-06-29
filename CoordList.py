@@ -6,10 +6,13 @@ class CoordList():
 		self.cList = []
 		self.cByZone = {}
 		for coord in coordTable:
-			self.addCoord(coord[0], coord[1], coord[2])
+			if len(coord) > 3:
+				self.addCoord(coord[0], coord[1], coord[2], coord[3])
+			else:
+				self.addCoord(coord[0], coord[1], coord[2])
 
-	def addCoord(self, map, x, y):
-		newCoord = Coord(map, x, y)
+	def addCoord(self, map, x, y, zone=False):
+		newCoord = Coord(map, x, y, zone)
 		if newCoord.pointList != {}:
 			self.cList.append(newCoord)
 			for c in newCoord.pointList:

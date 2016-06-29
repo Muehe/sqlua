@@ -200,14 +200,16 @@ Coord class
 """
 
 class Coord():
-    """This class takes a (x,y) point from the continent maps and creates a dictionary of all possible zone (x,y) coordinates.
-       If the map/zone belongs to an instance a dummy is added."""
-	def __init__(self, mapId, x, y):
+	"""This class takes a (x,y) point from the continent maps and creates a dictionary of all possible zone (x,y) coordinates.
+	   If the map/zone belongs to an instance a dummy is added."""
+	def __init__(self, mapId, x, y, zoneId=False):
 		self.pointList = {}
 		self.isInstance = False
 		self.isMulti = False
 		for mapSet in mapBorders:
 			zone = int(mapSet[0])
+			if zoneId and zone != zoneId:
+				continue
 			mId = int(mapSet[2])
 			x1 = float(mapSet[5])
 			x2 = float(mapSet[6])
