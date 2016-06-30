@@ -6,9 +6,9 @@ from sqlua.Items import *
 import pymysql
 
 dbc = pymysql.connect('localhost', 'mangos', 'mangos', 'mangos') # host, user, pw, db name
-cursor = dbc.cursor()
+cur = dbc.cursor()
 
-def doExtract(cur=cursor):
+def doExtract(cursor=cur):
 	quests = QuestList(cursor)
 	npcs = NpcList(cursor)
 	obj = ObjList(cursor)
@@ -21,4 +21,5 @@ def doExtract(cur=cursor):
 	print("Printing object file...")
 	obj.printObjFile()
 	print("Done.")
+	doItems(cursor)
 	return quests, npcs, obj
