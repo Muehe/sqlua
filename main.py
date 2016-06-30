@@ -1,13 +1,24 @@
 from sqlua.QuestList import *
 from sqlua.NpcList import *
+from sqlua.ObjList import *
+from sqlua.CoordList import *
+from sqlua.Items import *
 import pymysql
+
 dbc = pymysql.connect('localhost', 'mangos', 'mangos', 'mangos') # host, user, pw, db name
 cursor = dbc.cursor()
 
-def doQuests(cursor):
+def doExtract(cur=cursor):
 	quests = QuestList(cursor)
 	npcs = NpcList(cursor)
+	obj = ObjList(cursor)
 	print("Printing quest file...")
-	quests.printShaguQuestFile(npcs)
+	quests.printQuestFile()
 	print("Done.")
-	return quests, npcs
+	print("Printing NPC file...")
+	npcs.printNpcFile()
+	print("Done.")
+	print("Printing object file...")
+	obj.printObjFile()
+	print("Done.")
+	return quests, npcs, obj
