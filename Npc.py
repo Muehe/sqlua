@@ -24,6 +24,8 @@ class Npc():
         self.minlevelhealth = npc[4]
         self.maxlevelhealth = npc[5]
         self.rank = npc[6]
+        self.factionA =  npc[7]
+        self.factionH =  npc[8]
         spawns = []
         waypoints = []
         for spawn in tables[0]:
