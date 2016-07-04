@@ -280,11 +280,11 @@ end
             if (hasattr(quest, "ReqCreatureId")): #npc = ReqCreatureOrGOOrItm1
                 outfile.write("{")
                 for npc in quest.ReqCreatureId:
-                    outfile.write("{"+str(npc[0])+",")
+                    outfile.write("{"+str(npc[0]))
                     if (npc[1] != ''):
-                        outfile.write("\""+npc[1]+"\"},")
+                        outfile.write(",\""+npc[1]+"\"},")
                     else:
-                        outfile.write("nil},")
+                        outfile.write("},")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
