@@ -136,10 +136,10 @@ class QuestList():
     def printQuestFile(self, file="sqlua/qData.lua"):
         outfile = open(file, "w")
         functionString = """function deleteFaction(str)
-    if (WHDB_Settings.dbMode) then
+    if (ShaguDB_Settings.dbMode) then
         return;
     end
-    local before = WHDB_GetTableLength(qData);
+    local before = ShaguDB_GetTableLength(qData);
     for key, data in pairs(qData) do
         if (data[DB_REQ_RACE] == "AH") or (data[DB_REQ_RACE] ~= str) then
             data[DB_REQ_RACE] = nil;
@@ -147,18 +147,18 @@ class QuestList():
             qData[key] = nil;
         end
     end
-    local after = WHDB_GetTableLength(qData);
-    WHDB_Debug_Print(2, before-after.." opposite faction quests deleted");
+    local after = ShaguDB_GetTableLength(qData);
+    ShaguDB_Debug_Print(2, before-after.." opposite faction quests deleted");
 end
 function deleteClasses()
-    if (not WHDB_Settings.class) or (WHDB_Settings.dbMode) then
+    if (not ShaguDB_Settings.class) or (ShaguDB_Settings.dbMode) then
         return;
     end
-    local before = WHDB_GetTableLength(qData);
+    local before = ShaguDB_GetTableLength(qData);
     local classes = {"Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", "Druid"};
     local playerClass = false;
     for key, name in pairs(classes) do
-        if name == WHDB_Settings.class then
+        if name == ShaguDB_Settings.class then
             playerClass = key - 1;
         end
     end
@@ -177,8 +177,8 @@ function deleteClasses()
             end
         end
     end
-    local after = WHDB_GetTableLength(qData);
-    WHDB_Debug_Print(2, before-after.." other class quests deleted");
+    local after = ShaguDB_GetTableLength(qData);
+    ShaguDB_Debug_Print(2, before-after.." other class quests deleted");
 end
 qLookup = {};
 function fillQuestLookup()
@@ -310,41 +310,6 @@ end
             outfile.write("},\n")
         outfile.write("};\n")
         outfile.close();
-
-    def printShaguQuestFile(self, npcs, file="sqlua/questDB.lua"):
-        outfile = open(file, "w")
-        outfile.write("questDB = {\n")
-        excluded = self.checkStartEnd()
-        checked = []
-        for quest in self.qList:
-            if quest in excluded:
-                continue
-            if quest.Title not in checked:
-                checked.append(quest.Title)
-            else:
-                continue
-            start = []
-            end = []
-            for q in self.allQuests(Title = quest.Title):
-                if not (q in excluded):
-                    if hasattr(q, "creatureStart"):
-                        for id in q.creatureStart:
-                            if not id in start:
-                                start.append(id)
-                    if hasattr(q, "creatureEnd"):
-                        for id in q.creatureEnd:
-                            if not id in end:
-                                end.append(id)
-            outfile.write("\t[\""+quest.Title+"\"] = {\n")
-            for q in end:
-                if not q in start:
-                    start.append(q)
-            for npc in start:
-                found = npcs.findNpc(id = npc)
-                outfile.write("\t\t[\""+found.name+"\"] = 'NPC',\n")
-            outfile.write("\t},\n")
-        outfile.write("};")
-        outfile.close()
 
     def getFactionString(self, requiredRaces):
         if requiredRaces == 0:
