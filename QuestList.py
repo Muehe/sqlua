@@ -3,7 +3,7 @@ import re
 
 class QuestList():
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor):
+    def __init__(self, cursor, locale = "enGB"):
         self.qList = {}
         tables = self.__getQuestTables(cursor)
         infile = open("sqlua/AreaTrigger.dbc.CSV", "r")
@@ -13,6 +13,53 @@ class QuestList():
         areaTrigger = []
         for x in b:
             areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5]), float(x[6]), float(x[7]), float(x[8]), float(x[9])))
+        if locale == "deDE":
+            questNames = {}
+            for quest in tables[7]: # fill the dictionary
+                questNames[quest[0]] = quest
+            count = 0;
+            for quest in tables[0]: # replace enGB names
+                if quest[0] in questNames: # only when translation is found
+                    # 0entry, 19Title, 20Objectives, 45ObjectiveText1, 46ObjectiveText2, 47ObjectiveText3, 48ObjectiveText4, 49EndText
+                    # 0entry, 1Title_loc3, 2Objectives_loc3, 3ObjectiveText1_loc3, 4ObjectiveText2_loc3, 5ObjectiveText3_loc3, 6ObjectiveText4_loc3, 7EndText_loc3
+                    q = list(quest)
+                    if questNames[quest[0]][1] != None:
+                        q[19] = questNames[quest[0]][1]
+                    else:
+                        if q[19] and q[19] != '':
+                            q[19] = "TRANSLATION MISSING IN GMDB: "+q[19]
+                    if questNames[quest[0]][2] != None:
+                        q[20] = questNames[quest[0]][2]
+                    else:
+                        if q[20] and q[20] != '':
+                            q[20] = "TRANSLATION MISSING IN GMDB: "+q[20]
+                    if questNames[quest[0]][3] != None:
+                        q[45] = questNames[quest[0]][3]
+                    else:
+                        if q[45] and q[45] != '':
+                            q[45] = "TRANSLATION MISSING IN GMDB: "+q[45]
+                    if questNames[quest[0]][4] != None:
+                        q[46] = questNames[quest[0]][4]
+                    else:
+                        if q[46] and q[46] != '':
+                            q[46] = "TRANSLATION MISSING IN GMDB: "+q[46]
+                    if questNames[quest[0]][5] != None:
+                        q[47] = questNames[quest[0]][5]
+                    else:
+                        if q[47] and q[47] != '':
+                            q[47] = "TRANSLATION MISSING IN GMDB: "+q[47]
+                    if questNames[quest[0]][6] != None:
+                        q[48] = questNames[quest[0]][6]
+                    else:
+                        if q[48] and q[48] != '':
+                            q[48] = "TRANSLATION MISSING IN GMDB: "+q[48]
+                    if questNames[quest[0]][7] != None:
+                        q[49] = questNames[quest[0]][7]
+                    else:
+                        if q[49] and q[49] != '':
+                            q[49] = "TRANSLATION MISSING IN GMDB: "+q[49]
+                    tables[0][count] = tuple(q)
+                count += 1
         print("Adding Quests...")
         count = len(tables[0])
         for quest in tables[0]:
@@ -91,12 +138,12 @@ class QuestList():
         areatrigger_involvedrelation = []
         for a in cursor.fetchall():
             areatrigger_involvedrelation.append(a)
-        cursor.execute("SELECT entry, Title_loc3, Objectives_loc3, ObjectiveText1_loc3, ObjectiveText2_loc3, ObjectiveText3_loc3, ObjectiveText4_loc3 FROM locales_quest")
-        loc_quest = []
+        cursor.execute("SELECT entry, Title_loc3, Objectives_loc3, ObjectiveText1_loc3, ObjectiveText2_loc3, ObjectiveText3_loc3, ObjectiveText4_loc3, EndText_loc3 FROM locales_quest")
+        loc_quest_deDE = []
         for a in cursor.fetchall():
-            loc_quest.append(a)
+            loc_quest_deDE.append(a)
         print("Done.")
-        return (quest_template, creature_involvedrelation, gameobject_involvedrelation, creature_questrelation, gameobject_questrelation, item_questrelation, areatrigger_involvedrelation, loc_quest)
+        return [quest_template, creature_involvedrelation, gameobject_involvedrelation, creature_questrelation, gameobject_questrelation, item_questrelation, areatrigger_involvedrelation, loc_quest_deDE]
 
     def checkStartEnd(self):
         """Find quests with missing start or end points.

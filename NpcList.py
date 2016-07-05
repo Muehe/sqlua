@@ -2,9 +2,20 @@ from sqlua.Npc import *
 
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor):
+    def __init__(self, cursor, locale = "enGB"):
         self.nList = {}
         tables = self.__getNpcTables(cursor)
+        if locale == "deDE":
+            newTable = []
+            npcNames = {}
+            for npc in tables[6]: # fill the dictionary
+                npcNames[npc[0]] = npc[1]
+            for npc in tables[0]: # replace enGB names
+                if npcNames[npc[0]] != '': # only when translation is found
+                    newTable.append((npc[0], npcNames[npc[0]], npc[2], npc[3], npc[4], npc[5], npc[6], npc[7], npc[8]))
+                else:
+                    newTable.append(npc)
+            tables[0] = newTable
         print("Adding Npcs...")
         count = len(tables[0])
         for npc in tables[0]:
@@ -59,9 +70,13 @@ class NpcList():
         npc_mov_tpl = []
         for a in cursor.fetchall():
             npc_mov_tpl.append(a)
+        cursor.execute("SELECT entry, name_loc3 FROM locales_creature")
+        npc_loc_deDE = []
+        for a in cursor.fetchall():
+            npc_loc_deDE.append(a)
         print("Done.")
 
-        return [npc_tpl, npc, npc_start, npc_end, npc_mov, npc_mov_tpl]
+        return [npc_tpl, npc, npc_start, npc_end, npc_mov, npc_mov_tpl, npc_loc_deDE]
 
     def printNpcFile(self, file="sqlua/npcData.lua"):
         outfile = open(file, "w")

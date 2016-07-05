@@ -11,7 +11,8 @@ Not yet a class...
 
 """
 def doItems(cursor):
-    writeItemFile(sortItemTables(getItemTables(cursor)), "sqlua/itemData.lua")
+    items = writeItemFile(sortItemTables(getItemTables(cursor)), "sqlua/itemData.lua")
+    return items
 
 def objectivesText(objectives):
     split = objectives.split('$B')
@@ -84,9 +85,14 @@ def getItemTables(cursor):
     for a in cursor.fetchall():
         quest.append(a)
 
+    cursor.execute("SELECT entry, name_loc3 FROM locales_item")
+    item_loc_deDE = []
+    for a in cursor.fetchall():
+        item_loc_deDE.append(a)
+
     print("Done.")
 
-    return [item_tpl, npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl, npc_vendor_tpl, npc_vendor, quest]
+    return [item_tpl, npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl, npc_vendor_tpl, npc_vendor, quest, item_loc_deDE]
 
 # entry, item, ChanceOrQuestChance, groupid, mincountOrRef
 def getRefGroup(refLootTable, entry, chance):
@@ -175,6 +181,44 @@ def checkForItem(newLootTable, item):
     return False
 
 def sortItemTables(itemTables):
+    # entry, item, ChanceOrQuestChance, groupid, mincountOrRef
+    npcLootByGroup = {}
+    for npc in itemTables[1]:
+        npcLootByGroup[npc[0]] = npc
+    npcLootByItem = {}
+    for npc in itemTables[1]:
+        if npc[1] is in npcLootByItem:
+            npcLootByItem.append(npc)
+        else:
+            npcLootByItem[npc[1]] = [npc]
+    objLootByGroup = {}
+    for obj in itemTables[2]:
+        objLootByGroup[obj[0]] = obj
+    objLootByItem = {}
+    for obj in itemTables[2]:
+        if obj[1] is in objLootByItem:
+            objLootByItem.append(obj)
+        else:
+            objLootByItem[obj[1]] = [obj]
+    itmLootByGroup = {}
+    for itm in itemTables[3]:
+        itmLootByGroup[itm[0]] = itm
+    itmLootByItem = {}
+    for itm in itemTables[3]:
+        if itm[1] is in itmLootByItem:
+            itmLootByItem.append(itm)
+        else:
+            itmLootByItem[itm[1]] = [itm]
+    refLootByGroup = {}
+    for ref in itemTables[4]:
+        refLootByGroup[ref[0]] = ref
+    refLootByItem = {}
+    for ref in itemTables[4]:
+        if ref[1] is in refLootByItem:
+            refLootByItem.append(ref)
+        else:
+            refLootByItem[ref[1]] = [ref]
+
     print("Sorting NPC loot tables...")
     npcs = sortLootTable(itemTables[1], itemTables[4])
     print("\nAdding NPC ID's...")
@@ -241,10 +285,18 @@ def sortItemTables(itemTables):
         if count % 100 == 0:
             print(count, end="... ")
     print("\nDone.")
-#[item_tpl, npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl, npc_vendor_tpl, npc_vendor, quest]
-    return drops
+#[item_tpl, npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl, npc_vendor_tpl, npc_vendor, quest, item_loc_deDE]
+    return [drops, itemTables[10]]
 
-def writeItemFile(items, file="sqlua/itemData.lua"):
+def writeItemFile(itemData, locale = "enGB", file = "sqlua/itemData.lua"):
+    items = itemData[0]
+    if locale == "deDE":
+        itemNames = {}
+        for item in itemData[1]:
+            itemNames[item[0]] = item[1]
+        for item in items:
+            if itemNames[item[0]] != '':
+                item[1] = itemNames[item[0]]
     outfile = open(file, "w")
 
     outfile.write("itemLookup = {\n")
@@ -292,3 +344,5 @@ def writeItemFile(items, file="sqlua/itemData.lua"):
 
         outfile.write("\t},\n")
     outfile.write("}")
+
+    return items

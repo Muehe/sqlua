@@ -2,9 +2,20 @@ from sqlua.Obj import *
 
 class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor):
+    def __init__(self, cursor, locale = "enGB"):
         self.objectList = {}
         tables = self.__getObjTables(cursor)
+        if locale == "deDE":
+            newTable = []
+            objNames = {}
+            for obj in tables[4]: # fill the dictionary
+                objNames[obj[0]] = obj[1]
+            for obj in tables[0]: # replace enGB names
+                if objNames[obj[0]] != '': # only when translation is found
+                    newTable.append((obj[0], objNames[obj[0]], obj[2], obj[3], obj[4]))
+                else:
+                    newTable.append(obj)
+            tables[0] = newTable
         print("Adding Objs...")
         count = len(tables[0])
         for obj in tables[0]:
@@ -51,9 +62,13 @@ class ObjList():
         obj_end = []
         for a in cursor.fetchall():
             obj_end.append(a)
+        cursor.execute("SELECT entry, name_loc3 FROM locales_gameobject")
+        obj_loc_deDE = []
+        for a in cursor.fetchall():
+            obj_loc_deDE.append(a)
         print("Done.")
 
-        return [obj_tpl, obj, obj_start, obj_end]
+        return [obj_tpl, obj, obj_start, obj_end, obj_loc_deDE]
 
     def printObjFile(self, file="sqlua/objData.lua"):
         outfile = open(file, "w")

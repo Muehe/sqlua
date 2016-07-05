@@ -152,11 +152,11 @@ class Quest():
             else:
                 text = self.escapeName(quest[49])
             self.triggerEnd = (text, CoordList(triggers))
-        for locales in tables[6]:
+        """for locales in tables[6]:
             if locales[0] == self.id:
                 self.nameDE = self.escapeName(locales[1])
                 if (locales[2]):
-                    self.objectivesDE = self.objectivesText(locales[2])
+                    self.objectivesDE = self.objectivesText(locales[2])"""
 
     def __repr__(self):
         return str(self.id)
