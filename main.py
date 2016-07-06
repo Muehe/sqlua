@@ -5,6 +5,14 @@ from sqlua.CoordList import *
 from sqlua.Items import *
 import pymysql
 
+"""
+Usage:
+* Install pymysql package for python.
+* Apply your MySQL information to the line below.
+* Start python from sqlua's root folder and use "exec(open("sqlua/main.py").read())".
+* Use "quests, npcs, obj, items = doExtract(cur)"
+* Go make a coffee, do you laundry, save the world, etc.
+"""
 dbc = pymysql.connect('localhost', 'mangos', 'mangos', 'mangos') # host, user, pw, db name
 cur = dbc.cursor()
 
@@ -21,5 +29,5 @@ def doExtract(cursor=cur):
     print("Printing object file...")
     obj.printObjFile()
     print("Done.")
-    doItems(cursor)
-    return quests, npcs, obj
+    items = doItems(cursor)
+    return quests, npcs, obj, items

@@ -331,7 +331,7 @@ end
                     if (npc[1] != ''):
                         outfile.write(",\""+npc[1]+"\"},")
                     else:
-                        outfile.write("},")
+                        outfile.write(",nil},")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
@@ -342,10 +342,18 @@ end
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "ReqSourceId")): #itm = ReqCreatureOrGOOrItm3
+            if (hasattr(quest, "ReqSourceId")) or (hasattr(quest, "ReqItemId")): #itm = ReqCreatureOrGOOrItm3
                 outfile.write("{")
-                for itm in quest.ReqSourceId:
-                    outfile.write(str(itm)+",")
+                if (hasattr(quest, "ReqSourceId")):
+                    done = []
+                    for itm in quest.ReqSourceId:
+                        if itm in done:
+                            continue
+                        outfile.write("{"+str(itm)+",nil},")
+                        done.append(itm)
+                if (hasattr(quest, "ReqItemId")):
+                    for itm in quest.ReqItemId:
+                        outfile.write("{"+str(itm)+",nil},")
                 outfile.write("},")
             else:
                 outfile.write("nil,")

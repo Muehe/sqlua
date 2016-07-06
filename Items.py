@@ -182,6 +182,7 @@ def checkForItem(newLootTable, item):
 
 def sortItemTables(itemTables):
     # entry, item, ChanceOrQuestChance, groupid, mincountOrRef
+    """
     npcLootByGroup = {}
     for npc in itemTables[1]:
         npcLootByGroup[npc[0]] = npc
@@ -218,6 +219,7 @@ def sortItemTables(itemTables):
             refLootByItem.append(ref)
         else:
             refLootByItem[ref[1]] = [ref]
+    """
 
     print("Sorting NPC loot tables...")
     npcs = sortLootTable(itemTables[1], itemTables[4])
