@@ -425,6 +425,41 @@ end
                 outfile.write(str(quest.SrcItemId)+",")
             else:
                 outfile.write("nil,")
+            if (hasattr(quest, "PreQuestGroup")): # 12
+                outfile.write("{")
+                for questId in quest.PreQuestGroup:
+                    outfile.write(str(questId)+",")
+                outfile.write("},")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "PreQuestSingle")): # 13
+                outfile.write("{")
+                for questId in quest.PreQuestSingle:
+                    outfile.write(str(questId)+",")
+                outfile.write("},")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "SubQuests")): # 14
+                outfile.write("{")
+                for questId in quest.SubQuests:
+                    outfile.write(str(questId)+",")
+                outfile.write("},")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "InGroupWith")): # 15
+                outfile.write("{")
+                for questId in quest.InGroupWith:
+                    outfile.write(str(questId)+",")
+                outfile.write("},")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "ExclusiveTo")): # 16
+                outfile.write("{")
+                for questId in quest.ExclusiveTo:
+                    outfile.write(str(questId)+",")
+                outfile.write("},")
+            else:
+                outfile.write("nil,")
             outfile.write("},\n")
         outfile.write("};\n")
         outfile.close();
