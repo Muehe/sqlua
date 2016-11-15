@@ -68,6 +68,69 @@ class QuestList():
                 print(str(count)+"...", end="")
             count -= 1
         print("\nDone.")
+        print("Sort quest chain information...")
+        excluded = self.checkStartEnd() # quests that have no start or end point
+        for questId in self.qList:
+            quest = self.qList[questId]
+            if quest in excluded:
+                continue
+            if hasattr(quest, "ExclusiveGroup"):
+                group = self.allQuests(ExclusiveGroup = quest.ExclusiveGroup)
+                for q in group:
+                    if q in excluded:
+                        group.remove(q)
+                if quest.ExclusiveGroup > 0:
+                    for q in group:
+                        if q.id != quest.id:
+                            quest.addExclusive(q.id)
+                else: # quest.ExclusiveGroup < 0
+                    for q in group:
+                        if q.id != quest.id:
+                            quest.addGroup(q.id)
+        for questId in self.qList:
+            quest = self.qList[questId]
+            if quest.ExclusiveTo == []:
+                delattr(quest, "ExclusiveTo")
+            if quest.InGroupWith == []:
+                delattr(quest, "InGroupWith")
+        for questId in self.qList:
+            quest = self.qList[questId]
+            if quest in excluded:
+                continue
+            if hasattr(quest, "PrevQuestId"):
+                if quest.PrevQuestId > 0:
+                    # this should be the proper way to do it according to wiki, but due to the core handeling it differently the following fragment is deactivated
+                    # left here in case I want to debug the core/db later
+                    """
+                    if hasattr(self.qList[quest.PrevQuestId], "InGroupWith"):
+                        quest.addPreGroup(quest.PrevQuestId)
+                    else: # has either ExclusiveTo or no ExclusiveGroup
+                        quest.addPreSingle(quest.PrevQuestId)
+                    """
+                    # replacement for how core works atm.:
+                    quest.addPreSingle(quest.PrevQuestId)
+                else: # quest.PrevQuestId < 0
+                    self.qList[abs(quest.PrevQuestId)].addSub(questId)
+            if hasattr(quest, "NextQuestId"):
+                if quest.NextQuestId > 0:
+                    postQuest = self.qList[quest.NextQuestId]
+                    if hasattr(quest, "InGroupWith"):
+                        postQuest.addPreGroup(questId)
+                        for questId2 in quest.InGroupWith:
+                            postQuest.addPreGroup(questId2)
+                    else:
+                        postQuest.addPreSingle(questId)
+                else: # quest.NextQuestId < 0
+                    quest.addSub(abs(quest.NextQuestId))
+        for questId in self.qList:
+            quest = self.qList[questId]
+            if quest.PreQuestSingle == []:
+                delattr(quest, "PreQuestSingle")
+            if quest.PreQuestGroup == []:
+                delattr(quest, "PreQuestGroup")
+            if quest.SubQuests == []:
+                delattr(quest, "SubQuests")
+        print("\nDone.")
 
     def unpackBitMask(self, bitMask):
         bits = []

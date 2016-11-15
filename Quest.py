@@ -152,6 +152,11 @@ class Quest():
             else:
                 text = self.escapeName(quest[49])
             self.triggerEnd = (text, CoordList(triggers))
+        self.ExclusiveTo = []
+        self.InGroupWith = []
+        self.PreQuestGroup = []
+        self.PreQuestSingle = []
+        self.SubQuests = []
         """for locales in tables[6]:
             if locales[0] == self.id:
                 self.nameDE = self.escapeName(locales[1])
@@ -184,3 +189,23 @@ class Quest():
         split4 = temp.split('$n')
         temp = '$N'.join(split4)
         return self.escapeName(temp)
+
+    def addGroup(self, value):
+        if value not in self.InGroupWith:
+            self.InGroupWith.append(value)
+
+    def addExclusive(self, value):
+        if value not in self.ExclusiveTo:
+            self.ExclusiveTo.append(value)
+
+    def addPreGroup(self, value):
+        if value not in self.PreQuestGroup:
+            self.PreQuestGroup.append(value)
+
+    def addPreSingle(self, value):
+        if value not in self.PreQuestSingle:
+            self.PreQuestSingle.append(value)
+
+    def addSub(self, value):
+        if value not in self.SubQuests:
+            self.SubQuests.append(value)
