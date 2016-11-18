@@ -464,6 +464,54 @@ end
         outfile.write("};\n")
         outfile.close();
 
+    def printQuestieAddendum(self, file='sqlua/'):
+        questSort = {}
+        excluded = self.checkStartEnd()
+        print("Sorting quests by title...")
+        for id in sorted(self.qList):
+            quest = self.qList[id]
+            if quest in excluded:
+                continue
+            if quest.Title in questSort:
+                questSort[quest.Title].append(quest.id)
+            else:
+                questSort[quest.Title] = [quest.id]
+        print("Done.")
+        print("Printing file "+file)
+        outfile = open(file, "w")
+
+        outfile.write("local N = UnitName(\"player\");\nlocal R = UnitRace(\"player\");\nQuestieLevLookup = {\n")
+
+        for title in questSort:
+            outfile.write(" [\"")
+            outfile.write(title)
+            outfile.write("\"]={\n")
+            for id in questSort[title]:
+                quest = self.qList[id]
+                outfile.write("  [\"")
+                if (hasattr(quest, "Objectives")):
+                    if quest.id == 4641:
+                        quest.Objectives = quest.Objectives[0:-5]
+                    outfile.write(quest.Objectives)
+                outfile.write("\"]={")
+                outfile.write(str(quest.RequiredRaces))
+                outfile.write(",")
+                outfile.write(str(id))
+                outfile.write("},\n")
+            outfile.write(" },\n")
+
+        """
+        outfile.write("}\n\nQuestieHashMap = {\n")
+        for id in sorted(self.qList):
+            quest = self.qList[id]
+            if quest in excluded:
+                continue
+            outfile.write(" [")
+            outfile.write(str(id))
+            outfile.write("]={\n")
+        print("Done.")
+        """
+
     def getFactionString(self, requiredRaces):
         if requiredRaces == 0:
             return "AH"
