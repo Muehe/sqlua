@@ -66,25 +66,25 @@ class Quest():
         if (self.ReqSourceId == []):
             del self.ReqSourceId
         self.ReqCreatureId = []
-        if (quest[29] > 0):
+        if ((quest[29] > 0) and (quest[33] == 0)):
             self.ReqCreatureId.append((quest[29], self.escapeName(quest[45])))
-        if (quest[30] > 0):
+        if ((quest[30] > 0) and (quest[34] == 0)):
             self.ReqCreatureId.append((quest[30], self.escapeName(quest[46])))
-        if (quest[31] > 0):
+        if ((quest[31] > 0) and (quest[35] == 0)):
             self.ReqCreatureId.append((quest[31], self.escapeName(quest[47])))
-        if (quest[32] > 0):
+        if ((quest[32] > 0) and (quest[36] == 0)):
             self.ReqCreatureId.append((quest[32], self.escapeName(quest[48])))
         if (self.ReqCreatureId == []):
             del self.ReqCreatureId
         self.ReqGOId = []
-        if (quest[29] < 0):
-            self.ReqGOId.append((quest[29], self.escapeName(quest[45])))
-        if (quest[30] < 0):
-            self.ReqGOId.append((quest[30], self.escapeName(quest[46])))
-        if (quest[31] < 0):
-            self.ReqGOId.append((quest[31], self.escapeName(quest[47])))
-        if (quest[32] < 0):
-            self.ReqGOId.append((quest[32], self.escapeName(quest[48])))
+        if ((quest[29] < 0) and (quest[33] == 0)):
+            self.ReqGOId.append((abs(quest[29]), self.escapeName(quest[45])))
+        if ((quest[30] < 0) and (quest[34] == 0)):
+            self.ReqGOId.append((abs(quest[30]), self.escapeName(quest[46])))
+        if ((quest[31] < 0) and (quest[35] == 0)):
+            self.ReqGOId.append((abs(quest[31]), self.escapeName(quest[47])))
+        if ((quest[32] < 0) and (quest[36] == 0)):
+            self.ReqGOId.append((abs(quest[32]), self.escapeName(quest[48])))
         if (self.ReqGOId == []):
             del self.ReqGOId
         self.ReqSpellCast = []
