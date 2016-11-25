@@ -44,13 +44,13 @@ class Quest():
         if (quest[20] != ''):
             self.Objectives = self.objectivesText(quest[20])
         self.ReqItemId = []
-        if (quest[21] != 0):
+        if ((quest[21] != 0) and (quest[21] != quest[42])):
             self.ReqItemId.append(quest[21])
-        if (quest[22] != 0):
+        if ((quest[22] != 0) and (quest[22] != quest[42])):
             self.ReqItemId.append(quest[22])
-        if (quest[23] != 0):
+        if ((quest[23] != 0) and (quest[23] != quest[42])):
             self.ReqItemId.append(quest[23])
-        if (quest[24] != 0):
+        if ((quest[24] != 0) and (quest[24] != quest[42])):
             self.ReqItemId.append(quest[24])
         if (self.ReqItemId == []):
             del self.ReqItemId
