@@ -2,7 +2,7 @@ from sqlua.Npc import *
 
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, locale = "enGB"):
+    def __init__(self, cursor, locale = "enGB", extractSpawns = True):
         self.nList = {}
         tables = self.__getNpcTables(cursor)
         if locale == "deDE":
@@ -19,14 +19,14 @@ class NpcList():
         print("Adding Npcs...")
         count = len(tables[0])
         for npc in tables[0]:
-            self.addNpc(npc, tables[1:])
+            self.addNpc(npc, tables[1:], extractSpawns)
             if ((count % 200) == 0):
                 print(str(count)+"...", end="")
             count -= 1
         print("\nDone.")
 
-    def addNpc(self, npc, tables):
-        newNpc = Npc(npc, tables)
+    def addNpc(self, npc, tables, extractSpawns):
+        newNpc = Npc(npc, tables, extractSpawns)
         self.nList[newNpc.id] = newNpc
 
     def findNpc(self, **kwargs):

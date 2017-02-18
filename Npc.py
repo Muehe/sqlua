@@ -13,10 +13,26 @@ def getCreatureZones(file="sqlua/creatureZones.txt"):
 
 zones = getCreatureZones()
 
+def getFactionTemplate(file="sqlua/FactionTemplate.dbc.CSV"):
+    content = ""
+    with open(file, "r") as infile:
+        content = infile.read()
+    # 1,1,72,3,2,12,0,0,0.000000,0.000000,0,0,0,0,
+    # id,name,?,ourMask,friendlyMask,hostileMask,etc...
+    factionList = re.findall("(.*?),.*?,.*?,(.*?),(.*?),(.*?),.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,", content)
+    factionDict = {}
+    for data in factionList:
+        factionDict[int(data[0])] = (int(data[1]), # ourMask
+                                     int(data[2]), # friendlyMask
+                                     int(data[3])) # hostileMask
+    return factionDict
+
+factionTemplate = getFactionTemplate()
+
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
     waypointErrors = []
-    def __init__(self, npc, tables):
+    def __init__(self, npc, tables, extractSpawns):
         self.id = npc[0]
         self.name = self.escapeName(npc[1])
         self.minlevel = npc[2]
@@ -25,34 +41,43 @@ class Npc():
         self.maxlevelhealth = npc[5]
         self.rank = npc[6]
         self.factionA =  npc[7]
-        self.factionH =  npc[8]
-        spawns = []
-        waypoints = []
-        for spawn in tables[0]:
-            if (spawn[0] == self.id):
-                if spawn[4] in zones:
-                    spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
-                else:
-                    spawns.append((spawn[1], spawn[2], spawn[3]))
-                for waypoint in tables[3]:
-                    if (waypoint[1] == spawn[4]):
-                        waypoints.append((spawn[1], waypoint[2], waypoint[3]))
-        wpError = False
-        for waypoint in tables[4]:
-            if (waypoint[1] == self.id):
-                if (spawns == []):
-                    if (not wpError):
-                        wpError = True
-                else:
-                    waypoints.append((spawns[0][0], waypoint[2], waypoint[3]))
-        if (spawns == []):
-            Npc.spawnErrors.append(self.id)
+        if (12 & factionTemplate[self.factionA][0]) != 0:
+            self.hostileToA = True
         else:
-            self.spawns = CoordList(spawns)
-        if (waypoints != []):
-            self.waypoints = CoordList(waypoints)
-        if(wpError):
-            Npc.waypointErrors.append(self.id)
+            self.hostileToA = False
+        self.factionH =  npc[8]
+        if (10 & factionTemplate[self.factionH][0]) != 0:
+            self.hostileToH = True
+        else:
+            self.hostileToH = False
+        if extractSpawns:
+            spawns = []
+            waypoints = []
+            for spawn in tables[0]:
+                if (spawn[0] == self.id):
+                    if spawn[4] in zones:
+                        spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
+                    else:
+                        spawns.append((spawn[1], spawn[2], spawn[3]))
+                    for waypoint in tables[3]:
+                        if (waypoint[1] == spawn[4]):
+                            waypoints.append((spawn[1], waypoint[2], waypoint[3]))
+            wpError = False
+            for waypoint in tables[4]:
+                if (waypoint[1] == self.id):
+                    if (spawns == []):
+                        if (not wpError):
+                            wpError = True
+                    else:
+                        waypoints.append((spawns[0][0], waypoint[2], waypoint[3]))
+            if (spawns == []):
+                Npc.spawnErrors.append(self.id)
+            else:
+                self.spawns = CoordList(spawns)
+            if (waypoints != []):
+                self.waypoints = CoordList(waypoints)
+            if(wpError):
+                Npc.waypointErrors.append(self.id)
         self.start = []
         for pair in tables[1]:
             if pair[0] == self.id:
