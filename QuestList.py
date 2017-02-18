@@ -243,6 +243,26 @@ class QuestList():
             xx.append(q)
         return xx
 
+    def checkRequiredRaces(self, npcs):
+        actualRequiredRaces = {}
+        for quest in self.qList:
+            tempRace = 0
+            if hasattr(self.qList[quest], "creatureStart"):
+                for creature in self.qList[quest].creatureStart:
+                    if ((self.qList[quest].RequiredRaces & 77) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (77,178)) and npcs.nList[creature].hostileToA:
+                        tempRace = tempRace | 178
+                    if ((self.qList[quest].RequiredRaces & 178) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (77,178)) and npcs.nList[creature].hostileToH:
+                        tempRace = tempRace | 77
+            if hasattr(self.qList[quest], "creatureEnd"):
+                for creature in self.qList[quest].creatureEnd:
+                    if ((self.qList[quest].RequiredRaces & 77) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (77,178)) and npcs.nList[creature].hostileToA:
+                        tempRace = tempRace | 178
+                    if ((self.qList[quest].RequiredRaces & 178) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (77,178)) and npcs.nList[creature].hostileToH:
+                        tempRace = tempRace | 77
+            if tempRace not in (0,255):
+                actualRequiredRaces[self.qList[quest].id] = tempRace
+        return actualRequiredRaces
+
     def printQuestFile(self, file="sqlua/qData.lua"):
         outfile = open(file, "w")
         functionString = """function deleteFaction(str)
