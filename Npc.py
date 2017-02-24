@@ -1,7 +1,7 @@
-from sqlua.CoordList import *
+from CoordList import *
 import re
 
-def getCreatureZones(file="sqlua/creatureZones.txt"):
+def getCreatureZones(file="creatureZones.txt"):
     infile = open(file, "r")
     content = infile.read()
     infile.close()
@@ -13,7 +13,7 @@ def getCreatureZones(file="sqlua/creatureZones.txt"):
 
 zones = getCreatureZones()
 
-def getFactionTemplate(file="sqlua/FactionTemplate.dbc.CSV"):
+def getFactionTemplate(file="FactionTemplate.dbc.CSV"):
     content = ""
     with open(file, "r") as infile:
         content = infile.read()

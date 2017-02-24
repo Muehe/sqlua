@@ -1,4 +1,4 @@
-from sqlua.Coord import *
+from Coord import *
 
 class CoordList():
     """Holds a list of Coord() objects."""

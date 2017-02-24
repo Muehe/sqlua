@@ -1,4 +1,4 @@
-from sqlua.CoordList import *
+from CoordList import *
 
 class Quest():
     def __init__(self, quest, tables, areaTrigger):

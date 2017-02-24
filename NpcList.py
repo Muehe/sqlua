@@ -1,4 +1,4 @@
-from sqlua.Npc import *
+from Npc import *
 
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
@@ -78,7 +78,7 @@ class NpcList():
 
         return [npc_tpl, npc, npc_start, npc_end, npc_mov, npc_mov_tpl, npc_loc_deDE]
 
-    def printNpcFile(self, file="sqlua/npcData.lua"):
+    def printNpcFile(self, file="npcData.lua"):
         outfile = open(file, "w")
         outfile.write("npcData = {\n")
         for npcId in sorted(self.nList):

@@ -1,4 +1,4 @@
-from sqlua.Quest import *
+from Quest import *
 import re
 
 class QuestList():
@@ -6,7 +6,7 @@ class QuestList():
     def __init__(self, cursor, locale = "enGB"):
         self.qList = {}
         tables = self.__getQuestTables(cursor)
-        infile = open("sqlua/AreaTrigger.dbc.CSV", "r")
+        infile = open("AreaTrigger.dbc.CSV", "r")
         a = infile.read()
         infile.close()
         b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),", a)
@@ -263,7 +263,7 @@ class QuestList():
                 actualRequiredRaces[self.qList[quest].id] = tempRace
         return actualRequiredRaces
 
-    def printQuestFile(self, file="sqlua/qData.lua"):
+    def printQuestFile(self, file="qData.lua"):
         outfile = open(file, "w")
         functionString = """function deleteFaction(str)
     if (ShaguDB_Settings.dbMode) then
@@ -484,7 +484,7 @@ end
         outfile.write("};\n")
         outfile.close();
 
-    def printQuestieAddendum(self, file='sqlua/'):
+    def printQuestieAddendum(self, file='addendum.lua'):
         questSort = {}
         excluded = self.checkStartEnd()
         print("Sorting quests by title...")

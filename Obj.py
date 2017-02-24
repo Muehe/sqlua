@@ -1,7 +1,7 @@
-from sqlua.CoordList import *
+from CoordList import *
 import re
 
-def getObjectZones(file="sqlua/objectZones.txt"):
+def getObjectZones(file="objectZones.txt"):
     infile = open(file, "r")
     content = infile.read()
     infile.close()

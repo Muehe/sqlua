@@ -1,4 +1,4 @@
-from sqlua.Obj import *
+from Obj import *
 
 class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
@@ -70,7 +70,7 @@ class ObjList():
 
         return [obj_tpl, obj, obj_start, obj_end, obj_loc_deDE]
 
-    def printObjFile(self, file="sqlua/objData.lua"):
+    def printObjFile(self, file="objData.lua"):
         outfile = open(file, "w")
         outfile.write("objData = {\n")
         for objId in sorted(self.objectList):

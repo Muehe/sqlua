@@ -1,15 +1,15 @@
-from sqlua.QuestList import *
-from sqlua.NpcList import *
-from sqlua.ObjList import *
-from sqlua.CoordList import *
-from sqlua.Items import *
+from QuestList import *
+from NpcList import *
+from ObjList import *
+from CoordList import *
+from Items import *
 import pymysql
 
 """
 Usage:
 * Install pymysql package for python.
 * Apply your MySQL information to the line below.
-* Start python from sqlua's root folder and use "exec(open("sqlua/main.py").read())".
+* Start python from sqlua's root folder and use "exec(open("main.py").read())".
 * Use "quests, npcs, obj, items = doExtract(cur)"
 * Go make a coffee, do you laundry, save the world, etc.
 """
