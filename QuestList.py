@@ -266,10 +266,10 @@ class QuestList():
     def printQuestFile(self, file="qData.lua"):
         outfile = open(file, "w")
         functionString = """function deleteFaction(str)
-    if (ShaguDB_Settings.dbMode) then
+    if (CdbSettings.dbMode) then
         return;
     end
-    local before = ShaguDB_GetTableLength(qData);
+    local before = CdbGetTableLength(qData);
     for key, data in pairs(qData) do
         if (data[DB_REQ_RACE] == "AH") or (data[DB_REQ_RACE] ~= str) then
             data[DB_REQ_RACE] = nil;
@@ -277,18 +277,18 @@ class QuestList():
             qData[key] = nil;
         end
     end
-    local after = ShaguDB_GetTableLength(qData);
-    ShaguDB_Debug_Print(2, before-after.." opposite faction quests deleted");
+    local after = CdbGetTableLength(qData);
+    CdbDebugPrint(2, before-after.." opposite faction quests deleted");
 end
 function deleteClasses()
-    if (not ShaguDB_Settings.class) or (ShaguDB_Settings.dbMode) then
+    if (not CdbSettings.class) or (CdbSettings.dbMode) then
         return;
     end
-    local before = ShaguDB_GetTableLength(qData);
+    local before = CdbGetTableLength(qData);
     local classes = {"Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", "Druid"};
     local playerClass = false;
     for key, name in pairs(classes) do
-        if name == ShaguDB_Settings.class then
+        if name == CdbSettings.class then
             playerClass = key - 1;
         end
     end
@@ -307,8 +307,8 @@ function deleteClasses()
             end
         end
     end
-    local after = ShaguDB_GetTableLength(qData);
-    ShaguDB_Debug_Print(2, before-after.." other class quests deleted");
+    local after = CdbGetTableLength(qData);
+    CdbDebugPrint(2, before-after.." other class quests deleted");
 end
 qLookup = {};
 function fillQuestLookup()
