@@ -42,7 +42,7 @@ class ItemList():
         return after
 
     def __getItemTables(self, dictCursor):
-        print("Selecting MySQL tables...")
+        print("Selecting item related MySQL tables...")
 
         dictCursor.execute("SELECT entry AS id, name, Flags, startquest FROM item_template")
         item_tpl = dictCursor.fetchall()

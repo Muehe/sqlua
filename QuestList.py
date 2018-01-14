@@ -64,10 +64,10 @@ class QuestList():
         count = len(tables[0])
         for quest in tables[0]:
             self.__addQuest(quest, tables[1:], areaTrigger)
-            if ((count % 200) == 0):
-                print(str(count)+"...", end="")
+            if ((count % 500) == 0):
+                print(str(count)+"...")
             count -= 1
-        print("\nDone.")
+        print("Done.")
         print("Sort quest chain information...")
         excluded = self.checkStartEnd() # quests that have no start or end point
         for questId in self.qList:
@@ -130,7 +130,7 @@ class QuestList():
                 delattr(quest, "PreQuestGroup")
             if quest.SubQuests == []:
                 delattr(quest, "SubQuests")
-        print("\nDone.")
+        print("Done.")
 
     def unpackBitMask(self, bitMask):
         bits = []

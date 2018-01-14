@@ -20,10 +20,10 @@ class ObjList():
         count = len(tables[0])
         for obj in tables[0]:
             self.addObj(obj, tables[1:])
-            if ((count % 200) == 0):
-                print(str(count)+"...", end="")
+            if ((count % 500) == 0):
+                print(str(count)+"...")
             count -= 1
-        print("\nDone.")
+        print("Done.")
 
     def addObj(self, obj, tables):
         newObj = Obj(obj, tables)

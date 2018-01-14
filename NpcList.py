@@ -20,10 +20,10 @@ class NpcList():
         count = len(tables[0])
         for npc in tables[0]:
             self.addNpc(npc, tables[1:], extractSpawns)
-            if ((count % 200) == 0):
-                print(str(count)+"...", end="")
+            if ((count % 100) == 0):
+                print(str(count)+"...")
             count -= 1
-        print("\nDone.")
+        print("Done.")
 
     def addNpc(self, npc, tables, extractSpawns):
         newNpc = Npc(npc, tables, extractSpawns)
