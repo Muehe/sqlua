@@ -5,7 +5,7 @@ Unpacks data from the CMaNGOS classic server for addon developers. In Alpha.
 ## Requirements
 
 1. A full CMaNGOS installation (modified, see below).
-  * Optionally a localization.
+    * Optionally a localization.
 2. Python3.
 3. PyMySQL. Under Linux (Debian/Ubuntu) you install it like this:  
     ```
@@ -49,9 +49,9 @@ Unpacks data from the CMaNGOS classic server for addon developers. In Alpha.
     * `git rebase master`
 7. Copy the `.csv`-files from the `sqlua/preExtract` directory to the directory containing the `mangosd` executable.
 8. Start CMaNGOS.
-9. Invoke `server zone FILENAME` in the server console for all the copied files.
+* Invoke `server zone FILENAME` in the server console for all the copied files.
 10. Copy the files ending in `zone_and_ares.csv` back to the `sqlua/preExtract` directory.
-11. Follow one of the extraction methods outlined below.
+* Follow one of the extraction methods outlined below.
 
 ### Extraction from terminal:
 
