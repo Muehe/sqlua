@@ -166,6 +166,54 @@ class Quest():
     def __repr__(self):
         return str(self.id)
 
+    def printQuest(self):
+        keys = ['id',
+                'Title',
+                'ZoneOrSort',
+                'MinLevel',
+                'QuestLevel',
+                'Type',
+                'Method',
+                'QuestFlags',
+                'PrevQuestId',
+                'NextQuestId',
+                'NextQuestInChain',
+                'ExclusiveGroup',
+                'ExclusiveTo',
+                'InGroupWith',
+                'PreQuestGroup',
+                'PreQuestSingle',
+                'SubQuests',
+                'StartScript',
+                'creatureStart',
+                'goStart',
+                'itemStart',
+                'CompleteScript',
+                'creatureEnd',
+                'goEnd',
+                'triggerEnd',
+                'RequiredRaces',
+                'RequiredClasses',
+                'RequiredSkill',
+                'RequiredSkillValue',
+                'RequiredMinRepFaction',
+                'RequiredMinRepValue',
+                'RequiredMaxRepFaction',
+                'RequiredMaxRepValue',
+                'Objectives',
+                'RepObjectiveFaction',
+                'RepObjectiveValue',
+                'ReqItemId',
+                'ReqCreatureId',
+                'ReqGOId',
+                'ReqSpellCast',
+                'ReqSourceId',
+                'SrcItemId',
+               ]
+        for k in keys:
+            if hasattr(self, k):
+                print(k, ": ", getattr(self, k))
+
     def match(self, **kwargs):
         for (key, val) in kwargs.items():
             if not (hasattr(self, key)):
