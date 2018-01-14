@@ -1,7 +1,7 @@
 from CoordList import *
 import re
 
-def getCreatureZones(file="creatureZones.txt"):
+def getCreatureZones(file="data/creatureZones.txt"):
     infile = open(file, "r")
     content = infile.read()
     infile.close()
@@ -13,7 +13,7 @@ def getCreatureZones(file="creatureZones.txt"):
 
 zones = getCreatureZones()
 
-def getFactionTemplate(file="FactionTemplate.dbc.CSV"):
+def getFactionTemplate(file="data/FactionTemplate.dbc.CSV"):
     content = ""
     with open(file, "r") as infile:
         content = infile.read()

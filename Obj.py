@@ -1,7 +1,7 @@
 from CoordList import *
 import re
 
-def getObjectZones(file="objectZones.txt"):
+def getObjectZones(file="data/objectZones.txt"):
     infile = open(file, "r")
     content = infile.read()
     infile.close()

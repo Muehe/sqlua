@@ -7,7 +7,7 @@ Unpacks data from the CMaNGOS classic server for addon developers. In Alpha.
 1. A full CMaNGOS installation (modified, see below).
     * Optionally a localization.
 2. Python3.
-3. PyMySQL. Under Linux (Debian/Ubuntu) you install it like this:  
+3. PyMySQL. Under Linux (Debian/Ubuntu) you can install it like this:  
     ```
     sudo apt-get install pip3
     sudo pip3 install PyMySQL

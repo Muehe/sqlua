@@ -6,7 +6,7 @@ class QuestList():
     def __init__(self, cursor, locale = "enGB"):
         self.qList = {}
         tables = self.__getQuestTables(cursor)
-        infile = open("AreaTrigger.dbc.CSV", "r")
+        infile = open("data/AreaTrigger.dbc.CSV", "r")
         a = infile.read()
         infile.close()
         b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),", a)
