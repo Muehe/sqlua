@@ -58,9 +58,9 @@ Unpacks data from the CMaNGOS classic server for addon developers. In Alpha.
 * Invoke `python3 -m main`
 * This will start extraction and printing.
 
-### Extraction from IDLE:
+### Extraction/Usage from IDLE:
 
 * Start IDLE from sqlua's root directory.
-* Enter the command `exec(open("main.py").read())`.
+* Enter the command `from main import *`.
 * Use the command `main()` to start extraction and printing.
 * Use the command `quests, npcs, objects, items = getClassInstances()` to work with the classes from the interpreter.

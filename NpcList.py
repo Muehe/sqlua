@@ -1,25 +1,15 @@
 from Npc import *
+from Utilities import *
 
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, locale = "enGB", extractSpawns = True):
+    def __init__(self, cursor, dictCursor, extractSpawns = True):
         self.nList = {}
-        tables = self.__getNpcTables(cursor)
-        if locale == "deDE":
-            newTable = []
-            npcNames = {}
-            for npc in tables[6]: # fill the dictionary
-                npcNames[npc[0]] = npc[1]
-            for npc in tables[0]: # replace enGB names
-                if npcNames[npc[0]] != '': # only when translation is found
-                    newTable.append((npc[0], npcNames[npc[0]], npc[2], npc[3], npc[4], npc[5], npc[6], npc[7], npc[8]))
-                else:
-                    newTable.append(npc)
-            tables[0] = newTable
+        dicts = self.__getNpcTables(cursor, dictCursor)
         print("Adding Npcs...")
-        count = len(tables[0])
-        for npc in tables[0]:
-            self.addNpc(npc, tables[1:], extractSpawns)
+        count = len(dicts['npc_template'])
+        for npc in dicts['npc_template']:
+            self.addNpc(npc, dicts, extractSpawns)
             if ((count % 100) == 0):
                 print(str(count)+"...")
             count -= 1
@@ -44,7 +34,7 @@ class NpcList():
     def __iterNpc(self, **kwargs):
         return (self.nList[npc] for npc in self.nList if self.nList[npc].match(**kwargs))
 
-    def __getNpcTables(self, cursor):
+    def __getNpcTables(self, cursor, dictCursor):
         print("Selecting NPC related MySQL tables...")
         cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, FactionAlliance, FactionHorde FROM creature_template")
         npc_tpl = []
@@ -70,24 +60,33 @@ class NpcList():
         npc_mov_tpl = []
         for a in cursor.fetchall():
             npc_mov_tpl.append(a)
-        cursor.execute("SELECT entry, name_loc3 FROM locales_creature")
-        npc_loc_deDE = []
-        for a in cursor.fetchall():
-            npc_loc_deDE.append(a)
+        count = dictCursor.execute("SELECT * FROM locales_creature")
+        loc_npc = {}
+        for _ in range(0, count):
+            q = dictCursor.fetchone()
+            loc_npc[q['entry']] = q
         print("Done.")
+        return {'npc_template':npc_tpl,
+                'npc':npc,
+                'npc_start':npc_start,
+                'npc_end':npc_end,
+                'npc_movement':npc_mov,
+                'npc_movement_template':npc_mov_tpl,
+                'locales_npc':loc_npc}
 
-        return [npc_tpl, npc, npc_start, npc_end, npc_mov, npc_mov_tpl, npc_loc_deDE]
-
-    def printNpcFile(self, file="npcData.lua"):
+    def printNpcFile(self, file='npcData.lua', locale='enGB'):
         outfile = open(file, "w")
         outfile.write("npcData = {\n")
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
-            if (not hasattr(npc, "spawns")) and (not hasattr(npc, "waypoints")):
-                continue
+            #if (not hasattr(npc, "spawns")) and (not hasattr(npc, "waypoints")):
+            #    continue
             zoneId = 0
             lenSpawns = 0
-            outfile.write("["+str(npc.id)+"] = {'"+npc.name+"',"+str(npc.minlevelhealth)+","+str(npc.maxlevelhealth)+","+str(npc.minlevel)+","+str(npc.maxlevel)+","+str(npc.rank)+",")
+            name = npc.name
+            if locale != 'enGB' and hasattr(npc, 'locales') and npc.locales['name_loc'+str(localesMap[locale])] != None:
+                name = escapeQuotes(npc.locales['name_loc'+str(localesMap[locale])])
+            outfile.write("["+str(npc.id)+"] = {'"+name+"',"+str(npc.minlevelhealth)+","+str(npc.maxlevelhealth)+","+str(npc.minlevel)+","+str(npc.maxlevel)+","+str(npc.rank)+",")
             if hasattr(npc, "spawns"):
                 outfile.write("{")
                 for zone in npc.spawns.cByZone:

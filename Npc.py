@@ -1,4 +1,5 @@
 from CoordList import *
+from Utilities import *
 import re
 
 def getCreatureZones(file="data/creatureZones.txt"):
@@ -32,9 +33,9 @@ factionTemplate = getFactionTemplate()
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
     waypointErrors = []
-    def __init__(self, npc, tables, extractSpawns):
+    def __init__(self, npc, dicts, extractSpawns):
         self.id = npc[0]
-        self.name = self.escapeName(npc[1])
+        self.name = escapeQuotes(npc[1])
         self.minlevel = npc[2]
         self.maxlevel = npc[3]
         self.minlevelhealth = npc[4]
@@ -53,17 +54,17 @@ class Npc():
         if extractSpawns:
             spawns = []
             waypoints = []
-            for spawn in tables[0]:
+            for spawn in dicts['npc']:
                 if (spawn[0] == self.id):
                     if spawn[4] in zones:
                         spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
                     else:
                         spawns.append((spawn[1], spawn[2], spawn[3]))
-                    for waypoint in tables[3]:
+                    for waypoint in dicts['npc_movement']:
                         if (waypoint[1] == spawn[4]):
                             waypoints.append((spawn[1], waypoint[2], waypoint[3]))
             wpError = False
-            for waypoint in tables[4]:
+            for waypoint in dicts['npc_movement_template']:
                 if (waypoint[1] == self.id):
                     if (spawns == []):
                         if (not wpError):
@@ -79,25 +80,24 @@ class Npc():
             if(wpError):
                 Npc.waypointErrors.append(self.id)
         self.start = []
-        for pair in tables[1]:
+        for pair in dicts['npc_start']:
             if pair[0] == self.id:
                 self.start.append(pair[1])
         if self.start == []:
             del self.start
         self.end = []
-        for pair in tables[2]:
+        for pair in dicts['npc_end']:
             if pair[0] == self.id:
                 self.end.append(pair[1])
         if self.end == []:
             del self.end
+        if self.id in dicts['locales_npc']:
+            self.locales = dicts['locales_npc'][self.id]
+        else:
+            print('Missing translation for NPC:', self.name, '('+str(self.id)+')' )
 
     def __repr__(self):
         return str(self.id)
-
-    def escapeName(self, string):
-        name = string.replace('"', '\\"')
-        name2 = name.replace("'", "\\'")
-        return name2
 
     def match(self, **kwargs):
         for (key, val) in kwargs.items():

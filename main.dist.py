@@ -14,16 +14,16 @@ password = 'mangos'
 database = 'mangos'
 
 # Set up MySQL connection
-connection = pymysql.connect(host, user, password, database)
+connection = pymysql.connect(host, user, password, database, charset='utf8')
 cursor = connection.cursor()
 dictCursor = connection.cursor(pymysql.cursors.DictCursor)
 
 # Create new List classes
 def getClassInstances():
     """Get new instances of the list classes"""
-    quests = QuestList(cursor)
-    npcs = NpcList(cursor)
-    obj = ObjList(cursor)
+    quests = QuestList(cursor, dictCursor)
+    npcs = NpcList(cursor, dictCursor)
+    obj = ObjList(cursor, dictCursor)
     items = [] # will be changed to: ItemList(dictCursor)
     return quests, npcs, obj, items
 

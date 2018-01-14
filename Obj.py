@@ -1,4 +1,5 @@
 from CoordList import *
+from Utilities import *
 import re
 
 def getObjectZones(file="data/objectZones.txt"):
@@ -15,43 +16,43 @@ objectZones = getObjectZones()
 
 class Obj():
     spawnErrors = [] # Holds IDs of objects without spawns entry, name, type, faction, data1
-    def __init__(self, obj, tables):
+    def __init__(self, obj, dicts, extractSpawns):
         self.id = obj[0]
-        self.name = self.escapeName(obj[1])
+        self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]
         self.faction = obj[3]
         self.data1 = obj[4]
         spawns = []
-        for spawn in tables[0]:
-            if (spawn[0] == self.id):
-                if spawn[4] in objectZones:
-                    spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]]))
-                else:
-                    spawns.append((spawn[1], spawn[2], spawn[3]))
+        if extractSpawns:
+            for spawn in dicts['object']:
+                if (spawn[0] == self.id):
+                    if spawn[4] in objectZones:
+                        spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]]))
+                    else:
+                        spawns.append((spawn[1], spawn[2], spawn[3]))
         if (spawns == []):
             Obj.spawnErrors.append(self.id)
-        else:
+        elif extractSpawns:
             self.spawns = CoordList(spawns)
         self.start = []
-        for pair in tables[1]:
+        for pair in dicts['object_start']:
             if pair[0] == self.id:
                 self.start.append(pair[1])
         if self.start == []:
             del self.start
         self.end = []
-        for pair in tables[2]:
+        for pair in dicts['object_end']:
             if pair[0] == self.id:
                 self.end.append(pair[1])
         if self.end == []:
             del self.end
+        if self.id in dicts['locales_object']:
+            self.locales = dicts['locales_object'][self.id]
+        else:
+            print('Missing translation for Object:', self.name, '('+str(self.id)+')' )
 
     def __repr__(self):
         return str(self.id)
-
-    def escapeName(self, string):
-        name = string.replace('"', '\\"')
-        name2 = name.replace("'", "\\'")
-        return name2
 
     def match(self, **kwargs):
         for (key, val) in kwargs.items():

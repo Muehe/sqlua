@@ -1,32 +1,22 @@
 from Obj import *
+from Utilities import *
 
 class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, locale = "enGB"):
+    def __init__(self, cursor, dictCursor, extractSpawns=True):
         self.objectList = {}
-        tables = self.__getObjTables(cursor)
-        if locale == "deDE":
-            newTable = []
-            objNames = {}
-            for obj in tables[4]: # fill the dictionary
-                objNames[obj[0]] = obj[1]
-            for obj in tables[0]: # replace enGB names
-                if objNames[obj[0]] != '': # only when translation is found
-                    newTable.append((obj[0], objNames[obj[0]], obj[2], obj[3], obj[4]))
-                else:
-                    newTable.append(obj)
-            tables[0] = newTable
+        dicts = self.__getObjTables(cursor, dictCursor)
         print("Adding Objs...")
-        count = len(tables[0])
-        for obj in tables[0]:
-            self.addObj(obj, tables[1:])
+        count = len(dicts['object_template'])
+        for obj in dicts['object_template']:
+            self.addObj(obj, dicts, extractSpawns)
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
         print("Done.")
 
-    def addObj(self, obj, tables):
-        newObj = Obj(obj, tables)
+    def addObj(self, obj, dicts, extractSpawns):
+        newObj = Obj(obj, dicts, extractSpawns)
         self.objectList[newObj.id] = newObj
 
     def findObj(self, **kwargs):
@@ -44,7 +34,7 @@ class ObjList():
     def __iterObj(self, **kwargs):
         return (self.objectList[obj] for obj in self.objectList if self.objectList[obj].match(**kwargs))
 
-    def __getObjTables(self, cursor):
+    def __getObjTables(self, cursor, dictCursor):
         print("Selecting object related MySQL tables...")
         cursor.execute("SELECT entry, name, type, faction, data1 FROM gameobject_template")
         obj_tpl = []
@@ -62,24 +52,36 @@ class ObjList():
         obj_end = []
         for a in cursor.fetchall():
             obj_end.append(a)
-        cursor.execute("SELECT entry, name_loc3 FROM locales_gameobject")
-        obj_loc_deDE = []
-        for a in cursor.fetchall():
-            obj_loc_deDE.append(a)
+        count = dictCursor.execute("SELECT * FROM locales_gameobject")
+        loc_obj = {}
+        for _ in range(0, count):
+            q = dictCursor.fetchone()
+            loc_obj[q['entry']] = q
         print("Done.")
+        return {'object_template':obj_tpl,
+                'object':obj,
+                'object_start':obj_start,
+                'object_end':obj_end,
+                'locales_object':loc_obj}
 
-        return [obj_tpl, obj, obj_start, obj_end, obj_loc_deDE]
-
-    def printObjFile(self, file="objData.lua"):
+    def printObjFile(self, file='objData.lua', locale='enGB'):
         outfile = open(file, "w")
         outfile.write("objData = {\n")
         for objId in sorted(self.objectList):
             obj = self.objectList[objId]
-            if (not hasattr(obj, "spawns")) or (obj.type not in [2, 3, 5, 8, 10]):
+            if obj.type not in [2, 3, 5, 8, 10]:
                 continue
+            #if not hasattr(obj, 'spawns'):
+            #    continue
             zoneId = 0
             lenSpawns = 0
-            outfile.write("["+str(obj.id)+"] = {'"+obj.name+"',")
+            name = obj.name
+            if locale != 'enGB':
+                if hasattr(obj, 'locales') and obj.locales['name_loc'+str(localesMap[locale])] != None:
+                    name = escapeDoubleQuotes(obj.locales['name_loc'+str(localesMap[locale])])
+                else:
+                    print('Missing translation for Object:', obj.name, '('+str(obj.id)+')' )
+            outfile.write("[\""+str(obj.id)+"\"] = {\""+name+"\",")
             if hasattr(obj, "start"):
                 outfile.write("{")
                 for quest in obj.start:

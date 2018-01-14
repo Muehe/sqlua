@@ -1,11 +1,12 @@
 from Quest import *
+from Utilities import *
 import re
 
 class QuestList():
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, locale = "enGB"):
+    def __init__(self, cursor, dictCursor):
         self.qList = {}
-        tables = self.__getQuestTables(cursor)
+        dicts = self.__getQuestTables(cursor, dictCursor)
         infile = open("data/AreaTrigger.dbc.CSV", "r")
         a = infile.read()
         infile.close()
@@ -13,57 +14,10 @@ class QuestList():
         areaTrigger = []
         for x in b:
             areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5]), float(x[6]), float(x[7]), float(x[8]), float(x[9])))
-        if locale == "deDE":
-            questNames = {}
-            for quest in tables[7]: # fill the dictionary
-                questNames[quest[0]] = quest
-            count = 0;
-            for quest in tables[0]: # replace enGB names
-                if quest[0] in questNames: # only when translation is found
-                    # 0entry, 19Title, 20Objectives, 45ObjectiveText1, 46ObjectiveText2, 47ObjectiveText3, 48ObjectiveText4, 49EndText
-                    # 0entry, 1Title_loc3, 2Objectives_loc3, 3ObjectiveText1_loc3, 4ObjectiveText2_loc3, 5ObjectiveText3_loc3, 6ObjectiveText4_loc3, 7EndText_loc3
-                    q = list(quest)
-                    if questNames[quest[0]][1] != None:
-                        q[19] = questNames[quest[0]][1]
-                    else:
-                        if q[19] and q[19] != '':
-                            q[19] = "TRANSLATION MISSING IN GMDB: "+q[19]
-                    if questNames[quest[0]][2] != None:
-                        q[20] = questNames[quest[0]][2]
-                    else:
-                        if q[20] and q[20] != '':
-                            q[20] = "TRANSLATION MISSING IN GMDB: "+q[20]
-                    if questNames[quest[0]][3] != None:
-                        q[45] = questNames[quest[0]][3]
-                    else:
-                        if q[45] and q[45] != '':
-                            q[45] = "TRANSLATION MISSING IN GMDB: "+q[45]
-                    if questNames[quest[0]][4] != None:
-                        q[46] = questNames[quest[0]][4]
-                    else:
-                        if q[46] and q[46] != '':
-                            q[46] = "TRANSLATION MISSING IN GMDB: "+q[46]
-                    if questNames[quest[0]][5] != None:
-                        q[47] = questNames[quest[0]][5]
-                    else:
-                        if q[47] and q[47] != '':
-                            q[47] = "TRANSLATION MISSING IN GMDB: "+q[47]
-                    if questNames[quest[0]][6] != None:
-                        q[48] = questNames[quest[0]][6]
-                    else:
-                        if q[48] and q[48] != '':
-                            q[48] = "TRANSLATION MISSING IN GMDB: "+q[48]
-                    if questNames[quest[0]][7] != None:
-                        q[49] = questNames[quest[0]][7]
-                    else:
-                        if q[49] and q[49] != '':
-                            q[49] = "TRANSLATION MISSING IN GMDB: "+q[49]
-                    tables[0][count] = tuple(q)
-                count += 1
         print("Adding Quests...")
-        count = len(tables[0])
-        for quest in tables[0]:
-            self.__addQuest(quest, tables[1:], areaTrigger)
+        count = len(dicts['quest_template'])
+        for quest in dicts['quest_template']:
+            self.__addQuest(quest, dicts, areaTrigger)
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
@@ -169,11 +123,11 @@ class QuestList():
     def __iterQuest(self, **kwargs):
         return (self.qList[quest] for quest in self.qList if self.qList[quest].match(**kwargs))
 
-    def __getQuestTables(self, cursor):
+    def __getQuestTables(self, cursor, dictCursor):
         """only used by constructor"""
         print("Selecting quest related MySQL tables...")
         # SrcItemId needed to check for spell_script_target (type and targetEntry) via item_template.spellId
-        cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText FROM quest_template")
+        cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details FROM quest_template")
         quest_template = []
         for a in cursor.fetchall():
             quest_template.append(a)
@@ -201,12 +155,20 @@ class QuestList():
         areatrigger_involvedrelation = []
         for a in cursor.fetchall():
             areatrigger_involvedrelation.append(a)
-        cursor.execute("SELECT entry, Title_loc3, Objectives_loc3, ObjectiveText1_loc3, ObjectiveText2_loc3, ObjectiveText3_loc3, ObjectiveText4_loc3, EndText_loc3 FROM locales_quest")
-        loc_quest_deDE = []
-        for a in cursor.fetchall():
-            loc_quest_deDE.append(a)
+        count = dictCursor.execute("SELECT * FROM locales_quest")
+        loc_quests = {}
+        for _ in range(0, count):
+            q = dictCursor.fetchone()
+            loc_quests[q['entry']] = q
         print("Done.")
-        return [quest_template, creature_involvedrelation, gameobject_involvedrelation, creature_questrelation, gameobject_questrelation, item_questrelation, areatrigger_involvedrelation, loc_quest_deDE]
+        return {'quest_template':quest_template,
+                'creature_involvedrelation':creature_involvedrelation,
+                'gameobject_involvedrelation':gameobject_involvedrelation,
+                'creature_questrelation':creature_questrelation,
+                'gameobject_questrelation':gameobject_questrelation,
+                'item_questrelation':item_questrelation,
+                'areatrigger_involvedrelation':areatrigger_involvedrelation,
+                'locales_quest':loc_quests}
 
     def checkStartEnd(self):
         """Find quests with missing start or end points.
@@ -263,7 +225,7 @@ class QuestList():
                 actualRequiredRaces[self.qList[quest].id] = tempRace
         return actualRequiredRaces
 
-    def printQuestFile(self, file="qData.lua"):
+    def printQuestFile(self, file="qData.lua", locale="enGB"):
         outfile = open(file, "w")
         functionString = """function deleteFaction(str)
     if (CdbSettings.dbMode) then
@@ -340,7 +302,10 @@ end
             if quest in excluded:
                 continue
             outfile.write("\t["+str(quest.id)+"] = {") #key
-            outfile.write("\""+quest.Title+"\",") #name = 1
+            title = quest.Title
+            if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
+                title = escapeDoubleQuotes(quest.locales_Title[localesMap[locale]])
+            outfile.write("\""+title+"\",") #name = 1
             outfile.write("{") #starts = 2
             if (hasattr(quest, "creatureStart")):
                 outfile.write("{") #npc = starts1
@@ -393,7 +358,10 @@ end
             if (hasattr(quest, "Objectives")) and (len(self.allQuests(Title = quest.Title)) > 1): #objectives = 8
                 if quest.id == 4641:
                     quest.Objectives = quest.Objectives[0:-5]
-                outfile.write("\""+quest.Objectives+"\",")
+                objectives = quest.Objectives
+                if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
+                    objectives = quest.locales_Title[localesMap[locale]]
+                outfile.write("\""+objectives+"\",")
             else:
                 outfile.write("nil,")
             if (hasattr(quest, "triggerEnd")): #trigger = 9
