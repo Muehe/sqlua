@@ -1,0 +1,144 @@
+diff --git a/src/game/Chat/Chat.cpp b/src/game/Chat/Chat.cpp
+index 18ba4e67a..b4a014ac1 100644
+--- a/src/game/Chat/Chat.cpp
++++ b/src/game/Chat/Chat.cpp
+@@ -656,6 +656,7 @@ ChatCommand* ChatHandler::getCommandTable()
+
+     static ChatCommand serverCommandTable[] =
+     {
++        { "zone",           SEC_CONSOLE,        true,  &ChatHandler::HandleZoneAndAreaRequest,         "", nullptr },
+         { "corpses",        SEC_GAMEMASTER,     true,  &ChatHandler::HandleServerCorpsesCommand,       "", nullptr },
+         { "exit",           SEC_CONSOLE,        true,  &ChatHandler::HandleServerExitCommand,          "", nullptr },
+         { "idlerestart",    SEC_ADMINISTRATOR,  true,  nullptr,                                        "", serverIdleRestartCommandTable },
+diff --git a/src/game/Chat/Chat.h b/src/game/Chat/Chat.h
+index 9af020fe3..ff7c218dd 100644
+--- a/src/game/Chat/Chat.h
++++ b/src/game/Chat/Chat.h
+@@ -487,6 +487,7 @@ class ChatHandler
+         bool HandleSendMassMailCommand(char* args);
+         bool HandleSendMassMoneyCommand(char* args);
+
++        bool HandleZoneAndAreaRequest(char* args);
+         bool HandleServerCorpsesCommand(char* args);
+         bool HandleServerExitCommand(char* args);
+         bool HandleServerIdleRestartCommand(char* args);
+diff --git a/src/mangosd/CMakeLists.txt b/src/mangosd/CMakeLists.txt
+index 56c3b8548..9b53df224 100644
+--- a/src/mangosd/CMakeLists.txt
++++ b/src/mangosd/CMakeLists.txt
+@@ -19,6 +19,8 @@
+ set(EXECUTABLE_NAME ${CMANGOS_BINARY_SERVER_NAME})
+
+ set(EXECUTABLE_SRCS
++    CliAddon.cpp
++    CliAddon.h
+     CliRunnable.cpp
+     CliRunnable.h
+     MaNGOSsoap.cpp
+@@ -44,6 +46,7 @@ endif()
+ include_directories(
+   ${CMAKE_CURRENT_SOURCE_DIR}
+   ${CMAKE_BINARY_DIR}
++  ${CMAKE_SOURCE_DIR}/game
+ )
+
+ add_executable(${EXECUTABLE_NAME}
+diff --git a/src/mangosd/CliAddon.cpp b/src/mangosd/CliAddon.cpp
+new file mode 100644
+index 000000000..d7fcb572b
+--- /dev/null
++++ b/src/mangosd/CliAddon.cpp
+@@ -0,0 +1,41 @@
++#include "CliAddon.h"
++#include "Maps/GridMap.h"
++
++std::istream& read_line(std::istream& in, CoordinateSet& cs)
++{
++    getline(in, cs.id, ',');
++    getline(in, cs.map, ',');
++    getline(in, cs.x, ',');
++    getline(in, cs.y, ',');
++    getline(in, cs.z, ',');
++    return in;
++}
++
++void getZoneAndArea(char* fileName)
++{
++    using namespace std;
++    ifstream csvread(fileName);
++    if (!csvread.is_open())
++    {
++        cerr<<"Error opening the file"<<endl;
++        return;
++    }
++    char zoneAndArea[] = "zone_and_area.csv";
++    char * newFileName = new char[strlen(fileName)+strlen(zoneAndArea)+1];
++    strcpy(newFileName, fileName);
++    strcat(newFileName, zoneAndArea);
++    ofstream csvwrite(newFileName);
++    csvwrite<<"--uniqueID,zoneID,areaID\n";
++    for (CoordinateSet cs; read_line(csvread, cs); )
++    {
++        uint mapid = stoul(cs.map);
++        float ax = stof(cs.x);
++        float ay = stof(cs.y);
++        float az = stof(cs.z);
++        uint zone, area;
++        sTerrainMgr.LoadTerrain(mapid)->GetZoneAndAreaId(zone, area, ax, ay, az);
++        csvwrite<<cs.id<<","<<zone<<","<<area<<",";
++    }
++    csvread.close();
++    csvwrite.close();
++}
+diff --git a/src/mangosd/CliAddon.h b/src/mangosd/CliAddon.h
+new file mode 100644
+index 000000000..479cef1c0
+--- /dev/null
++++ b/src/mangosd/CliAddon.h
+@@ -0,0 +1,21 @@
++#ifndef __CLIADDON_H
++#define __CLIADDON_H
++
++#include <iostream>
++#include <fstream>
++#include <string>
++#include <cstring>
++
++struct CoordinateSet
++{
++    std::string id;
++    std::string map;
++    std::string x;
++    std::string y;
++    std::string z;
++};
++
++std::istream& read_line(std::istream& in, CoordinateSet& cs);
++void getZoneAndArea(char* fileName);
++
++#endif
+diff --git a/src/mangosd/CliRunnable.cpp b/src/mangosd/CliRunnable.cpp
+index ba6c192e6..da1a2bfab 100644
+--- a/src/mangosd/CliRunnable.cpp
++++ b/src/mangosd/CliRunnable.cpp
+@@ -29,6 +29,7 @@
+ #include "Config/Config.h"
+ #include "Util.h"
+ #include "Accounts/AccountMgr.h"
++#include "CliAddon.h"
+ #include "CliRunnable.h"
+ #include "Maps/MapManager.h"
+ #include "Entities/Player.h"
+@@ -56,6 +57,12 @@ void commandFinished(bool /*sucess*/)
+     fflush(stdout);
+ }
+
++bool ChatHandler::HandleZoneAndAreaRequest(char* args)
++{
++    getZoneAndArea(args);
++    return true;
++}
++
+ /// Delete a user account and all associated characters in this realm
+ /// \todo This function has to be enhanced to respect the login/realm split (delete char, delete account chars in realm, delete account chars in realm then delete account
+ bool ChatHandler::HandleAccountDeleteCommand(char* args)

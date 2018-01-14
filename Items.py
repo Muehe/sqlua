@@ -11,7 +11,7 @@ Not yet a class...
 
 """
 def doItems(cursor):
-    items = writeItemFile(sortItemTables(getItemTables(cursor)), "sqlua/itemData.lua")
+    items = writeItemFile(sortItemTables(getItemTables(cursor)), "itemData.lua")
     return items
 
 def objectivesText(objectives):
@@ -33,7 +33,7 @@ def escapeName(string):
     return name2
 
 def getItemTables(cursor):
-    print("Selecting MySQL tables...")
+    print("Selecting item related MySQL tables...")
 
     cursor.execute("SELECT entry, item, ChanceOrQuestChance, groupid, mincountOrRef FROM creature_loot_template")
     npc_loot_tpl = []
@@ -165,8 +165,8 @@ def sortLootTable(lootTable, refLootTable):
     count = len(lootTable)
     for x in lootTable:
         count -= 1
-        if count % 1000 == 0:
-            print(count, end="... ")
+        if count % 5000 == 0:
+            print(count, "...")
         if x[0] in processed:
             continue
         else:
@@ -223,7 +223,7 @@ def sortItemTables(itemTables):
 
     print("Sorting NPC loot tables...")
     npcs = sortLootTable(itemTables[1], itemTables[4])
-    print("\nAdding NPC ID's...")
+    print("Adding NPC ID's...")
     for x in npcs:
         for y in itemTables[5]:
             if y[1] == x[0]:
@@ -232,7 +232,7 @@ def sortItemTables(itemTables):
 
     print("Sorting Object loot tables...")
     objs = sortLootTable(itemTables[2], itemTables[4])
-    print("\nAdding Object ID's...")
+    print("Adding Object ID's...")
     for x in objs:
         for y in itemTables[6]:
             if y[1] == x[0]:
@@ -241,7 +241,7 @@ def sortItemTables(itemTables):
 
     print("Sorting Item loot tables...")
     items = sortLootTable(itemTables[3], itemTables[4])
-    print("\nDone.")
+    print("Done.")
 
     print("Sorting tables per item...")
     drops = []
@@ -285,12 +285,13 @@ def sortItemTables(itemTables):
             drops.append(newItem)
         count -= 1
         if count % 100 == 0:
-            print(count, end="... ")
-    print("\nDone.")
+            print(count, "...")
+    print("Done.")
 #[item_tpl, npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl, npc_vendor_tpl, npc_vendor, quest, item_loc_deDE]
     return [drops, itemTables[10]]
 
-def writeItemFile(itemData, locale = "enGB", file = "sqlua/itemData.lua"):
+def writeItemFile(itemData, locale = "enGB", file = "itemData.lua"):
+    print("Printing item file...")
     items = itemData[0]
     if locale == "deDE":
         itemNames = {}
@@ -346,5 +347,6 @@ def writeItemFile(itemData, locale = "enGB", file = "sqlua/itemData.lua"):
 
         outfile.write("\t},\n")
     outfile.write("}")
+    print("Done.")
 
     return items

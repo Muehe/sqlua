@@ -1,0 +1,6 @@
+main.py
+__pycache__
+*.pyc
+*.lua
+*coords.csv
+*area.csv
