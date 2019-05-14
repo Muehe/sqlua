@@ -1,7 +1,8 @@
 from CoordList import *
+from Utilities import *
 
 class Quest():
-    def __init__(self, quest, dicts, areaTrigger):
+    def __init__(self, quest, dicts, areaTrigger, translations=False):
         self.id = quest[0]
         self.MinLevel = quest[1]
         self.QuestLevel = quest[2]
@@ -10,6 +11,8 @@ class Quest():
         self.Title = escapeDoubleQuotes(quest[19])
         self.locales_Title = {}
         for x in range(1, 9):
+            if not translations:
+                continue
             self.locales_Title[x] = dicts['locales_quest'][self.id]['Title_loc'+str(x)]
         self.Method = quest[44]
         if (quest[40] != 0):
@@ -48,6 +51,8 @@ class Quest():
             self.Objectives = self.objectivesText(quest[20])
             self.locales_Objectives = {}
             for x in range(1, 9):
+                if not translations:
+                    continue
                 self.locales_Objectives[x] = dicts['locales_quest'][self.id]['Objectives_loc'+str(x)]
         self.ReqItemId = []
         if ((quest[21] != 0) and (quest[21] != quest[42])):
@@ -71,37 +76,44 @@ class Quest():
             self.ReqSourceId.append(quest[28])
         if (self.ReqSourceId == []):
             del self.ReqSourceId
+        self.locales_ObjectiveTexts = {1:{}, 2:{}, 3:{}, 4:{}}
+        for x in range(1, 5):
+            for y in range(1, 9):
+                if not translations:
+                    continue
+                if dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)] != None:
+                    self.locales_ObjectiveTexts[x][y] = escapeDoubleQuotes(dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)])
         self.ReqCreatureId = []
         if ((quest[29] > 0) and (quest[33] == 0)):
-            self.ReqCreatureId.append((quest[29], escapeDoubleQuotes(quest[45]),1))
+            self.ReqCreatureId.append((quest[29], escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
         if ((quest[30] > 0) and (quest[34] == 0)):
-            self.ReqCreatureId.append((quest[30], escapeDoubleQuotes(quest[46]),2))
+            self.ReqCreatureId.append((quest[30], escapeDoubleQuotes(quest[46]), self.locales_ObjectiveTexts[2]))
         if ((quest[31] > 0) and (quest[35] == 0)):
-            self.ReqCreatureId.append((quest[31], escapeDoubleQuotes(quest[47]),3))
+            self.ReqCreatureId.append((quest[31], escapeDoubleQuotes(quest[47]), self.locales_ObjectiveTexts[3]))
         if ((quest[32] > 0) and (quest[36] == 0)):
-            self.ReqCreatureId.append((quest[32], escapeDoubleQuotes(quest[48]),4))
+            self.ReqCreatureId.append((quest[32], escapeDoubleQuotes(quest[48]), self.locales_ObjectiveTexts[4]))
         if (self.ReqCreatureId == []):
             del self.ReqCreatureId
         self.ReqGOId = []
         if ((quest[29] < 0) and (quest[33] == 0)):
-            self.ReqGOId.append((abs(quest[29]), escapeDoubleQuotes(quest[45]),1))
+            self.ReqGOId.append((abs(quest[29]), escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
         if ((quest[30] < 0) and (quest[34] == 0)):
-            self.ReqGOId.append((abs(quest[30]), escapeDoubleQuotes(quest[46]),2))
+            self.ReqGOId.append((abs(quest[30]), escapeDoubleQuotes(quest[46]), self.locales_ObjectiveTexts[2]))
         if ((quest[31] < 0) and (quest[35] == 0)):
-            self.ReqGOId.append((abs(quest[31]), escapeDoubleQuotes(quest[47]),3))
+            self.ReqGOId.append((abs(quest[31]), escapeDoubleQuotes(quest[47]), self.locales_ObjectiveTexts[3]))
         if ((quest[32] < 0) and (quest[36] == 0)):
-            self.ReqGOId.append((abs(quest[32]), escapeDoubleQuotes(quest[48]),4))
+            self.ReqGOId.append((abs(quest[32]), escapeDoubleQuotes(quest[48]), self.locales_ObjectiveTexts[4]))
         if (self.ReqGOId == []):
             del self.ReqGOId
         self.ReqSpellCast = []
         if (quest[33] != 0):
-            self.ReqSpellCast.append((quest[33], quest[29], escapeDoubleQuotes(quest[45]),1))
+            self.ReqSpellCast.append((quest[33], quest[29], escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
         if (quest[34] != 0):
-            self.ReqSpellCast.append((quest[34], quest[30], escapeDoubleQuotes(quest[46]),2))
+            self.ReqSpellCast.append((quest[34], quest[30], escapeDoubleQuotes(quest[46]), self.locales_ObjectiveTexts[2]))
         if (quest[35] != 0):
-            self.ReqSpellCast.append((quest[35], quest[31], escapeDoubleQuotes(quest[47]),3))
+            self.ReqSpellCast.append((quest[35], quest[31], escapeDoubleQuotes(quest[47]), self.locales_ObjectiveTexts[3]))
         if (quest[36] != 0):
-            self.ReqSpellCast.append((quest[36], quest[32], escapeDoubleQuotes(quest[48]),4))
+            self.ReqSpellCast.append((quest[36], quest[32], escapeDoubleQuotes(quest[48]), self.locales_ObjectiveTexts[4]))
         if (self.ReqSpellCast == []):
             del self.ReqSpellCast
         if (quest[37] != 0):
@@ -160,11 +172,16 @@ class Quest():
             self.triggerEnd = (text, CoordList(triggers))
             self.locales_EndText = {}
             for x in range(1, 9):
+                if not translations:
+                    continue
                 self.locales_EndText[x] = dicts['locales_quest'][self.id]['EndText_loc'+str(x)]
         self.Details = escapeDoubleQuotes(quest[50])
         self.locales_Details = {}
         for x in range(1, 9):
-            self.locales_Details[x] = dicts['locales_quest'][self.id]['Details_loc'+str(x)]
+            if not translations:
+                continue
+            if dicts['locales_quest'][self.id]['Details_loc'+str(x)] != None:
+                self.locales_Details[x] = escapeDoubleQuotes(dicts['locales_quest'][self.id]['Details_loc'+str(x)])
         self.ExclusiveTo = []
         self.InGroupWith = []
         self.PreQuestGroup = []
