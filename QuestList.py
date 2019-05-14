@@ -452,6 +452,146 @@ end
         outfile.write("};\n")
         outfile.close();
 
+    def pfQuestFile(self, file='quests.lua', locale='enGB'):
+        outfile = open(file, 'w')
+        outfile.write('pfDB["quests"]["'+locale+'"] = {\n')
+        excluded = self.checkStartEnd()
+        for id in sorted(self.qList):
+            quest = self.qList[id]
+            if quest in excluded:
+                continue
+            outfile.write('[\"'+str(quest.id)+'\"] = {\n') #key
+            title = quest.Title
+            if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
+                title = escapeDoubleQuotes(quest.locales_Title[localesMap[locale]])
+            outfile.write('\tid = {},\n'.format(quest.id)) #id = 0
+            outfile.write('\ttitle = "{}",\n'.format(title)) #name = 1
+            outfile.write('\t["start"] = {\n') #starts = 2
+            if (hasattr(quest, 'creatureStart')):
+                outfile.write('\t\t["NPC"] = {\n') #npc = starts1
+                for npc in quest.creatureStart:
+                    outfile.write('\t\t\t{},\n'.format(npc))
+                outfile.write('\t\t},\n')
+            if (hasattr(quest, 'goStart')):
+                outfile.write('\t\t["OBJECT"] = {\n') #obj = starts2
+                for obj in quest.goStart:
+                    outfile.write('\t\t\t{},\n'.format(obj))
+                outfile.write('\t\t},\n')
+            if (hasattr(quest, 'itemStart')):
+                outfile.write('\t\t["ITEM"] = {\n') #itm = starts3
+                for itm in quest.itemStart:
+                    outfile.write('\t\t\t{},\n'.format(itm))
+                outfile.write('\t\t},\n')
+            outfile.write('\t},\n')
+            outfile.write('\t["end"] = {\n') #ends = 3
+            if (hasattr(quest, 'creatureEnd')): #npc = ends1
+                outfile.write('\t\t["NPC"] = {\n')
+                for npc in quest.creatureEnd:
+                    outfile.write('\t\t\t{},\n'.format(npc))
+                outfile.write('\t\t},\n')
+            if (hasattr(quest, 'goEnd')): #obj = ends2
+                outfile.write('\t\t["OBJECT"] = {\n')
+                for obj in quest.goEnd:
+                    outfile.write('\t\t\t{},\n'.format(obj))
+                outfile.write('\t\t},\n')
+            outfile.write('\t},\n')
+            outfile.write('\t["min"] = {},\n'.format(quest.MinLevel)) #minLevel = 4
+            outfile.write('\t["lvl"] = {},\n'.format(quest.QuestLevel)) #level = 5
+            outfile.write('\t["race"] = {},\n'.format(quest.RequiredRaces)) #RequiredRaces = 6
+            if (hasattr(quest, 'RequiredClasses')): #RequiredClasses = 7
+                outfile.write('\t["min"] = {},\n'.format(quest.RequiredClasses))
+            if (hasattr(quest, 'Objectives')): #objectives = 8
+                if quest.id == 4641:
+                    quest.Objectives = quest.Objectives[0:-5]
+                objectives = quest.Objectives
+                if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
+                    objectives = quest.locales_Title[localesMap[locale]]
+                outfile.write('\t["obj"] = "{}",\n'.format(objectives))
+            if (hasattr(quest, 'Details')):
+                details = quest.Details
+                if locale != 'enGB' and hasattr(quest, 'locales_Details') and localesMap[locale] in quest.locales_Details and quest.locales_Details[localesMap[locale]] != None:
+                    details = quest.locales_Details[localesMap[locale]]
+                outfile.write('\t["log"] = "{}",\n'.format(details))
+            if (hasattr(quest, 'triggerEnd')): #trigger = 9
+                outfile.write('\t["trigger"] = {\n')
+                outfile.write('\t\t"{}",\n'.format(quest.triggerEnd[0]))
+                outfile.write('\t\t{\n')
+                for tri in quest.triggerEnd[1].cByZone:
+                    outfile.write('\t\t\t['+str(tri)+'] = {\n')
+                    for c in quest.triggerEnd[1].cByZone[tri]:
+                        outfile.write('\t\t\t\t{'+str(c[0])+','+str(c[1])+'},\n')
+                    outfile.write('\t\t\t},\n')
+                outfile.write('\t\t},\n\t},\n')
+            outfile.write('\t["targets"] = {\n') #ReqCreatureOrGOOrItm = 10
+            if (hasattr(quest, 'ReqCreatureId')): #npc = ReqCreatureOrGOOrItm1
+                outfile.write('\t\t["NPC"] = {\n')
+                for npc in quest.ReqCreatureId:
+                    outfile.write('\t\t\t{["id"]='+str(npc[0]))
+                    if (npc[1] != ''):
+                        text = npc[1]
+                        if locale != 'enGB' and localesMap[locale] in npc[2]:
+                            text = npc[2][localesMap[locale]]
+                        outfile.write(',["text"]="'+text+'"},\n')
+                    else:
+                        outfile.write('},\n')
+                outfile.write('\t\t},\n')
+            if (hasattr(quest, 'ReqGOId')): #obj = ReqCreatureOrGOOrItm2
+                outfile.write('\t\t["OBJECT"] = {\n')
+                for obj in quest.ReqGOId:
+                    outfile.write('\t\t\t{["id"]='+str(abs(obj[0])))
+                    if (obj[1] != ''):
+                        text = obj[1]
+                        if locale != 'enGB' and localesMap[locale] in obj[2]:
+                            text = obj[2][localesMap[locale]]
+                        outfile.write(',["text"]="'+text+'"},\n')
+                    else:
+                        outfile.write('},\n')
+                outfile.write('\t\t},\n')
+            if (hasattr(quest, 'ReqSourceId')) or (hasattr(quest, 'ReqItemId')): #itm = ReqCreatureOrGOOrItm3
+                outfile.write('\t\t["ITEM"] = {\n')
+                if (hasattr(quest, 'ReqSourceId')):
+                    done = []
+                    for itm in quest.ReqSourceId:
+                        if itm in done:
+                            continue
+                        outfile.write('\t\t\t{["id"]='+str(itm)+'},\n')
+                        done.append(itm)
+                if (hasattr(quest, 'ReqItemId')):
+                    for itm in quest.ReqItemId:
+                        outfile.write('\t\t\t{["id"]='+str(itm)+'},\n')
+                outfile.write('\t\t},\n')
+            outfile.write('\t},\n')
+            if (hasattr(quest, 'SrcItemId')): #SrcItemId = 11
+                outfile.write('\t["providedItem"] = {},\n'.format(quest.SrcItemId))
+            if (hasattr(quest, 'PreQuestGroup')): # 12
+                outfile.write('\t["preQuestGroup"] = {\n')
+                for questId in quest.PreQuestGroup:
+                    outfile.write('\t\t{},\n'.format(questId))
+                outfile.write('\t},\n')
+            if (hasattr(quest, 'PreQuestSingle')): # 13
+                outfile.write('\t["preQuestSingle"] = {\n')
+                for questId in quest.PreQuestSingle:
+                    outfile.write('\t\t{},\n'.format(questId))
+                outfile.write('\t},\n')
+            if (hasattr(quest, 'SubQuests')): # 14
+                outfile.write('\t["subQuests"] = {\n')
+                for questId in quest.SubQuests:
+                    outfile.write('\t\t{},\n'.format(questId))
+                outfile.write('\t},\n')
+            if (hasattr(quest, 'InGroupWith')): # 15
+                outfile.write('\t["inGroupWith"] = {\n')
+                for questId in quest.InGroupWith:
+                    outfile.write('\t\t{},\n'.format(questId))
+                outfile.write('\t},\n')
+            if (hasattr(quest, 'ExclusiveTo')): # 16
+                outfile.write('\t["exclusiveTo"] = {\n')
+                for questId in quest.ExclusiveTo:
+                    outfile.write('\t\t{},\n'.format(questId))
+                outfile.write('\t},\n')
+            outfile.write('},\n')
+        outfile.write('}; -- End of pfDB["quests"]["'+locale+'"]\n')
+        outfile.close();
+
     def printQuestieAddendum(self, file='addendum.lua'):
         questSort = {}
         excluded = self.checkStartEnd()
