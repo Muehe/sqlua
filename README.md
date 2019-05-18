@@ -21,12 +21,12 @@ Unpacks data from the CMaNGOS classic server for addon developers. In Alpha.
     * `main.py` is listed in the gitignore file, so one doesn't accidentally publish ones MySQL credentials.
 2. Apply your MySQL information in the `main.py` file.
 3. Start IDLE, or another Python 3 interpreter, with sqlua's root as the working directory.
-4. Enter the command "exec(open("main.py").read())".
-5. Enter the command "printCoordFiles(cursor)".
+4. Enter the command `from main import *`.
+5. Enter the command `printCoordFiles(cursor)`.
 6. **Note: Currently you can skip to step 11 at this point.** Modifying CMaNGOS:
   * Working as of:
-    * cmangos/mangos-classic@9ce621b3392da2d9a78e25d1fb2c0e7fcab5aef0
-    * cmangos/classic-db@336b9053b638e3048a2a88d5db0da4667a078bcb
+    * cmangos/mangos-classic@0293535a0b96f4683d02ab230bc728eec84e99bf
+    * cmangos/classic-db@6767bf6c3abfade6f8de8efbfdb1ca3dd858e068
   * Go to your `mangos-classic` repository.
   * Make sure you are on the master branch and it is up-to-date:
     * `git checkout master`

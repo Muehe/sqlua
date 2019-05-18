@@ -33,7 +33,7 @@ factionTemplate = getFactionTemplate()
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
     waypointErrors = []
-    def __init__(self, npc, dicts, extractSpawns):
+    def __init__(self, npc, dicts, extractSpawns, translation=False):
         self.id = npc[0]
         self.name = escapeQuotes(npc[1])
         self.minlevel = npc[2]
@@ -41,13 +41,12 @@ class Npc():
         self.minlevelhealth = npc[4]
         self.maxlevelhealth = npc[5]
         self.rank = npc[6]
-        self.factionA =  npc[7]
-        if (12 & factionTemplate[self.factionA][0]) != 0:
+        self.faction =  npc[7]
+        if (12 & factionTemplate[self.faction][0]) != 0:
             self.hostileToA = True
         else:
             self.hostileToA = False
-        self.factionH =  npc[8]
-        if (10 & factionTemplate[self.factionH][0]) != 0:
+        if (10 & factionTemplate[self.faction][0]) != 0:
             self.hostileToH = True
         else:
             self.hostileToH = False
@@ -94,7 +93,8 @@ class Npc():
         if self.id in dicts['locales_npc']:
             self.locales = dicts['locales_npc'][self.id]
         else:
-            print('Missing translation for NPC:', self.name, '('+str(self.id)+')' )
+            if translation:
+                print('Missing translation for NPC:', self.name, '('+str(self.id)+')' )
 
     def __repr__(self):
         return str(self.id)

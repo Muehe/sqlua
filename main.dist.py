@@ -11,7 +11,7 @@ import pymysql
 host = 'localhost'
 user = 'mangos'
 password = 'mangos'
-database = 'mangos'
+database = 'classicmangos'
 
 # Set up MySQL connection
 connection = pymysql.connect(host, user, password, database, charset='utf8')

@@ -16,7 +16,7 @@ objectZones = getObjectZones()
 
 class Obj():
     spawnErrors = [] # Holds IDs of objects without spawns entry, name, type, faction, data1
-    def __init__(self, obj, dicts, extractSpawns):
+    def __init__(self, obj, dicts, extractSpawns, translation=False):
         self.id = obj[0]
         self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]
@@ -49,7 +49,8 @@ class Obj():
         if self.id in dicts['locales_object']:
             self.locales = dicts['locales_object'][self.id]
         else:
-            print('Missing translation for Object:', self.name, '('+str(self.id)+')' )
+            if translation:
+                print('Missing translation for Object:', self.name, '('+str(self.id)+')' )
 
     def __repr__(self):
         return str(self.id)

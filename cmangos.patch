@@ -1,9 +1,9 @@
 diff --git a/src/game/Chat/Chat.cpp b/src/game/Chat/Chat.cpp
-index 18ba4e67a..b4a014ac1 100644
+index 21f555727..68dd0a77c 100644
 --- a/src/game/Chat/Chat.cpp
 +++ b/src/game/Chat/Chat.cpp
-@@ -656,6 +656,7 @@ ChatCommand* ChatHandler::getCommandTable()
-
+@@ -678,6 +678,7 @@ ChatCommand* ChatHandler::getCommandTable()
+ 
      static ChatCommand serverCommandTable[] =
      {
 +        { "zone",           SEC_CONSOLE,        true,  &ChatHandler::HandleZoneAndAreaRequest,         "", nullptr },
@@ -11,41 +11,41 @@ index 18ba4e67a..b4a014ac1 100644
          { "exit",           SEC_CONSOLE,        true,  &ChatHandler::HandleServerExitCommand,          "", nullptr },
          { "idlerestart",    SEC_ADMINISTRATOR,  true,  nullptr,                                        "", serverIdleRestartCommandTable },
 diff --git a/src/game/Chat/Chat.h b/src/game/Chat/Chat.h
-index 9af020fe3..ff7c218dd 100644
+index 2ff556e20..4a0f9b6f1 100644
 --- a/src/game/Chat/Chat.h
 +++ b/src/game/Chat/Chat.h
-@@ -487,6 +487,7 @@ class ChatHandler
+@@ -507,6 +507,7 @@ class ChatHandler
          bool HandleSendMassMailCommand(char* args);
          bool HandleSendMassMoneyCommand(char* args);
-
+ 
 +        bool HandleZoneAndAreaRequest(char* args);
          bool HandleServerCorpsesCommand(char* args);
          bool HandleServerExitCommand(char* args);
          bool HandleServerIdleRestartCommand(char* args);
 diff --git a/src/mangosd/CMakeLists.txt b/src/mangosd/CMakeLists.txt
-index 56c3b8548..9b53df224 100644
+index 86ad8bb93..3b2ed2ec2 100644
 --- a/src/mangosd/CMakeLists.txt
 +++ b/src/mangosd/CMakeLists.txt
 @@ -19,6 +19,8 @@
  set(EXECUTABLE_NAME ${CMANGOS_BINARY_SERVER_NAME})
-
+ 
  set(EXECUTABLE_SRCS
 +    CliAddon.cpp
 +    CliAddon.h
      CliRunnable.cpp
      CliRunnable.h
      MaNGOSsoap.cpp
-@@ -44,6 +46,7 @@ endif()
- include_directories(
-   ${CMAKE_CURRENT_SOURCE_DIR}
-   ${CMAKE_BINARY_DIR}
-+  ${CMAKE_SOURCE_DIR}/game
+@@ -47,6 +49,7 @@ add_executable(${EXECUTABLE_NAME}
+ 
+ target_include_directories(${EXECUTABLE_NAME}
+   INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
++  INTERFACE ${CMAKE_SOURCE_DIR}/game
+   PRIVATE ${OPENSSL_INCLUDE_DIR}
+   PRIVATE ${Boost_INCLUDE_DIRS}
  )
-
- add_executable(${EXECUTABLE_NAME}
 diff --git a/src/mangosd/CliAddon.cpp b/src/mangosd/CliAddon.cpp
 new file mode 100644
-index 000000000..d7fcb572b
+index 000000000..973e43e5b
 --- /dev/null
 +++ b/src/mangosd/CliAddon.cpp
 @@ -0,0 +1,41 @@
@@ -76,7 +76,7 @@ index 000000000..d7fcb572b
 +    strcpy(newFileName, fileName);
 +    strcat(newFileName, zoneAndArea);
 +    ofstream csvwrite(newFileName);
-+    csvwrite<<"--uniqueID,zoneID,areaID\n";
++    csvwrite<<"--uniqueID,zoneID,areaID,\n";
 +    for (CoordinateSet cs; read_line(csvread, cs); )
 +    {
 +        uint mapid = stoul(cs.map);
@@ -118,7 +118,7 @@ index 000000000..479cef1c0
 +
 +#endif
 diff --git a/src/mangosd/CliRunnable.cpp b/src/mangosd/CliRunnable.cpp
-index ba6c192e6..da1a2bfab 100644
+index 08e7f6e9d..322d6abb6 100644
 --- a/src/mangosd/CliRunnable.cpp
 +++ b/src/mangosd/CliRunnable.cpp
 @@ -29,6 +29,7 @@
@@ -129,10 +129,10 @@ index ba6c192e6..da1a2bfab 100644
  #include "CliRunnable.h"
  #include "Maps/MapManager.h"
  #include "Entities/Player.h"
-@@ -56,6 +57,12 @@ void commandFinished(bool /*sucess*/)
+@@ -63,6 +64,12 @@ void commandFinished(bool /*sucess*/)
      fflush(stdout);
  }
-
+ 
 +bool ChatHandler::HandleZoneAndAreaRequest(char* args)
 +{
 +    getZoneAndArea(args);
