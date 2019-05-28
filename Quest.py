@@ -97,38 +97,38 @@ class Quest():
                 if dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)] != None:
                     self.locales_ObjectiveTexts[x][y] = escapeDoubleQuotes(dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)])
         self.ReqCreatureId = []
-        if ((quest[29] > 0) and (quest[33] == 0)):
+        if ((quest[29] > 0)):
             self.ReqCreatureId.append((quest[29], escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
             self.ObjectiveList[0]['type'] = 'monster'
             self.ObjectiveList[0]['id'] = quest[29]
-        if ((quest[30] > 0) and (quest[34] == 0)):
+        if ((quest[30] > 0)):
             self.ReqCreatureId.append((quest[30], escapeDoubleQuotes(quest[46]), self.locales_ObjectiveTexts[2]))
             self.ObjectiveList[1]['type'] = 'monster'
             self.ObjectiveList[1]['id'] = quest[30]
-        if ((quest[31] > 0) and (quest[35] == 0)):
+        if ((quest[31] > 0)):
             self.ReqCreatureId.append((quest[31], escapeDoubleQuotes(quest[47]), self.locales_ObjectiveTexts[3]))
             self.ObjectiveList[2]['type'] = 'monster'
             self.ObjectiveList[2]['id'] = quest[31]
-        if ((quest[32] > 0) and (quest[36] == 0)):
+        if ((quest[32] > 0)):
             self.ReqCreatureId.append((quest[32], escapeDoubleQuotes(quest[48]), self.locales_ObjectiveTexts[4]))
             self.ObjectiveList[3]['type'] = 'monster'
             self.ObjectiveList[3]['id'] = quest[32]
         if (self.ReqCreatureId == []):
             del self.ReqCreatureId
         self.ReqGOId = []
-        if ((quest[29] < 0) and (quest[33] == 0)):
+        if ((quest[29] < 0)):
             self.ReqGOId.append((abs(quest[29]), escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
             self.ObjectiveList[0]['type'] = 'object'
             self.ObjectiveList[0]['id'] = abs(quest[29])
-        if ((quest[30] < 0) and (quest[34] == 0)):
+        if ((quest[30] < 0)):
             self.ReqGOId.append((abs(quest[30]), escapeDoubleQuotes(quest[46]), self.locales_ObjectiveTexts[2]))
             self.ObjectiveList[1]['type'] = 'object'
             self.ObjectiveList[1]['id'] = abs(quest[30])
-        if ((quest[31] < 0) and (quest[35] == 0)):
+        if ((quest[31] < 0)):
             self.ReqGOId.append((abs(quest[31]), escapeDoubleQuotes(quest[47]), self.locales_ObjectiveTexts[3]))
             self.ObjectiveList[2]['type'] = 'object'
             self.ObjectiveList[2]['id'] = abs(quest[31])
-        if ((quest[32] < 0) and (quest[36] == 0)):
+        if ((quest[32] < 0)):
             self.ReqGOId.append((abs(quest[32]), escapeDoubleQuotes(quest[48]), self.locales_ObjectiveTexts[4]))
             self.ObjectiveList[3]['type'] = 'object'
             self.ObjectiveList[3]['id'] = abs(quest[32])
