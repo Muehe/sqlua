@@ -23,6 +23,21 @@ def getClassInstances():
     items = [] # will be changed to: ItemList(dictCursor)
     return quests, npcs, obj, items
 
+def questiePrint():
+    """Partial extraction and print for QuestieClassic branch (no items)"""
+    print("Printing quest file...")
+    quests = QuestList(cursor, dictCursor)
+    quests.printQuestFile()
+    print("Done.")
+    print("Printing NPC file...")
+    npcs = NpcList(cursor, dictCursor)
+    npcs.printNpcFile()
+    print("Done.")
+    print("Printing object file...")
+    obj = ObjList(cursor, dictCursor)
+    objects.printObjFile()
+    print("Done.")
+
 def main():
     """Extracts and prints quest related data"""
     quests, npcs, objects, items = getClassInstances()
