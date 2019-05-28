@@ -27,16 +27,16 @@ def questiePrint():
     """Partial extraction and print for QuestieClassic branch (no items)"""
     print("Printing quest file...")
     quests = QuestList(cursor, dictCursor)
-    quests.printQuestFile()
-    print("Done.")
+    quests.printQuestFile("questDB.lua")
+    print("Done printing quests.")
     print("Printing NPC file...")
     npcs = NpcList(cursor, dictCursor)
-    npcs.printNpcFile()
-    print("Done.")
+    npcs.printNpcFile("spawnDB.lua")
+    print("Done printing NPCs.")
     print("Printing object file...")
     obj = ObjList(cursor, dictCursor)
-    objects.printObjFile()
-    print("Done.")
+    obj.printObjFile("objectDB.lua")
+    print("Done printing objects.")
 
 def main():
     """Extracts and prints quest related data"""
