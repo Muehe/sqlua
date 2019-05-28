@@ -17,9 +17,9 @@ Unpacks data from the CMaNGOS classic server for addon developers. In Alpha.
 
 ### Setup
 
-1. Copy the file `main.dist.py` and rename the copy to `main.py`.
-    * `main.py` is listed in the gitignore file, so one doesn't accidentally publish ones MySQL credentials.
-2. Apply your MySQL information in the `main.py` file.
+1. Copy the file `config.py.dist` and rename the copy to `config.py`.
+    * `config.py` is listed in the gitignore file, so one doesn't accidentally publish ones MySQL credentials.
+2. Apply your MySQL information in the `config.py` file.
 3. Start IDLE, or another Python 3 interpreter, with sqlua's root as the working directory.
 4. Enter the command `from main import *`.
 5. Enter the command `printCoordFiles(cursor)`.

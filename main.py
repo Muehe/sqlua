@@ -2,19 +2,15 @@ from QuestList import *
 from NpcList import *
 from ObjList import *
 from CoordList import *
-from Items import *
 from ItemList import *
+from Items import *
 from preExtract.CoordPreExtract import printCoordFiles
-import pymysql
 
-# MySQL information
-host = 'localhost'
-user = 'mangos'
-password = 'mangos'
-database = 'classicmangos'
+import pymysql
+import config
 
 # Set up MySQL connection
-connection = pymysql.connect(host, user, password, database, charset='utf8')
+connection = pymysql.connect(config.host, config.user, config.password, config.database, charset='utf8')
 cursor = connection.cursor()
 dictCursor = connection.cursor(pymysql.cursors.DictCursor)
 
