@@ -227,81 +227,45 @@ class QuestList():
 
     def printQuestFile(self, file="qData.lua", locale="enGB"):
         outfile = open(file, "w")
-        functionString = """function deleteFaction(str)
-    if (CdbSettings.dbMode) then
-        return;
-    end
-    local before = CdbGetTableLength(qData);
-    for key, data in pairs(qData) do
-        if (data[DB_REQ_RACE] == "AH") or (data[DB_REQ_RACE] ~= str) then
-            data[DB_REQ_RACE] = nil;
-        else
-            qData[key] = nil;
-        end
-    end
-    local after = CdbGetTableLength(qData);
-    CdbDebugPrint(2, before-after.." opposite faction quests deleted");
-end
-function deleteClasses()
-    if (not CdbSettings.class) or (CdbSettings.dbMode) then
-        return;
-    end
-    local before = CdbGetTableLength(qData);
-    local classes = {"Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", "Druid"};
-    local playerClass = false;
-    for key, name in pairs(classes) do
-        if name == CdbSettings.class then
-            playerClass = key - 1;
-        end
-    end
-    if playerClass then
-        for key, data in pairs(qData) do
-            if data[DB_REQ_CLASS] then
-                local found = false;
-                for k, class in pairs(data[DB_REQ_CLASS]) do
-                    if class == playerClass then
-                        found = true;
-                    end
-                end
-                if not found then
-                    qData[key] = nil;
-                end
-            end
-        end
-    end
-    local after = CdbGetTableLength(qData);
-    CdbDebugPrint(2, before-after.." other class quests deleted");
-end
-qLookup = {};
-function fillQuestLookup()
-    local checkedNames = {};
-    for key, data in pairs(qData) do
-        local name = data[DB_NAME];
-        local checked = checkedNames[name];
-        if not checked then
-            checkedNames[name] = true;
-            qLookup[name] = {};
-            for k, d in pairs(qData) do
-                if (d[DB_NAME] == name) then
-                    if d[DB_OBJECTIVES] then
-                        qLookup[name][k] = d[DB_OBJECTIVES];
-                    else
-                        qLookup[name][k] = '';
-                    end
-                end
-            end
-        end
-    end
-end
-"""
-        outfile.write(functionString)
+        outfile.write("""qKeys = {
+    ['name'] = 1, -- string
+    ['startedBy'] = 2, -- table
+        ['creatureStart'] = 1, -- table {creature(int),...}
+        ['objectStart'] = 2, -- table {object(int),...}
+        ['itemStart'] = 3, -- table {item(int),...}
+    ['finishedBy'] = 3, -- table
+        ['creatureEnd'] = 1, -- table {creature(int),...}
+        ['objectEnd'] = 2, -- table {object(int),...}
+    ['requiredLevel'] = 4, -- int
+    ['questLevel'] = 5, -- int
+    ['requiredRaces'] = 6, -- bitmask
+    ['requiredClasses'] = 7, -- bitmask
+    ['objectivesText'] = 8, -- string, Description of the quest. Auto-complete if nil.
+    ['triggerEnd'] = 9, -- table: {text, {[zoneID] = {coordPair,...},...}}
+    ['objectives'] = 10, -- table
+        ['creatureObjective'] = 1, -- table {{creature(int), text(string)},...}, If text is nil the default "<Name> slain x/y" is used
+        ['objectObjective'] = 2, -- table {{object(int), text(string)},...}
+        ['itemObjective'] = 3, -- table {{item(int), text(string)},...}
+        ['reputationObjective'] = 4, -- table: {faction(int), value(int)}
+    ['sourceItemId'] = 11, -- int, item provided by quest starter
+    ['preQuestGroup'] = 12, -- table: {quest(int)}
+    ['preQuestSingle'] = 13, -- table: {quest(int)}
+    ['subQuests'] = 14, -- table: {quest(int)}
+    ['inGroupWith'] = 15, -- table: {quest(int)}
+    ['exclusiveTo'] = 16, -- table: {quest(int)}
+    ['zoneOrSort'] = 17, -- int, >0: AreaTable.dbc ID; <0: QuestSort.dbc ID
+    ['requiredSkill'] = 18, -- table: {skill(int), value(int)}
+    ['requiredMinRep'] = 19, -- table: {faction(int), value(int)}
+    ['requiredMaxRep'] = 20, -- table: {faction(int), value(int)}
+}
+""")
         outfile.write("qData = {\n")
         excluded = self.checkStartEnd()
         for id in sorted(self.qList):
             quest = self.qList[id]
             if quest in excluded:
                 continue
-            outfile.write("\t["+str(quest.id)+"] = {") #key
+            outfile.write("["+str(quest.id)+"] = {") #key
             title = quest.Title
             if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
                 title = escapeDoubleQuotes(quest.locales_Title[localesMap[locale]])
@@ -374,8 +338,8 @@ end
                 outfile.write("}},")
             else:
                 outfile.write("nil,")
-            outfile.write("{") #ReqCreatureOrGOOrItm = 10
-            if (hasattr(quest, "ReqCreatureId")): #npc = ReqCreatureOrGOOrItm1
+            outfile.write("{") #objectives = 10
+            if (hasattr(quest, "ReqCreatureId")): #npc = objectives1
                 outfile.write("{")
                 for npc in quest.ReqCreatureId:
                     outfile.write("{"+str(npc[0]))
@@ -386,14 +350,14 @@ end
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "ReqGOId")): #obj = ReqCreatureOrGOOrItm2
+            if (hasattr(quest, "ReqGOId")): #obj = objectives2
                 outfile.write("{")
                 for obj in quest.ReqGOId:
                     outfile.write("{"+str(abs(obj[0]))+",\""+str(obj[1])+"\"},")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "ReqSourceId")) or (hasattr(quest, "ReqItemId")): #itm = ReqCreatureOrGOOrItm3
+            if (hasattr(quest, "ReqSourceId")) or (hasattr(quest, "ReqItemId")): #itm = objectives3
                 outfile.write("{")
                 if (hasattr(quest, "ReqSourceId")):
                     done = []
@@ -406,6 +370,10 @@ end
                     for itm in quest.ReqItemId:
                         outfile.write("{"+str(itm)+",nil},")
                 outfile.write("},")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "RepObjectiveFaction")): #rep = objectives4
+                outfile.write("{"+str(quest.RepObjectiveFaction)+","+str(quest.RepObjectiveValue)+"},")
             else:
                 outfile.write("nil,")
             outfile.write("},")
@@ -446,6 +414,22 @@ end
                 for questId in quest.ExclusiveTo:
                     outfile.write(str(questId)+",")
                 outfile.write("},")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "ZoneOrSort")): #17
+                outfile.write(str(quest.ZoneOrSort)+",")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "RequiredSkill")): #18
+                outfile.write("{"+str(quest.RequiredSkill)+str(quest.RequiredSkillValue)+"},")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "RequiredMinRepFaction")): #19
+                outfile.write("{"+str(quest.RequiredMinRepFaction)+str(quest.RequiredMinRepValue)+"},")
+            else:
+                outfile.write("nil,")
+            if (hasattr(quest, "RequiredMaxRepFaction")): #20
+                outfile.write("{"+str(quest.RequiredMaxRepFaction)+str(quest.RequiredMaxRepValue)+"},")
             else:
                 outfile.write("nil,")
             outfile.write("},\n")
