@@ -311,7 +311,7 @@ class QuestList():
             outfile.write("},")
             outfile.write(str(quest.MinLevel)+",") #minLevel = 4
             outfile.write(str(quest.QuestLevel)+",") #level = 5
-            outfile.write("\""+self.getFactionString(quest.RequiredRaces)+"\",") #RequiredRaces = 6
+            outfile.write(f'{quest.RequiredRaces},') #RequiredRaces = 6
             if (hasattr(quest, "RequiredClasses")): #RequiredClasses = 7
                 outfile.write("{")
                 for n in self.unpackBitMask(quest.RequiredClasses):
