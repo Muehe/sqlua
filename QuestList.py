@@ -421,15 +421,15 @@ class QuestList():
             else:
                 outfile.write("nil,")
             if (hasattr(quest, "RequiredSkill")): #18
-                outfile.write("{"+str(quest.RequiredSkill)+str(quest.RequiredSkillValue)+"},")
+                outfile.write("{"+str(quest.RequiredSkill)+","+str(quest.RequiredSkillValue)+"},")
             else:
                 outfile.write("nil,")
             if (hasattr(quest, "RequiredMinRepFaction")): #19
-                outfile.write("{"+str(quest.RequiredMinRepFaction)+str(quest.RequiredMinRepValue)+"},")
+                outfile.write("{"+str(quest.RequiredMinRepFaction)+","+str(quest.RequiredMinRepValue)+"},")
             else:
                 outfile.write("nil,")
             if (hasattr(quest, "RequiredMaxRepFaction")): #20
-                outfile.write("{"+str(quest.RequiredMaxRepFaction)+str(quest.RequiredMaxRepValue)+"},")
+                outfile.write("{"+str(quest.RequiredMaxRepFaction)+","+str(quest.RequiredMaxRepValue)+"},")
             else:
                 outfile.write("nil,")
             outfile.write("},\n")
