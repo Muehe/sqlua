@@ -41,7 +41,7 @@ class Npc():
         self.minlevelhealth = npc[4]
         self.maxlevelhealth = npc[5]
         self.rank = npc[6]
-        self.faction =  npc[7]
+        self.faction = npc[7]
         if (12 & factionTemplate[self.faction][0]) != 0:
             self.hostileToA = True
         else:

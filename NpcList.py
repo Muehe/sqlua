@@ -76,6 +76,25 @@ class NpcList():
 
     def printNpcFile(self, file='npcData.lua', locale='enGB'):
         outfile = open(file, "w")
+        outfile.write("""npcCache = {}
+
+npcKeys = {
+    ['name'] = 1, -- string
+    ['minLevelHealth'] = 2, -- int
+    ['maxLevelHealth'] = 3, -- int
+    ['minLevel'] = 4, -- int
+    ['maxLevel'] = 5, -- int
+    ['rank'] = 6, -- int, see https://github.com/cmangos/issues/wiki/creature_template#rank
+    ['spawns'] = 7, -- table {[zoneID(int)] = {coordPair(floatVector2D),...},...}
+    ['waypoints'] = 8, -- table {[zoneID(int)] = {coordPair(floatVector2D),...},...}
+    ['zoneID'] = 9, -- guess as to where this NPC is most common
+    ['startQuests'] = 10, -- table {questID(int),...}
+    ['endQuests'] = 11, -- table {questID(int),...}
+    ['factionID'] = 12, int, see https://github.com/cmangos/issues/wiki/FactionTemplate.dbc
+    ['friendlyToFaction'] = 13, -- string, Contains "A" and/or "H" depending on NPC being friendly towards those factions. nil if hostile to both.
+}
+
+""")
         outfile.write("npcData = {\n")
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
@@ -86,8 +105,13 @@ class NpcList():
             name = npc.name
             if locale != 'enGB' and hasattr(npc, 'locales') and npc.locales['name_loc'+str(localesMap[locale])] != None:
                 name = escapeQuotes(npc.locales['name_loc'+str(localesMap[locale])])
-            outfile.write("["+str(npc.id)+"] = {'"+name+"',"+str(npc.minlevelhealth)+","+str(npc.maxlevelhealth)+","+str(npc.minlevel)+","+str(npc.maxlevel)+","+str(npc.rank)+",")
-            if hasattr(npc, "spawns"):
+            outfile.write("["+str(npc.id)+"] = {'"+name+"'," #1
+                                                  +str(npc.minlevelhealth)+"," #2
+                                                  +str(npc.maxlevelhealth)+"," #3
+                                                  +str(npc.minlevel)+"," #4
+                                                  +str(npc.maxlevel)+"," #5
+                                                  +str(npc.rank)+",") #6
+            if hasattr(npc, "spawns"): #7
                 outfile.write("{")
                 for zone in npc.spawns.cByZone:
                     if not zone in validZoneList:
@@ -105,7 +129,7 @@ class NpcList():
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if hasattr(npc, "waypoints"):
+            if hasattr(npc, "waypoints"): #8
                 outfile.write("{")
                 for zone in npc.waypoints.cByZone:
                     if not zone in validZoneList:
@@ -120,20 +144,34 @@ class NpcList():
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            outfile.write(str(zoneId)+",")
-            if hasattr(npc, "start"):
+            outfile.write(str(zoneId)+",") #9
+            if hasattr(npc, "start"): #10
                 outfile.write("{")
                 for quest in npc.start:
                     outfile.write(str(quest)+",")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if hasattr(npc, "end"):
+            if hasattr(npc, "end"): #11
                 outfile.write("{")
                 for quest in npc.end:
                     outfile.write(str(quest)+",")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
+            if hasattr(npc, "faction"): #12
+                outfile.write(str(npc.faction)+",")
+            else:
+                outfile.write("nil,")
+                print(f"Error: No faction found for NPC {npc.name} ({npc.id})")
+            friendlyTo = ""
+            if not npc.hostileToA:
+                friendlyTo += "A"
+            if not npc.hostileToH:
+                friendlyTo += "H"
+            if friendlyTo == "": #13
+                outfile.write("nil,")
+            else:
+                outfile.write(f'"{friendlyTo}",')
             outfile.write("},\n")
         outfile.write("}\n")
