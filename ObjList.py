@@ -66,6 +66,15 @@ class ObjList():
 
     def printObjFile(self, file='objData.lua', locale='enGB'):
         outfile = open(file, "w")
+        outfile.write("""objKeys = {
+    ['name'] = 1, -- string
+    ['questStarts'] = 2, -- table {questID(int),...}
+    ['questEnds'] = 3, -- table {questID(int),...}
+    ['spawns'] = 4, -- table {[zoneID(int)] = {coordPair(floatVector2D),...},...}
+    ['zoneID'] = 5, -- guess as to where this object is most common
+}
+
+""")
         outfile.write("objData = {\n")
         for objId in sorted(self.objectList):
             obj = self.objectList[objId]
@@ -81,22 +90,22 @@ class ObjList():
                     name = escapeDoubleQuotes(obj.locales['name_loc'+str(localesMap[locale])])
                 else:
                     print('Missing translation for Object:', obj.name, '('+str(obj.id)+')' )
-            outfile.write("[\""+str(obj.id)+"\"] = {\""+name+"\",")
-            if hasattr(obj, "start"):
+            outfile.write("[\""+str(obj.id)+"\"] = {\""+name+"\",") #1
+            if hasattr(obj, "start"): #2
                 outfile.write("{")
                 for quest in obj.start:
                     outfile.write(str(quest)+",")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if hasattr(obj, "end"):
+            if hasattr(obj, "end"): #3
                 outfile.write("{")
                 for quest in obj.end:
                     outfile.write(str(quest)+",")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if hasattr(obj, "spawns"):
+            if hasattr(obj, "spawns"): #4
                 outfile.write("{")
                 for zone in obj.spawns.cByZone:
                     if not zone in validZoneList:
@@ -114,6 +123,6 @@ class ObjList():
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            outfile.write(str(zoneId)+",")
+            outfile.write(str(zoneId)+",") #5
             outfile.write("},\n")
         outfile.write("}\n")
