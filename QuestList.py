@@ -313,10 +313,7 @@ class QuestList():
             outfile.write(str(quest.QuestLevel)+",") #level = 5
             outfile.write(f'{quest.RequiredRaces},') #RequiredRaces = 6
             if (hasattr(quest, "RequiredClasses")): #RequiredClasses = 7
-                outfile.write("{")
-                for n in self.unpackBitMask(quest.RequiredClasses):
-                    outfile.write(str(n)+",")
-                outfile.write("},")
+                outfile.write(f"{quest.RequiredClasses},")
             else:
                 outfile.write("nil,")
             if (hasattr(quest, "Objectives")) and (len(self.allQuests(Title = quest.Title)) > 1): #objectives = 8
