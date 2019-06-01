@@ -90,7 +90,7 @@ class ObjList():
                     name = escapeDoubleQuotes(obj.locales['name_loc'+str(localesMap[locale])])
                 else:
                     print('Missing translation for Object:', obj.name, '('+str(obj.id)+')' )
-            outfile.write("[\""+str(obj.id)+"\"] = {\""+name+"\",") #1
+            outfile.write(f'[{obj.id}] = {{"{obj.name}",') #1
             if hasattr(obj, "start"): #2
                 outfile.write("{")
                 for quest in obj.start:
