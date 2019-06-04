@@ -257,6 +257,7 @@ class QuestList():
     ['requiredSkill'] = 18, -- table: {skill(int), value(int)}
     ['requiredMinRep'] = 19, -- table: {faction(int), value(int)}
     ['requiredMaxRep'] = 20, -- table: {faction(int), value(int)}
+    ['requiredSourceItems'] = 21, -- table: {item(int), ...} Items that are not an objective but still needed for the quest.
 }
 """)
         outfile.write("qData = {\n")
@@ -354,15 +355,8 @@ class QuestList():
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "ReqSourceId")) or (hasattr(quest, "ReqItemId")): #itm = objectives3
+            if (hasattr(quest, "ReqItemId")): #itm = objectives3
                 outfile.write("{")
-                if (hasattr(quest, "ReqSourceId")):
-                    done = []
-                    for itm in quest.ReqSourceId:
-                        if itm in done:
-                            continue
-                        outfile.write("{"+str(itm)+",nil},")
-                        done.append(itm)
                 if (hasattr(quest, "ReqItemId")):
                     for itm in quest.ReqItemId:
                         outfile.write("{"+str(itm)+",nil},")
@@ -429,6 +423,17 @@ class QuestList():
                 outfile.write("{"+str(quest.RequiredMaxRepFaction)+","+str(quest.RequiredMaxRepValue)+"},")
             else:
                 outfile.write("nil,")
+            if (hasattr(quest, 'ReqSourceId')): #21
+                outfile.write('{')
+                done = []
+                for itm in quest.ReqSourceId:
+                    if itm in done:
+                        continue
+                    outfile.write(f'{itm},')
+                    done.append(itm)
+                outfile.write('},')
+            else:
+                outfile.write('nil,')
             outfile.write("},\n")
         outfile.write("};\n")
         outfile.close();
