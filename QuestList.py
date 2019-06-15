@@ -259,6 +259,7 @@ class QuestList():
     ['requiredMinRep'] = 19, -- table: {faction(int), value(int)}
     ['requiredMaxRep'] = 20, -- table: {faction(int), value(int)}
     ['requiredSourceItems'] = 21, -- table: {item(int), ...} Items that are not an objective but still needed for the quest.
+    ['nextQuestInChain'] = 22, -- int: if this quest is active/finished, the current quest is not available anymore
 }
 """)
         outfile.write("qData = {\n")
@@ -434,6 +435,10 @@ class QuestList():
                     outfile.write(f'{itm},')
                     done.append(itm)
                 outfile.write('},')
+            else:
+                outfile.write('nil,')
+            if (hasattr(quest, 'NextQuestInChain')): #22
+                outfile.write(f'{quest.NextQuestInChain},')
             else:
                 outfile.write('nil,')
             outfile.write("},\n")
