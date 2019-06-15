@@ -6,6 +6,7 @@ class QuestList():
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
     def __init__(self, cursor, dictCursor):
         self.qList = {}
+        self.dictCursor = dictCursor
         dicts = self.__getQuestTables(cursor, dictCursor)
         infile = open("data/AreaTrigger.dbc.CSV", "r")
         a = infile.read()
@@ -240,7 +241,7 @@ class QuestList():
     ['questLevel'] = 5, -- int
     ['requiredRaces'] = 6, -- bitmask
     ['requiredClasses'] = 7, -- bitmask
-    ['objectivesText'] = 8, -- string, Description of the quest. Auto-complete if nil.
+    ['objectivesText'] = 8, -- table: {string,...}, Description of the quest. Auto-complete if nil.
     ['triggerEnd'] = 9, -- table: {text, {[zoneID] = {coordPair,...},...}}
     ['objectives'] = 10, -- table
         ['creatureObjective'] = 1, -- table {{creature(int), text(string)},...}, If text is nil the default "<Name> slain x/y" is used
@@ -317,13 +318,14 @@ class QuestList():
                 outfile.write(f"{quest.RequiredClasses},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "Objectives")) and (len(self.allQuests(Title = quest.Title)) > 1): #objectives = 8
-                if quest.id == 4641:
-                    quest.Objectives = quest.Objectives[0:-5]
-                objectives = quest.Objectives
+            if (hasattr(quest, "Objectives")): # and (len(self.allQuests(Title = quest.Title)) > 1): #objectives = 8
+                objectives = self.questieObjectivesText(quest.Objectives)
                 if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
-                    objectives = quest.locales_Title[localesMap[locale]]
-                outfile.write("\""+objectives+"\",")
+                    objectives = self.questieObjectivesText(quest.locales_Title[localesMap[locale]])
+                outfile.write('{')
+                for line in objectives:
+                    outfile.write(f'"{line}",')
+                outfile.write('},')
             else:
                 outfile.write("nil,")
             if (hasattr(quest, "triggerEnd")): #trigger = 9
@@ -635,3 +637,31 @@ class QuestList():
         if requiredRaces & 178:
             faction += "H"
         return faction
+
+    def questieObjectivesText(self, objectives, cutName=True):
+        split = objectives.split('\\n')
+        target = []
+        for s in split:
+            if (s != '') and not (('$n' in s) and cutName):
+                target.append(s)
+        target2 = []
+        for s in target:
+            if '  ' in s:
+                split2 = s.split('  ')
+                for x in split2:
+                    target2.append(x)
+            else:
+                target2.append(s)
+        return target2
+
+    def lineWrap(self, source):
+        target = []
+        temp = source
+        while(len(temp)>80):
+            cutoff = 80
+            while(temp[cutoff] != ' '):
+                cutoff -= 1
+            target.append(temp[:cutoff])
+            temp = temp[cutoff+1:]
+        target.append(temp)
+        return target
