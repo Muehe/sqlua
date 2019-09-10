@@ -76,9 +76,7 @@ class NpcList():
 
     def printNpcFile(self, file='npcData.lua', locale='enGB'):
         outfile = open(file, "w")
-        outfile.write("""npcCache = {}
-
-npcKeys = {
+        outfile.write("""QuestieDB.npcKeys = {
     ['name'] = 1, -- string
     ['minLevelHealth'] = 2, -- int
     ['maxLevelHealth'] = 3, -- int
@@ -95,7 +93,7 @@ npcKeys = {
 }
 
 """)
-        outfile.write("npcData = {\n")
+        outfile.write("QuestieDB.npcData = {\n")
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
             #if (not hasattr(npc, "spawns")) and (not hasattr(npc, "waypoints")):

@@ -228,7 +228,7 @@ class QuestList():
 
     def printQuestFile(self, file="qData.lua", locale="enGB"):
         outfile = open(file, "w")
-        outfile.write("""qKeys = {
+        outfile.write("""QuestieDB.questKeys = {
     ['name'] = 1, -- string
     ['startedBy'] = 2, -- table
         ['creatureStart'] = 1, -- table {creature(int),...}
@@ -264,7 +264,7 @@ class QuestList():
     ['specialFlags'] = 24, -- bitmask: 1 = Repeatable, 2 = Needs event, 4 = Monthly reset (req. 1). See https://github.com/cmangos/issues/wiki/Quest_template#specialflags
 }
 """)
-        outfile.write("qData = {\n")
+        outfile.write("QuestieDB.questData = {\n")
         excluded = self.checkStartEnd()
         for id in sorted(self.qList):
             quest = self.qList[id]

@@ -66,7 +66,7 @@ class ObjList():
 
     def printObjFile(self, file='objData.lua', locale='enGB'):
         outfile = open(file, "w")
-        outfile.write("""objKeys = {
+        outfile.write("""QuestieDB.objectKeys = {
     ['name'] = 1, -- string
     ['questStarts'] = 2, -- table {questID(int),...}
     ['questEnds'] = 3, -- table {questID(int),...}
@@ -75,7 +75,7 @@ class ObjList():
 }
 
 """)
-        outfile.write("objData = {\n")
+        outfile.write("QuestieDB.objectData = {\n")
         for objId in sorted(self.objectList):
             obj = self.objectList[objId]
             if obj.type not in [2, 3, 5, 8, 10]:
