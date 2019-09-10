@@ -216,6 +216,8 @@ class Quest():
         self.PreQuestGroup = []
         self.PreQuestSingle = []
         self.SubQuests = []
+        if (quest[51] != 0):
+            self.SpecialFlags = quest[51]
 
     def __repr__(self):
         return str(self.id)
@@ -264,6 +266,7 @@ class Quest():
                 'ReqSpellCast',
                 'ReqSourceId',
                 'SrcItemId',
+                'SpecialFlags',
                ]
         for k in keys:
             if hasattr(self, k):

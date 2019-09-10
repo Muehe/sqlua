@@ -128,7 +128,7 @@ class QuestList():
         """only used by constructor"""
         print("Selecting quest related MySQL tables...")
         # SrcItemId needed to check for spell_script_target (type and targetEntry) via item_template.spellId
-        cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details FROM quest_template")
+        cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags FROM quest_template")
         quest_template = []
         for a in cursor.fetchall():
             quest_template.append(a)
@@ -260,6 +260,8 @@ class QuestList():
     ['requiredMaxRep'] = 20, -- table: {faction(int), value(int)}
     ['requiredSourceItems'] = 21, -- table: {item(int), ...} Items that are not an objective but still needed for the quest.
     ['nextQuestInChain'] = 22, -- int: if this quest is active/finished, the current quest is not available anymore
+    ['questFlags'] = 23, -- bitmask: see https://github.com/cmangos/issues/wiki/Quest_template#questflags
+    ['specialFlags'] = 24, -- bitmask: 1 = Repeatable, 2 = Needs event, 4 = Monthly reset (req. 1). See https://github.com/cmangos/issues/wiki/Quest_template#specialflags
 }
 """)
         outfile.write("qData = {\n")
@@ -439,6 +441,14 @@ class QuestList():
                 outfile.write('nil,')
             if (hasattr(quest, 'NextQuestInChain')): #22
                 outfile.write(f'{quest.NextQuestInChain},')
+            else:
+                outfile.write('nil,')
+            if (hasattr(quest, 'QuestFlags')): # 23
+                outfile.write(f'{quest.QuestFlags},')
+            else:
+                outfile.write('nil,')
+            if (hasattr(quest, 'SpecialFlags')): # 24
+                outfile.write(f'{quest.SpecialFlags},')
             else:
                 outfile.write('nil,')
             outfile.write("},\n")
