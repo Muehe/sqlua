@@ -65,7 +65,8 @@ class QuestList():
                     # replacement for how core works atm.:
                     quest.addPreSingle(quest.PrevQuestId)
                 else: # quest.PrevQuestId < 0
-                    self.qList[abs(quest.PrevQuestId)].addSub(questId)
+                    self.qList[abs(quest.PrevQuestId)].addChild(questId)
+                    self.qList[questId].setParent(abs(quest.PrevQuestId))
             if hasattr(quest, "NextQuestId"):
                 if quest.NextQuestId > 0:
                     postQuest = self.qList[quest.NextQuestId]
@@ -76,15 +77,15 @@ class QuestList():
                     else:
                         postQuest.addPreSingle(questId)
                 else: # quest.NextQuestId < 0
-                    quest.addSub(abs(quest.NextQuestId))
+                    quest.addChild(abs(quest.NextQuestId))
         for questId in self.qList:
             quest = self.qList[questId]
             if quest.PreQuestSingle == []:
                 delattr(quest, "PreQuestSingle")
             if quest.PreQuestGroup == []:
                 delattr(quest, "PreQuestGroup")
-            if quest.SubQuests == []:
-                delattr(quest, "SubQuests")
+            if quest.ChildQuests == []:
+                delattr(quest, "ChildQuests")
         print("Done.")
 
     def unpackBitMask(self, bitMask):
@@ -251,7 +252,7 @@ class QuestList():
     ['sourceItemId'] = 11, -- int, item provided by quest starter
     ['preQuestGroup'] = 12, -- table: {quest(int)}
     ['preQuestSingle'] = 13, -- table: {quest(int)}
-    ['subQuests'] = 14, -- table: {quest(int)}
+    ['childQuests'] = 14, -- table: {quest(int)}
     ['inGroupWith'] = 15, -- table: {quest(int)}
     ['exclusiveTo'] = 16, -- table: {quest(int)}
     ['zoneOrSort'] = 17, -- int, >0: AreaTable.dbc ID; <0: QuestSort.dbc ID
@@ -262,6 +263,7 @@ class QuestList():
     ['nextQuestInChain'] = 22, -- int: if this quest is active/finished, the current quest is not available anymore
     ['questFlags'] = 23, -- bitmask: see https://github.com/cmangos/issues/wiki/Quest_template#questflags
     ['specialFlags'] = 24, -- bitmask: 1 = Repeatable, 2 = Needs event, 4 = Monthly reset (req. 1). See https://github.com/cmangos/issues/wiki/Quest_template#specialflags
+    ['parentQuest'] = 25, -- int, the ID of the parent quest that needs to be active for the current one to be available. See also 'childQuests' (field 14)
 }
 """)
         outfile.write("QuestieDB.questData = {\n")
@@ -391,9 +393,9 @@ class QuestList():
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "SubQuests")): # 14
+            if (hasattr(quest, "ChildQuests")): # 14
                 outfile.write("{")
-                for questId in quest.SubQuests:
+                for questId in quest.ChildQuests:
                     outfile.write(str(questId)+",")
                 outfile.write("},")
             else:
@@ -576,9 +578,9 @@ class QuestList():
                 for questId in quest.PreQuestSingle:
                     outfile.write('\t\t{},\n'.format(questId))
                 outfile.write('\t},\n')
-            if (hasattr(quest, 'SubQuests')): # 14
-                outfile.write('\t["subQuests"] = {\n')
-                for questId in quest.SubQuests:
+            if (hasattr(quest, 'ChildQuests')): # 14
+                outfile.write('\t["childQuests"] = {\n')
+                for questId in quest.ChildQuests:
                     outfile.write('\t\t{},\n'.format(questId))
                 outfile.write('\t},\n')
             if (hasattr(quest, 'InGroupWith')): # 15

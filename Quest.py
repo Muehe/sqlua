@@ -215,7 +215,7 @@ class Quest():
         self.InGroupWith = []
         self.PreQuestGroup = []
         self.PreQuestSingle = []
-        self.SubQuests = []
+        self.ChildQuests = []
         if (quest[51] != 0):
             self.SpecialFlags = quest[51]
 
@@ -240,7 +240,7 @@ class Quest():
                 'InGroupWith',
                 'PreQuestGroup',
                 'PreQuestSingle',
-                'SubQuests',
+                'ChildQuests',
                 'StartScript',
                 'creatureStart',
                 'goStart',
@@ -307,6 +307,9 @@ class Quest():
         if value not in self.PreQuestSingle:
             self.PreQuestSingle.append(value)
 
-    def addSub(self, value):
-        if value not in self.SubQuests:
-            self.SubQuests.append(value)
+    def addChild(self, value):
+        if value not in self.ChildQuests:
+            self.ChildQuests.append(value)
+
+    def setParent(self, value):
+        self.ParentQuest = value
