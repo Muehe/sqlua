@@ -453,6 +453,10 @@ class QuestList():
                 outfile.write(f'{quest.SpecialFlags},')
             else:
                 outfile.write('nil,')
+            if (hasattr(quest, 'ParentQuest')): # 25
+                outfile.write(f'{quest.ParentQuest},')
+            else:
+                outfile.write('nil,')
             outfile.write("},\n")
         outfile.write("};\n")
         outfile.close();
