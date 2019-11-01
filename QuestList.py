@@ -267,11 +267,11 @@ class QuestList():
 }
 """)
         outfile.write("QuestieDB.questData = {\n")
-        excluded = self.checkStartEnd()
+        #excluded = self.checkStartEnd()
         for id in sorted(self.qList):
             quest = self.qList[id]
-            if quest in excluded:
-                continue
+            #if quest in excluded:
+            #    continue
             outfile.write("["+str(quest.id)+"] = {") #key
             title = quest.Title
             if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
