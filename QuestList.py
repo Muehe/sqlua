@@ -229,7 +229,15 @@ class QuestList():
 
     def printQuestFile(self, file="qData.lua", locale="enGB"):
         outfile = open(file, "w")
-        outfile.write("""QuestieDB.questKeys = {
+        outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
+
+-------------------------
+--Import modules.
+-------------------------
+---@type QuestieDB
+local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+
+QuestieDB.questKeys = {
     ['name'] = 1, -- string
     ['startedBy'] = 2, -- table
         --['creatureStart'] = 1, -- table {creature(int),...}

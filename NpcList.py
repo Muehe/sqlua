@@ -76,7 +76,15 @@ class NpcList():
 
     def printNpcFile(self, file='npcData.lua', locale='enGB'):
         outfile = open(file, "w")
-        outfile.write("""QuestieDB.npcKeys = {
+        outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
+
+-------------------------
+--Import modules.
+-------------------------
+---@type QuestieDB
+local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+
+QuestieDB.npcKeys = {
     ['name'] = 1, -- string
     ['minLevelHealth'] = 2, -- int
     ['maxLevelHealth'] = 3, -- int
