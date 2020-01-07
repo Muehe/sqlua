@@ -54,7 +54,7 @@ class NpcList():
 
     def __getNpcTables(self, cursor, dictCursor):
         print("Selecting NPC related MySQL tables...")
-        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction FROM creature_template")
+        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags FROM creature_template")
         npc_tpl = []
         for a in cursor.fetchall():
             npc_tpl.append(a)
@@ -116,6 +116,9 @@ QuestieDB.npcKeys = {
     ['questEnds'] = 11, -- table {questID(int),...}
     ['factionID'] = 12, -- int, see https://github.com/cmangos/issues/wiki/FactionTemplate.dbc
     ['friendlyToFaction'] = 13, -- string, Contains "A" and/or "H" depending on NPC being friendly towards those factions. nil if hostile to both.
+    ['subName'] = 14, -- string, The title or function of the NPC, e.g. "Weapon Vendor"
+    ['npcFlags'] = 15, -- int, Bitmask containing various flags about the NPCs function (Vendor, Trainer, Flight Master, etc.).
+                       -- For flag values see https://github.com/cmangos/mangos-classic/blob/172c005b0a69e342e908f4589b24a6f18246c95e/src/game/Entities/Unit.h#L536
 }
 
 """)
@@ -197,5 +200,13 @@ QuestieDB.npcKeys = {
                 outfile.write("nil,")
             else:
                 outfile.write(f'"{friendlyTo}",')
+            if (hasattr(npc, "subName") and npc.subName != None): #14
+                outfile.write(f'"{npc.subName}",')
+            else:
+                outfile.write("nil,")
+            if hasattr(npc, "npcFlags"): #15
+                outfile.write(f'{str(npc.npcFlags)},')
+            else:
+                outfile.write("nil,")
             outfile.write("},\n")
         outfile.write("}\n")

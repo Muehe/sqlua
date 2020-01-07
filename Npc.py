@@ -50,6 +50,8 @@ class Npc():
             self.hostileToH = True
         else:
             self.hostileToH = False
+        self.subName = npc[8]
+        self.npcFlags = npc[9]
         if extractSpawns:
             spawns = []
             waypoints = []
