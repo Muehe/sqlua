@@ -1,24 +1,34 @@
 class Item():
     def __init__(self, item, tables, locale='enGB'):
-        # tables =  [npc_loot_tpl, obj_loot_tpl, item_loot_tpl, ref_loot_tpl, npc_tpl, obj_tpl, npc_vendor_tpl, npc_vendor, quest_tpl, item_loc_deDE]
-        self.id = item["id"]
-        if locale == 'deDE' and self.id in tables[9]:
-            self.name = tables[9][self.id]["name"]
-        else:
-            self.name = item["name"]
+        self.id = item['id']
+        self.name = item['name']
+        self.flags = item['Flags']
+        self.startquest = item['startquest']
 
-        if 4 & item["Flags"]:
+        # check if item is lootable, i.e. a container like clams
+        if 4 & item['Flags']:
             self.lootable = True
         else:
             self.lootable = False
-        if item["startquest"] != 0:
-            self.startquest = item["startquest"]
+
+        self.npcs = self.get(self.id, 'item', tables['creature_loot_template'])
+        self.objects = self.get(self.id, 'item', tables['gameobject_loot_template'])
+        self.items = self.get(self.id, 'item', tables['item_loot_template'])
+        # self.references = self.get(self.id, 'item', tables['reference_loot_template'])
+        # TODO replacing lootid/data1, merging references
+        self.vendors = self.get(self.id, 'item', tables['npc_vendor'])
+        self.quests = []
+        for quest in tables['quest_template']:
+            for key in quest:
+                if key != 'id' and quest[key] == self.id:
+                    self.quests.append(quest['id'])
+                    break
+
+        self.drops = len(self.npcs) + len(self.objects) + len(self.items) + len(self.vendors) + len(self.quests)
 
     def __repr__(self):
         return str(self.id)
 
-    def match(self, **kwargs):
-        for (key, val) in kwargs.items():
-            if not (hasattr(self, key)):
-                return False
-        return all(getattr(self,key) == val for (key, val) in kwargs.items())
+    def get(self, needle, field, stack):
+        temp = list(filter(lambda step: step[field] == needle, stack))
+        return temp
