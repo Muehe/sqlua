@@ -1,15 +1,34 @@
 from Item import *
 
+import os.path
+import pickle
+
 class ItemList():
-    def __init__(self, dictCursor, locale = "enGB"):
+    def __init__(self, dictCursor, locale = "enGB", recache = False):
+        if (not os.path.isfile('items.pkl') or recache):
+            self.cacheItems(dictCursor, locale)
+        else:
+            try:
+                with open('items.pkl', 'rb') as f:
+                    self.itemList = pickle.load(f)
+                print('Using cached items.')
+            except:
+                print('ERROR: Something went wrong while loading cached items. Recaching.')
+                self.cacheItems(dictCursor, locale)
+
+    def cacheItems(self, dictCursor, locale = 'enGB'):
         self.itemList = {}
         tables = self.__getItemTables(dictCursor)
         count = len(tables["item_template"])
+        print(f'Caching {count} items...')
         for item in tables["item_template"]:
             self.__addItem(item, tables, locale)
             if ((count % 250) == 0):
                 print(str(count)+"...")
             count -= 1
+        with open('items.pkl', 'wb') as f:
+            pickle.dump(self.itemList, f, protocol=pickle.HIGHEST_PROTOCOL)
+        print('Done caching items.')
 
     def __addItem(self, item, tables, locale = "enGB"):
         """only used by constructor"""
@@ -41,7 +60,7 @@ class ItemList():
         return after
 
     def __getItemTables(self, dictCursor):
-        print("Selecting item related MySQL tables...")
+        print("Getting item related MySQL tables...")
 
         ret = {}
 
@@ -75,7 +94,7 @@ class ItemList():
         dictCursor.execute("SELECT entry AS id, RewChoiceItemId1, RewChoiceItemId2, RewChoiceItemId3,RewChoiceItemId4 ,RewChoiceItemId5, RewChoiceItemId6, RewItemId1, RewItemId2, RewItemId3, RewItemId4 FROM quest_template")
         ret['quest_template'] = dictCursor.fetchall()
 
-        print("Done.")
+        print("Done getting tables.")
 
         return ret
 

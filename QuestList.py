@@ -1,10 +1,26 @@
 from Quest import *
 from Utilities import *
+
 import re
+import os.path
+import pickle
+
 
 class QuestList():
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor):
+    def __init__(self, cursor, dictCursor, recache=False):
+        if (not os.path.isfile('quests.pkl') or recache):
+            self.cacheQuests(cursor, dictCursor)
+        else:
+            try:
+                with open('quests.pkl', 'rb') as f:
+                    self.qList = pickle.load(f)
+                print('Using cached quests.')
+            except:
+                print('ERROR: Something went wrong while loading cached quests. Recaching.')
+                self.cacheQuests(cursor, dictCursor)
+
+    def cacheQuests(self, cursor, dictCursor):
         self.qList = {}
         self.dictCursor = dictCursor
         dicts = self.__getQuestTables(cursor, dictCursor)
@@ -15,8 +31,8 @@ class QuestList():
         areaTrigger = []
         for x in b:
             areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5]), float(x[6]), float(x[7]), float(x[8]), float(x[9])))
-        print("Adding Quests...")
         count = len(dicts['quest_template'])
+        print(f'Caching {count} quests...')
         for quest in dicts['quest_template']:
             self.__addQuest(quest, dicts, areaTrigger)
             if ((count % 500) == 0):
@@ -86,7 +102,9 @@ class QuestList():
                 delattr(quest, "PreQuestGroup")
             if quest.ChildQuests == []:
                 delattr(quest, "ChildQuests")
-        print("Done.")
+        with open('quests.pkl', 'wb') as f:
+            pickle.dump(self.qList, f, protocol=pickle.HIGHEST_PROTOCOL)
+        print("Done caching quests.")
 
     def unpackBitMask(self, bitMask):
         bits = []

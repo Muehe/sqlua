@@ -1,19 +1,37 @@
 from Npc import *
 from Utilities import *
 
+import os.path
+import pickle
+
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, extractSpawns = True):
+    def __init__(self, cursor, dictCursor, extractSpawns=True, recache=False):
+        if (not os.path.isfile('npcs.pkl') or recache):
+            self.cacheNpcs(cursor, dictCursor, extractSpawns)
+        else:
+            try:
+                with open('npcs.pkl', 'rb') as f:
+                    self.nList = pickle.load(f)
+                print('Using cached NPCs.')
+            except:
+                print('ERROR: Something went wrong while loading cached NPCs. Recaching.')
+                self.cacheNpcs(cursor, dictCursor, extractSpawns)
+
+
+    def cacheNpcs(self, cursor, dictCursor, extractSpawns=True):
         self.nList = {}
         dicts = self.__getNpcTables(cursor, dictCursor)
-        print("Adding Npcs...")
         count = len(dicts['npc_template'])
+        print(f'Caching {count} NPCs...')
         for npc in dicts['npc_template']:
             self.addNpc(npc, dicts, extractSpawns)
             if ((count % 100) == 0):
                 print(str(count)+"...")
             count -= 1
-        print("Done.")
+        with open('npcs.pkl', 'wb') as f:
+            pickle.dump(self.nList, f, protocol=pickle.HIGHEST_PROTOCOL)
+        print("Done caching NPCs.")
 
     def addNpc(self, npc, tables, extractSpawns):
         newNpc = Npc(npc, tables, extractSpawns)

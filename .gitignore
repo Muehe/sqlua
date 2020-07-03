@@ -1,6 +1,7 @@
 config.py
 __pycache__
 *.pyc
+*.pkl
 *.lua
 *coords.csv
 *area.csv

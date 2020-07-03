@@ -1,19 +1,37 @@
 from Obj import *
 from Utilities import *
 
+import os.path
+import pickle
+
+
 class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, extractSpawns=True):
+    def __init__(self, cursor, dictCursor, extractSpawns=True, recache=False):
+        if (not os.path.isfile('objects.pkl') or recache):
+            self.cacheObjects(cursor, dictCursor, extractSpawns)
+        else:
+            try:
+                with open('objects.pkl', 'rb') as f:
+                    self.objectList = pickle.load(f)
+                print('Using cached objects.')
+            except:
+                print('ERROR: Something went wrong while loading cached objects. Recaching.')
+                self.cacheObjects(cursor, dictCursor, extractSpawns)
+    
+    def cacheObjects(self, cursor, dictCursor, extractSpawns=True):
         self.objectList = {}
         dicts = self.__getObjTables(cursor, dictCursor)
-        print("Adding Objs...")
         count = len(dicts['object_template'])
+        print(f'Caching {count} objects...')
         for obj in dicts['object_template']:
             self.addObj(obj, dicts, extractSpawns)
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
-        print("Done.")
+        with open('objects.pkl', 'wb') as f:
+            pickle.dump(self.objectList, f, protocol=pickle.HIGHEST_PROTOCOL)
+        print("Done caching objects.")
 
     def addObj(self, obj, dicts, extractSpawns):
         newObj = Obj(obj, dicts, extractSpawns)

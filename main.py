@@ -15,13 +15,16 @@ cursor = connection.cursor()
 dictCursor = connection.cursor(pymysql.cursors.DictCursor)
 
 # Create new List classes
-def getClassInstances():
+def getClassInstances(recache=False):
     """Get new instances of the list classes"""
-    quests = QuestList(cursor, dictCursor)
-    npcs = NpcList(cursor, dictCursor)
-    obj = ObjList(cursor, dictCursor)
-    items = [] # will be changed to: ItemList(dictCursor)
+    quests = QuestList(cursor, dictCursor, recache=recache)
+    npcs = NpcList(cursor, dictCursor, recache=recache)
+    obj = ObjList(cursor, dictCursor, recache=recache)
+    items = ItemList(dictCursor, recache=recache)
     return quests, npcs, obj, items
+
+def recache():
+    _, _, _, _ = getClassInstances(True)
 
 def questiePrint():
     """Partial extraction and print for QuestieClassic branch (no items)"""
