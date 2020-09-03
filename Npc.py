@@ -1,18 +1,34 @@
 from CoordList import *
 from Utilities import *
 import re
+import csv
 
-def getCreatureZones(file="data/creatureZones.txt"):
+def getCreatureZones(file="data/creature_preExtract.csv"):
     infile = open(file, "r")
-    content = infile.read()
-    infile.close()
-    zoneList = re.findall("(\d+),(\d+)", content)
+    reader = csv.reader(infile)
     zoneDict = {}
-    for pair in zoneList:
-        zoneDict[int(pair[1])] = int(pair[0])
+    for row in reader:
+        zoneDict[int(row[0])] = int(row[1])
     return zoneDict
 
 zones = getCreatureZones()
+
+def getCreatureWaypoints(file="data/creature_movement_preExtract.csv"):
+    infile = open(file, "r")
+    reader = csv.reader(infile)
+    zoneDict = {}
+    for row in reader:
+        # Split id#point strings
+        idAndPoint = re.split("\D", row[0])
+        cid = int(idAndPoint[0])
+        point = int(idAndPoint[1])
+        if cid not in zoneDict:
+            zoneDict[cid] = {}
+        zoneDict[cid][point] = int(row[1])
+    return zoneDict
+
+movementZones = getCreatureWaypoints()
+movementTemplateZones = getCreatureWaypoints("data/creature_movement_template_preExtract.csv")
 
 def getFactionTemplate(file="data/FactionTemplate.dbc.CSV"):
     content = ""
@@ -55,29 +71,59 @@ class Npc():
         if extractSpawns:
             spawns = []
             waypoints = []
+            # spawns and spawn waypoints
             for spawn in dicts['npc']:
+                # id, map, position_x, position_y, guid
                 if (spawn[0] == self.id):
+                    # get spawns
                     if spawn[4] in zones:
                         spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
                     else:
                         spawns.append((spawn[1], spawn[2], spawn[3]))
+                    # get waypoints
+                    wpSort = {}
                     for waypoint in dicts['npc_movement']:
+                        # point, guid, position_x, position_y
                         if (waypoint[1] == spawn[4]):
-                            waypoints.append((spawn[1], waypoint[2], waypoint[3]))
+                            if (spawn[4] in movementZones) and (waypoint[0] in movementZones[spawn[4]]):
+                                wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3], movementZones[spawn[4]][waypoint[0]])
+                            else:
+                                wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3])
+                    # sort waypoints if there is more than one, discard single-point pathes
+                    if (len(wpSort) > 1):
+                        temp = []
+                        for wp in sorted(list(wpSort)):
+                            temp.append(wpSort[wp])
+                        waypoints.append(CoordList(temp))
+                    elif (len(wpSort) == 1):
+                        print(f'Discarded single-point path for GUID {spawn[4]}')
+
+            # template waypoints
             wpError = False
+            # get waypoints
+            wptSort = {}
             for waypoint in dicts['npc_movement_template']:
-                if (waypoint[1] == self.id):
-                    if (spawns == []):
-                        if (not wpError):
-                            wpError = True
+                # point, entry, position_x, position_y
+                if (waypoint[1] == self.id) and (len(spawns) > 0):
+                    if (self.id in movementTemplateZones) and (waypoint[0] in movementTemplateZones[self.id]):
+                        wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3], movementTemplateZones[self.id][waypoint[0]])
                     else:
-                        waypoints.append((spawns[0][0], waypoint[2], waypoint[3]))
+                        wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3])
+                else:
+                    wpError = True
+            # sort waypoints
+            if (len(wptSort) > 0):
+                temp = []
+                for wp in sorted(list(wptSort)):
+                    temp.append(wptSort[wp])
+                waypoints.append(CoordList(temp))
+            # persist spawns and waypoints
             if (spawns == []):
                 Npc.spawnErrors.append(self.id)
             else:
                 self.spawns = CoordList(spawns)
             if (waypoints != []):
-                self.waypoints = CoordList(waypoints)
+                self.waypoints = waypoints
             if(wpError):
                 Npc.waypointErrors.append(self.id)
         self.start = []

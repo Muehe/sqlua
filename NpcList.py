@@ -21,7 +21,7 @@ class NpcList():
 
     def cacheNpcs(self, cursor, dictCursor, extractSpawns=True):
         self.nList = {}
-        dicts = self.__getNpcTables(cursor, dictCursor)
+        dicts = self.getNpcTables(cursor, dictCursor)
         count = len(dicts['npc_template'])
         print(f'Caching {count} NPCs...')
         for npc in dicts['npc_template']:
@@ -52,7 +52,7 @@ class NpcList():
     def __iterNpc(self, **kwargs):
         return (self.nList[npc] for npc in self.nList if self.nList[npc].match(**kwargs))
 
-    def __getNpcTables(self, cursor, dictCursor):
+    def getNpcTables(self, cursor, dictCursor):
         print("Selecting NPC related MySQL tables...")
         cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags FROM creature_template")
         npc_tpl = []
@@ -158,15 +158,30 @@ QuestieDB.npcKeys = {
                 outfile.write("nil,")
             if hasattr(npc, "waypoints"): #8
                 outfile.write("{")
-                for zone in npc.waypoints.cByZone:
-                    if not zone in validZoneList:
-                        if zoneId == 0:
-                            zoneId = zone
-                        outfile.write("["+str(zone)+"]={{-1, -1}},")
-                        continue
-                    outfile.write("["+str(zone)+"]={")
-                    for coords in npc.waypoints.cByZone[zone]:
-                        outfile.write("{"+str(coords[0])+","+str(coords[1])+"},")
+                waypointsByZone = {}
+                for route in npc.waypoints:
+                    lastZone = 0
+                    path = []
+                    for wp in route.cList:
+                        for zone in wp.pointList:
+                            if zone not in waypointsByZone:
+                                waypointsByZone[zone] = []
+                            if (zone != lastZone) and (lastZone != 0):
+                                waypointsByZone[zone].append(path)
+                                path = []
+                            lastZone = zone
+                            path.append(wp.pointList[zone])
+                    if (lastZone != 0) and (len(path) > 0):
+                        waypointsByZone[lastZone].append(path)
+                for zone in waypointsByZone:
+                    outfile.write('['+str(zone)+']={')
+                    for path in waypointsByZone[zone]:
+                        outfile.write('{')
+                        for wp in path:
+                            outfile.write('{')
+                            outfile.write(f'{wp[0]},{wp[1]}')
+                            outfile.write('},')
+                        outfile.write('},')
                     outfile.write("},")
                 outfile.write("},")
             else:
