@@ -18,7 +18,7 @@ class ObjList():
             except:
                 print('ERROR: Something went wrong while loading cached objects. Recaching.')
                 self.cacheObjects(cursor, dictCursor, extractSpawns)
-    
+
     def cacheObjects(self, cursor, dictCursor, extractSpawns=True):
         self.objectList = {}
         dicts = self.__getObjTables(cursor, dictCursor)
@@ -82,7 +82,7 @@ class ObjList():
                 'object_end':obj_end,
                 'locales_object':loc_obj}
 
-    def printObjFile(self, file='objData.lua', locale='enGB'):
+    def printObjFile(self, file='objectDB.lua', locale='enGB'):
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
