@@ -16,7 +16,7 @@ class Item():
         self.items = self.get(self.id, 'item', tables['item_loot_template'])
         # self.references = self.get(self.id, 'item', tables['reference_loot_template'])
         # TODO replacing lootid/data1, merging references
-        self.vendors = self.get(self.id, 'item', tables['npc_vendor'])
+        self.vendors = list(filter(lambda step: step['item'] == self.id, tables['npc_vendor']))
         self.quests = []
         for quest in tables['quest_template']:
             for key in quest:
@@ -30,5 +30,11 @@ class Item():
         return str(self.id)
 
     def get(self, needle, field, stack):
-        temp = list(filter(lambda step: step[field] == needle, stack))
+        temp = list(filter(lambda step: step[field] == needle and not self.isReference(step), stack))
         return temp
+
+    def isReference(self, loot):
+        if loot['mincountOrRef'] < 0:
+            return True
+        else:
+            return False
