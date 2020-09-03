@@ -4,6 +4,9 @@ class Item():
         self.name = item['name']
         self.flags = item['Flags']
         self.startquest = item['startquest']
+        self.foodtype = item['FoodType']
+        self.itemlevel = item['ItemLevel']
+        self.requiredlevel = item['RequiredLevel']
 
         # check if item is lootable, i.e. a container like clams
         if 4 & item['Flags']:

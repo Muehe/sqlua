@@ -64,7 +64,7 @@ class ItemList():
 
         ret = {}
 
-        dictCursor.execute("SELECT entry AS id, name, Flags, startquest FROM item_template")
+        dictCursor.execute("SELECT entry AS id, name, Flags, startquest, FoodType, ItemLevel, RequiredLevel FROM item_template")
         ret['item_template'] = dictCursor.fetchall()
 
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM creature_loot_template")
@@ -113,11 +113,14 @@ QuestieDB.itemKeys = {
     ['name'] = 1, -- string
     ['flags'] = 2, -- int or nil, see: https://github.com/cmangos/issues/wiki/Item_template#flags
     ['startQuest'] = 3, -- int or nil, ID of the quest started by this item
-    ['npcDrops'] = 4, -- table or nil, !not! the npc IDs, see lootid: https://github.com/cmangos/issues/wiki/Creature_template#lootid
-    ['objectDrops'] = 5, -- table or nil, !not! the object IDs, see data1: https://github.com/cmangos/issues/wiki/Gameobject_template#data0-23
-    ['itemDrops'] = 6, -- table or nil, IDs of the items
-    ['vendors'] = 7, -- table or nil, IDs of NPCs selling this
-    ['questRewards'] = 8, -- table or nil, IDs of the quests rewarding this
+    ['foodType'] = 4, -- int or nil, see https://github.com/cmangos/issues/wiki/Item_template#foodtype
+    ['itemLevel'] = 5 -- int, the level of this item
+    ['requiredLevel'] = 6 -- int, the level required to equip/use this item
+    ['npcDrops'] = 7, -- table or nil, !not! the npc IDs, see lootid: https://github.com/cmangos/issues/wiki/Creature_template#lootid
+    ['objectDrops'] = 8, -- table or nil, !not! the object IDs, see data1: https://github.com/cmangos/issues/wiki/Gameobject_template#data0-23
+    ['itemDrops'] = 9, -- table or nil, IDs of the items
+    ['vendors'] = 10, -- table or nil, IDs of NPCs selling this
+    ['questRewards'] = 11, -- table or nil, IDs of the quests rewarding this
 }
 
 QuestieDB.items = {
@@ -129,20 +132,23 @@ QuestieDB.items = {
             fo.write(f'"{item.name}",') #1
             fo.write(f"{item.flags}," if item.flags != 0 else 'nil,') #2
             fo.write(f"{item.startquest}," if item.startquest != 0 else 'nil,') #3
+            fo.write(f"{item.foodtype}," if item.foodtype != 0 else 'nil,') #4
+            fo.write(f"{item.itemlevel},") #5
+            fo.write(f"{item.requiredlevel},") #6
             if item.drops == 0:
                 fo.write('},\n')
                 continue
-            self.writeList(fo, item.npcs) #4
-            self.writeList(fo, item.objects) #5
-            self.writeList(fo, item.items) #6
-            if len(item.vendors) > 0: #7
+            self.writeList(fo, item.npcs) #7
+            self.writeList(fo, item.objects) #8
+            self.writeList(fo, item.items) #9
+            if len(item.vendors) > 0: #10
                 fo.write('{')
                 for thing in item.vendors:
                     fo.write(f'{thing["id"]},')
                 fo.write('},',)
             else:
                 fo.write('nil,')
-            if len(item.quests) > 0: #8
+            if len(item.quests) > 0: #11
                 fo.write('{')
                 for thing in item.quests:
                     fo.write(f'{thing},')
