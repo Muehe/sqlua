@@ -7,6 +7,9 @@ class Item():
         self.foodtype = item['FoodType']
         self.itemlevel = item['ItemLevel']
         self.requiredlevel = item['RequiredLevel']
+        self.ammoType = item['ammo_type']
+        self.cls = item['class']
+        self.subClass = item['subclass']
 
         # check if item is lootable, i.e. a container like clams
         if 4 & item['Flags']:

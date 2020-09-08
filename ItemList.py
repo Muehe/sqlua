@@ -64,7 +64,7 @@ class ItemList():
 
         ret = {}
 
-        dictCursor.execute("SELECT entry AS id, name, Flags, startquest, FoodType, ItemLevel, RequiredLevel FROM item_template")
+        dictCursor.execute("SELECT entry AS id, name, Flags, startquest, FoodType, ItemLevel, RequiredLevel, ammo_type, class, subclass FROM item_template")
         ret['item_template'] = dictCursor.fetchall()
 
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM creature_loot_template")
@@ -79,7 +79,7 @@ class ItemList():
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM reference_loot_template")
         ret['reference_loot_template'] = dictCursor.fetchall()
 
-        dictCursor.execute("SELECT entry AS id, data1 FROM gameobject_template WHERE type = 3")
+        dictCursor.execute("SELECT entry AS id, data1 FROM gameobject_template WHERE type IN(3, 25)")
         a = dictCursor.fetchall()
         # create loot lookup dict for objects
         b = {}
@@ -131,11 +131,14 @@ QuestieDB.itemKeys = {
     ['foodType'] = 4, -- int or nil, see https://github.com/cmangos/issues/wiki/Item_template#foodtype
     ['itemLevel'] = 5 -- int, the level of this item
     ['requiredLevel'] = 6 -- int, the level required to equip/use this item
-    ['npcDrops'] = 7, -- table or nil, NPC IDs
-    ['objectDrops'] = 8, -- table or nil, object IDs
-    ['itemDrops'] = 9, -- table or nil, item IDs
-    ['vendors'] = 10, -- table or nil, NPC IDs
-    ['questRewards'] = 11, -- table or nil, quest IDs
+    ['ammoType'] = 7, -- int,
+    ['class'] = 8, -- int,
+    ['subClass'] = 9, -- int,
+    ['npcDrops'] = 10, -- table or nil, NPC IDs
+    ['objectDrops'] = 11, -- table or nil, object IDs
+    ['itemDrops'] = 12, -- table or nil, item IDs
+    ['vendors'] = 13, -- table or nil, NPC IDs
+    ['questRewards'] = 14, -- table or nil, quest IDs
 
 QuestieDB.items = {
 """)
@@ -149,10 +152,13 @@ QuestieDB.items = {
             fo.write(f"{item.foodtype}," if item.foodtype != 0 else 'nil,') #4
             fo.write(f"{item.itemlevel},") #5
             fo.write(f"{item.requiredlevel},") #6
+            fo.write(f"{item.ammoType},") #7
+            fo.write(f"{item.cls},") #8
+            fo.write(f"{item.subClass},") #9
             if item.drops == 0:
                 fo.write('},\n')
                 continue
-            #7
+            #10
             if item.npcs:
                 fo.write('{')
                 for npc in item.npcs:
@@ -160,7 +166,7 @@ QuestieDB.items = {
                 fo.write('},',)
             else:
                 fo.write('nil,')
-            #8
+            #11
             if item.objects:
                 fo.write('{')
                 for objectID in item.objects:
@@ -168,15 +174,15 @@ QuestieDB.items = {
                 fo.write('},',)
             else:
                 fo.write('nil,')
-            self.writeList(fo, item.items) #9
-            if len(item.vendors) > 0: #10
+            self.writeList(fo, item.items) #12
+            if len(item.vendors) > 0: #13
                 fo.write('{')
                 for thing in item.vendors:
                     fo.write(f'{thing["id"]},')
                 fo.write('},',)
             else:
                 fo.write('nil,')
-            if len(item.quests) > 0: #11
+            if len(item.quests) > 0: #14
                 fo.write('{')
                 for thing in item.quests:
                     fo.write(f'{thing},')
