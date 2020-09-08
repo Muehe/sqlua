@@ -1,15 +1,17 @@
 from CoordList import *
 from Utilities import *
 import re
+import csv
 
-def getObjectZones(file="data/objectZones.txt"):
+def getObjectZones(file="data/gameobject_preExtract.csv"):
     infile = open(file, "r")
-    content = infile.read()
-    infile.close()
-    zoneList = re.findall("(\d+),(\d+)", content)
+    reader = csv.reader(infile)
+    # skip header line
+    next(reader)
     zoneDict = {}
-    for pair in zoneList:
-        zoneDict[int(pair[1])] = int(pair[0])
+    for row in reader:
+        zoneDict[int(row[0])] = int(row[1])
+    infile.close()
     return zoneDict
 
 objectZones = getObjectZones()

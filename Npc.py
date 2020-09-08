@@ -6,9 +6,12 @@ import csv
 def getCreatureZones(file="data/creature_preExtract.csv"):
     infile = open(file, "r")
     reader = csv.reader(infile)
+    # skip header line
+    next(reader)
     zoneDict = {}
     for row in reader:
         zoneDict[int(row[0])] = int(row[1])
+    infile.close()
     return zoneDict
 
 zones = getCreatureZones()
@@ -16,6 +19,8 @@ zones = getCreatureZones()
 def getCreatureWaypoints(file="data/creature_movement_preExtract.csv"):
     infile = open(file, "r")
     reader = csv.reader(infile)
+    # skip header line
+    next(reader)
     zoneDict = {}
     for row in reader:
         # Split id#point strings
@@ -25,6 +30,7 @@ def getCreatureWaypoints(file="data/creature_movement_preExtract.csv"):
         if cid not in zoneDict:
             zoneDict[cid] = {}
         zoneDict[cid][point] = int(row[1])
+    infile.close()
     return zoneDict
 
 movementZones = getCreatureWaypoints()
