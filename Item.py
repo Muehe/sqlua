@@ -14,11 +14,28 @@ class Item():
         else:
             self.lootable = False
 
-        self.npcs = self.get(self.id, 'item', tables['creature_loot_template'])
-        self.objects = self.get(self.id, 'item', tables['gameobject_loot_template'])
+        # create list of NPC loot table entries containing this item
+        lootIDs = self.get(self.id, 'item', tables['creature_loot_template'])
+        # translate LootId (id) field to NPC IDs
+        self.npcs = []
+        for loot in lootIDs:
+            for npcID in tables['lootIDs'][loot['id']]:
+                if npcID not in self.npcs:
+                    self.npcs.append(npcID)
+        # create list of object loot table entries containing this item
+        dates = self.get(self.id, 'item', tables['gameobject_loot_template'])
+        # translate data1 (id) field to object IDs
+        self.objects = []
+        for loot in dates:
+            if loot['id'] not in tables['data1']:
+                print(f'No object found for {loot} of item {self.name} ({self.id})')
+                continue
+            for objectID in tables['data1'][loot['id']]:
+                if objectID not in self.objects:
+                    self.objects.append(objectID)
         self.items = self.get(self.id, 'item', tables['item_loot_template'])
         # self.references = self.get(self.id, 'item', tables['reference_loot_template'])
-        # TODO replacing lootid/data1, merging references
+        # TODO merging references
         self.vendors = list(filter(lambda step: step['item'] == self.id, tables['npc_vendor']))
         self.quests = []
         for quest in tables['quest_template']:

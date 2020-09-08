@@ -80,10 +80,25 @@ class ItemList():
         ret['reference_loot_template'] = dictCursor.fetchall()
 
         dictCursor.execute("SELECT entry AS id, data1 FROM gameobject_template WHERE type = 3")
-        ret['gameobject_template'] = dictCursor.fetchall()
-
+        a = dictCursor.fetchall()
+        # create loot lookup dict for objects
+        b = {}
+        for x in a:
+            if x['data1'] not in b:
+                b[x['data1']] = []
+            b[x['data1']].append(x['id'])
+        ret['gameobject_template'] = a
+        ret['data1'] = b
         dictCursor.execute("SELECT entry AS id, LootId, VendorTemplateId FROM creature_template") # PickpocketLootId and SkinningLootId might be good...
-        ret['creature_template'] = dictCursor.fetchall()
+        a = dictCursor.fetchall()
+        # create loot lookup table for NPCs
+        b = {}
+        for x in a:
+            if x['LootId'] not in b:
+                b[x['LootId']] = []
+            b[x['LootId']].append(x['id'])
+        ret['creature_template'] = a
+        ret['lootIDs'] = b
 
         dictCursor.execute("SELECT entry AS id, item, maxcount, incrtime FROM npc_vendor_template")
         ret['npc_vendor_template'] = dictCursor.fetchall()
@@ -116,12 +131,11 @@ QuestieDB.itemKeys = {
     ['foodType'] = 4, -- int or nil, see https://github.com/cmangos/issues/wiki/Item_template#foodtype
     ['itemLevel'] = 5 -- int, the level of this item
     ['requiredLevel'] = 6 -- int, the level required to equip/use this item
-    ['npcDrops'] = 7, -- table or nil, !not! the npc IDs, see lootid: https://github.com/cmangos/issues/wiki/Creature_template#lootid
-    ['objectDrops'] = 8, -- table or nil, !not! the object IDs, see data1: https://github.com/cmangos/issues/wiki/Gameobject_template#data0-23
-    ['itemDrops'] = 9, -- table or nil, IDs of the items
-    ['vendors'] = 10, -- table or nil, IDs of NPCs selling this
-    ['questRewards'] = 11, -- table or nil, IDs of the quests rewarding this
-}
+    ['npcDrops'] = 7, -- table or nil, NPC IDs
+    ['objectDrops'] = 8, -- table or nil, object IDs
+    ['itemDrops'] = 9, -- table or nil, item IDs
+    ['vendors'] = 10, -- table or nil, NPC IDs
+    ['questRewards'] = 11, -- table or nil, quest IDs
 
 QuestieDB.items = {
 """)
@@ -138,8 +152,22 @@ QuestieDB.items = {
             if item.drops == 0:
                 fo.write('},\n')
                 continue
-            self.writeList(fo, item.npcs) #7
-            self.writeList(fo, item.objects) #8
+            #7
+            if item.npcs:
+                fo.write('{')
+                for npc in item.npcs:
+                    fo.write(f'{npc},')
+                fo.write('},',)
+            else:
+                fo.write('nil,')
+            #8
+            if item.objects:
+                fo.write('{')
+                for objectID in item.objects:
+                    fo.write(f'{objectID},')
+                fo.write('},',)
+            else:
+                fo.write('nil,')
             self.writeList(fo, item.items) #9
             if len(item.vendors) > 0: #10
                 fo.write('{')
