@@ -1,6 +1,5 @@
 from CoordList import *
 from Utilities import *
-import re
 import csv
 
 def getCreatureZones(file="data/creature_preExtract.csv"):

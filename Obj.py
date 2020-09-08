@@ -1,6 +1,5 @@
 from CoordList import *
 from Utilities import *
-import re
 import csv
 
 def getObjectZones(file="data/gameobject_preExtract.csv"):

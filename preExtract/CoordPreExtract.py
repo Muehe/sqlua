@@ -5,7 +5,7 @@ def printCoordFiles(cursor):
     ## sort by guid
     for a in cursor.fetchall():
         npc[a[5]] = a
-    fileName = "preExtract/creature_coords.csv"
+    fileName = "preExtract/creature_preExtract.csv"
     outfile = open(fileName, "w")
     for guid in npc: # (guid, map, x, y, z)
         outfile.write(str(guid)+","+str(npc[guid][1])+","+str(npc[guid][2])+","+str(npc[guid][3])+","+str(npc[guid][4])+",\n")
@@ -17,7 +17,7 @@ def printCoordFiles(cursor):
     ## sort by guid#point
     for a in cursor.fetchall():
         npc_mov[str(a[1])+"#"+str(a[0])] = a
-    fileName = "preExtract/creature_movement_coords.csv"
+    fileName = "preExtract/creature_movement_preExtract.csv"
     outfile = open(fileName, "w")
     for guid in npc_mov: # (guid, map, x, y, z)
         if npc_mov[guid][1] in npc:
@@ -38,7 +38,7 @@ def printCoordFiles(cursor):
     npc_mov_tpl = []
     for a in cursor.fetchall():
         npc_mov_tpl.append(a)
-    fileName = "preExtract/creature_movement_template_coords.csv"
+    fileName = "preExtract/creature_movement_template_preExtract.csv"
     outfile = open(fileName, "w")
     for point in npc_mov_tpl: # (id, map, x, y, z)
         if point[1] in npcById:
@@ -53,7 +53,7 @@ def printCoordFiles(cursor):
     ## sort by guid
     for a in cursor.fetchall():
         obj[a[5]] = a
-    fileName = "preExtract/gameobject_coords.csv"
+    fileName = "preExtract/gameobject_preExtract.csv"
     outfile = open(fileName, "w")
     for guid in obj: # (guid, map, x, y, z)
         outfile.write(str(guid)+","+str(obj[guid][1])+","+str(obj[guid][2])+","+str(obj[guid][3])+","+str(obj[guid][4])+",\n")
