@@ -3,7 +3,6 @@ from NpcList import *
 from ObjList import *
 from CoordList import *
 from ItemList import *
-from Items import *
 from preExtract.CoordPreExtract import printCoordFiles
 
 import pymysql
