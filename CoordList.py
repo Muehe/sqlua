@@ -13,13 +13,13 @@ class CoordList():
 
     def addCoord(self, map, x, y, zone=False):
         newCoord = Coord(map, x, y, zone)
-        if newCoord.pointList != {}:
+        if not newCoord.noZone:
             self.cList.append(newCoord)
-            for c in newCoord.pointList:
-                if c in self.cByZone:
-                    self.cByZone[c].append(newCoord.pointList[c])
+            for zone in newCoord.zoneList:
+                if zone in self.cByZone:
+                    self.cByZone[zone].append(newCoord.zoneList[zone])
                 else:
-                    self.cByZone[c] = [newCoord.pointList[c]]
+                    self.cByZone[zone] = [newCoord.zoneList[zone]]
 
     def findCoord(self, **kwargs):
         return next(self.__iterCoord(**kwargs))

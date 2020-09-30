@@ -210,9 +210,11 @@ class Coord():
     """This class takes a (x,y) point from the continent maps and creates a dictionary of all possible zone (x,y) coordinates.
        If the map/zone belongs to an instance a dummy is added."""
     def __init__(self, mapId, x, y, zoneId=False):
-        self.pointList = {}
+        self.pointList = []
+        self.zoneList = {}
         self.isInstance = False
         self.isMulti = False
+        self.noZone = False
         for mapSet in mapBorders:
             zone = int(mapSet[0])
             if zoneId in validZoneList and zone != zoneId:
@@ -225,19 +227,22 @@ class Coord():
             if (mapId == mId) and (x < x1) and (x > x2) and (y < y1) and (y > y2):
                 xCoord = round(abs((x-x1)/(x2-x1)*100), 2)
                 yCoord = round(abs((y-y1)/(y2-y1)*100), 2)
-                self.pointList[zone] = (yCoord, xCoord)
+                self.zoneList[zone] = (yCoord, xCoord)
+                self.pointList.append((zone, yCoord, xCoord))
         if len(self.pointList) > 1:
             self.isMulti = True
+        elif len(self.pointList) == 0:
+            self.noZone = True
 
         for instance in instanceIds:
             zoneId = int(instance[0])
             mapID = int(instance[2])
             if (mapId == mapID):
-                self.pointList[zoneId] = (-1, -1)
+                self.zoneList[zoneId] = (-1, -1)
                 self.isInstance = True
 
     def __repr__(self):
         points = ""
-        for c in self.pointList:
-            points += "("+str(c)+": "+str(self.pointList[c])+")"
+        for c in self.zoneList:
+            points += "("+str(c)+": "+str(self.zoneList[c])+")"
         return points
