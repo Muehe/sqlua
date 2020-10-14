@@ -163,6 +163,9 @@ QuestieDB.npcKeys = {
                         # skip empty lists, these seem to be mostly instance and script spawns, but some other edge cases might be hidded here
                         # print(f'Empty waypoint list for NPC {npc.name} ({npc.id}).')
                         continue
+                    if route.cList[0].isInstance:
+                        # skip waypoints in instances
+                        continue
                     lastZone = route.cList[0].pointList[0][0]
                     path = []
                     for coord in route.cList:
