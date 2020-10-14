@@ -229,17 +229,19 @@ class Coord():
                 yCoord = round(abs((y-y1)/(y2-y1)*100), 2)
                 self.zoneList[zone] = (yCoord, xCoord)
                 self.pointList.append((zone, yCoord, xCoord))
+
+        for instance in instanceIds:
+            zoneID = int(instance[0])
+            mapID = int(instance[2])
+            if (mapId == mapID):
+                self.zoneList[zoneID] = (-1, -1)
+                self.pointList.append((zoneID, -1, -1))
+                self.isInstance = True
+
         if len(self.pointList) > 1:
             self.isMulti = True
         elif len(self.pointList) == 0:
             self.noZone = True
-
-        for instance in instanceIds:
-            zoneId = int(instance[0])
-            mapID = int(instance[2])
-            if (mapId == mapID):
-                self.zoneList[zoneId] = (-1, -1)
-                self.isInstance = True
 
     def __repr__(self):
         points = ""
