@@ -248,3 +248,9 @@ class Coord():
         for c in self.zoneList:
             points += "("+str(c)+": "+str(self.zoneList[c])+")"
         return points
+
+
+def worldToZone(mapId, x, y, zone=False):
+    a = Coord(mapId, x, y, zone)
+    for point in a.pointList:
+        print(point)
