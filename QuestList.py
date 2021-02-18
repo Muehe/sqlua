@@ -246,7 +246,7 @@ class QuestList():
                 actualRequiredRaces[self.qList[quest].id] = tempRace
         return actualRequiredRaces
 
-    def printQuestFile(self, file="questDB.lua", locale="enGB"):
+    def printQuestFile(self, file="output/questDB.lua", locale="enGB"):
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 

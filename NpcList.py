@@ -93,7 +93,7 @@ class NpcList():
                 'npc_movement_template':npc_mov_tpl,
                 'locales_npc':loc_npc}
 
-    def printNpcFile(self, file='spawnDB.lua', locale='enGB'):
+    def printNpcFile(self, file='output/spawnDB.lua', locale='enGB'):
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 

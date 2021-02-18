@@ -114,7 +114,7 @@ class ItemList():
 
         return ret
 
-    def writeFile(self, file = 'itemDB.lua'):
+    def writeFile(self, file = 'output/itemDB.lua'):
         fo = open(file, "w")
 
         fo.write("""-- AUTO GENERATED FILE! DO NOT EDIT!

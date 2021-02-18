@@ -83,7 +83,7 @@ class ObjList():
                 'object_end':obj_end,
                 'locales_object':loc_obj}
 
-    def printObjFile(self, file='objectDB.lua', locale='enGB'):
+    def printObjFile(self, file='output/objectDB.lua', locale='enGB'):
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
