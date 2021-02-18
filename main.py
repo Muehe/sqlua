@@ -5,19 +5,9 @@ from CoordList import *
 from ItemList import *
 from preExtract.CoordPreExtract import printCoordFiles
 
+import sys
 import pymysql
 import config
-
-# Set up MySQL connection
-connection = pymysql.connect(
-    host=config.host,
-    user=config.user,
-    password=config.password,
-    database=config.database,
-    charset='utf8'
-)
-cursor = connection.cursor()
-dictCursor = connection.cursor(pymysql.cursors.DictCursor)
 
 def getClassInstances(recache=False):
     """Get new instances of the list classes"""
@@ -41,6 +31,27 @@ def main(recache):
     print("Done.")
     return 0
 
+version = config.version # accepts 'classic' or 'tbc'
+runMain = False
+
 if __name__ == "__main__":
-    # execute only if run as a script
+    """Executes only if run as a script"""
+    if len(sys.argv) > 1:
+        if sys.argv[1] in ['classic', 'tbc']:
+            version = sys.argv[1]
+    print(f'Using version {version}')
+    runMain = True
+
+# Set up MySQL connection
+connection = pymysql.connect(
+    host=config.dbInfo['host'],
+    user=config.dbInfo['user'],
+    password=config.dbInfo['password'],
+    database=config.dbInfo[version],
+    charset='utf8'
+)
+cursor = connection.cursor()
+dictCursor = connection.cursor(pymysql.cursors.DictCursor)
+
+if runMain:
     main(True)

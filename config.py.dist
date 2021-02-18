@@ -1,5 +1,10 @@
+# Which database to use, may also be passed as argument to the main script
+version = 'classic'
 # MySQL information
-host = 'localhost'
-user = 'mangos'
-password = 'mangos'
-database = 'classicmangos'
+dbInfo = {
+    'host': 'localhost',
+    'user': 'mangos',
+    'password': 'mangos',
+    'classic': 'classicmangos',
+    'tbc': 'tbcmangos',
+}
