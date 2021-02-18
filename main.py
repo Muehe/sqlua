@@ -9,7 +9,13 @@ import pymysql
 import config
 
 # Set up MySQL connection
-connection = pymysql.connect(config.host, config.user, config.password, config.database, charset='utf8')
+connection = pymysql.connect(
+    host=config.host,
+    user=config.user,
+    password=config.password,
+    database=config.database,
+    charset='utf8'
+)
 cursor = connection.cursor()
 dictCursor = connection.cursor(pymysql.cursors.DictCursor)
 
