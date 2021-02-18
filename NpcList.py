@@ -6,12 +6,13 @@ import pickle
 
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, extractSpawns=True, recache=False):
-        if (not os.path.isfile('npcs.pkl') or recache):
+    def __init__(self, cursor, dictCursor, version, extractSpawns=True, recache=False):
+        self.version = version
+        if (not os.path.isfile(f'data/{version}/npcs.pkl') or recache):
             self.cacheNpcs(cursor, dictCursor, extractSpawns)
         else:
             try:
-                with open('npcs.pkl', 'rb') as f:
+                with open(f'data/{version}/npcs.pkl', 'rb') as f:
                     self.nList = pickle.load(f)
                 print('Using cached NPCs.')
             except:
@@ -29,7 +30,7 @@ class NpcList():
             if ((count % 100) == 0):
                 print(str(count)+"...")
             count -= 1
-        with open('npcs.pkl', 'wb') as f:
+        with open(f'data/{self.version}/npcs.pkl', 'wb') as f:
             pickle.dump(self.nList, f, protocol=pickle.HIGHEST_PROTOCOL)
         print("Done caching NPCs.")
 

@@ -4,12 +4,13 @@ import os.path
 import pickle
 
 class ItemList():
-    def __init__(self, dictCursor, locale = "enGB", recache = False):
-        if (not os.path.isfile('items.pkl') or recache):
+    def __init__(self, dictCursor, version, locale = "enGB", recache = False):
+        self.version = version
+        if (not os.path.isfile(f'data/{version}/items.pkl') or recache):
             self.cacheItems(dictCursor, locale)
         else:
             try:
-                with open('items.pkl', 'rb') as f:
+                with open(f'data/{version}/items.pkl', 'rb') as f:
                     self.itemList = pickle.load(f)
                 print('Using cached items.')
             except:
@@ -26,7 +27,7 @@ class ItemList():
             if ((count % 250) == 0):
                 print(str(count)+"...")
             count -= 1
-        with open('items.pkl', 'wb') as f:
+        with open(f'data/{self.version}/items.pkl', 'wb') as f:
             pickle.dump(self.itemList, f, protocol=pickle.HIGHEST_PROTOCOL)
         print('Done caching items.')
 

@@ -8,12 +8,13 @@ import pickle
 
 class QuestList():
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, recache=False):
-        if (not os.path.isfile('quests.pkl') or recache):
+    def __init__(self, cursor, dictCursor, version, recache=False):
+        self.version = version
+        if (not os.path.isfile(f'data/{version}/quests.pkl') or recache):
             self.cacheQuests(cursor, dictCursor)
         else:
             try:
-                with open('quests.pkl', 'rb') as f:
+                with open(f'data/{version}/quests.pkl', 'rb') as f:
                     self.qList = pickle.load(f)
                 print('Using cached quests.')
             except:
@@ -102,7 +103,7 @@ class QuestList():
                 delattr(quest, "PreQuestGroup")
             if quest.ChildQuests == []:
                 delattr(quest, "ChildQuests")
-        with open('quests.pkl', 'wb') as f:
+        with open(f'data/{self.version}/quests.pkl', 'wb') as f:
             pickle.dump(self.qList, f, protocol=pickle.HIGHEST_PROTOCOL)
         print("Done caching quests.")
 

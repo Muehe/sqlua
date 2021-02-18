@@ -7,12 +7,13 @@ import pickle
 
 class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, extractSpawns=True, recache=False):
-        if (not os.path.isfile('objects.pkl') or recache):
+    def __init__(self, cursor, dictCursor, version, extractSpawns=True, recache=False):
+        self.version = version
+        if (not os.path.isfile(f'data/{version}/objects.pkl') or recache):
             self.cacheObjects(cursor, dictCursor, extractSpawns)
         else:
             try:
-                with open('objects.pkl', 'rb') as f:
+                with open(f'data/{version}/objects.pkl', 'rb') as f:
                     self.objectList = pickle.load(f)
                 print('Using cached objects.')
             except:
@@ -29,7 +30,7 @@ class ObjList():
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
-        with open('objects.pkl', 'wb') as f:
+        with open(f'data/{self.version}/objects.pkl', 'wb') as f:
             pickle.dump(self.objectList, f, protocol=pickle.HIGHEST_PROTOCOL)
         print("Done caching objects.")
 

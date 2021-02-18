@@ -11,10 +11,10 @@ import config
 
 def getClassInstances(recache=False):
     """Get new instances of the list classes"""
-    quests = QuestList(cursor, dictCursor, recache=recache)
-    npcs = NpcList(cursor, dictCursor, recache=recache)
-    obj = ObjList(cursor, dictCursor, recache=recache)
-    items = ItemList(dictCursor, recache=recache)
+    quests = QuestList(cursor, dictCursor, version, recache=recache)
+    npcs = NpcList(cursor, dictCursor, version, recache=recache)
+    obj = ObjList(cursor, dictCursor, version, recache=recache)
+    items = ItemList(dictCursor, version, recache=recache)
     return quests, npcs, obj, items
 
 def recache():
