@@ -13,11 +13,11 @@ localesMap = {
 def escapeDoubleQuotes(inp):
     if inp == None:
         return inp
-    name = inp.replace('"', '\\"')
+    name = inp.replace('"', '\\"').lstrip().rstrip()
     return name
 
 def escapeQuotes(inp):
     if inp == None:
         return inp
-    name = inp.replace("'", "\\'")
+    name = inp.replace("'", "\\'").lstrip().rstrip()
     return name

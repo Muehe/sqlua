@@ -134,6 +134,8 @@ QuestieDB.objectKeys = {
                 outfile.write("nil,")
             if hasattr(obj, "spawns"): #4
                 outfile.write("{")
+                if objId == 182798:
+                    print(obj.spawns.cList)
                 for zone in obj.spawns.cByZone:
                     if not zone in validZoneList:
                         if zoneId == 0:

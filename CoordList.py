@@ -2,9 +2,10 @@ from Coord import *
 
 class CoordList():
     """Holds a list of Coord() objects."""
-    def __init__(self, coordTable):
+    def __init__(self, coordTable, debug=False):
         self.cList = []
         self.cByZone = {}
+        self.debug = debug
         for coord in coordTable:
             if len(coord) > 3:
                 self.addCoord(coord[0], coord[1], coord[2], coord[3])
@@ -12,7 +13,9 @@ class CoordList():
                 self.addCoord(coord[0], coord[1], coord[2])
 
     def addCoord(self, map, x, y, zone=False):
-        newCoord = Coord(map, x, y, zone)
+        newCoord = Coord(map, x, y, zone,debug=self.debug)
+        #if self.debug:
+        #    print(newCoord)
         if not newCoord.noZone:
             self.cList.append(newCoord)
             for zone in newCoord.zoneList:

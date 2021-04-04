@@ -40,14 +40,25 @@ def getFactionTemplate(file="data/FactionTemplate.dbc.CSV"):
     content = ""
     with open(file, "r") as infile:
         content = infile.read()
+    print("Parsing faction list:")
+    print(content)
+    a = content.split("\n")
     # 1,1,72,3,2,12,0,0,0.000000,0.000000,0,0,0,0,
     # id,name,?,ourMask,friendlyMask,hostileMask,etc...
-    factionList = re.findall("(.*?),.*?,.*?,(.*?),(.*?),(.*?),.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,", content)
+    #factionList = re.findall("(.*?),.*?,.*?,(.*?),(.*?),(.*?),.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,", content)
     factionDict = {}
-    for data in factionList:
-        factionDict[int(data[0])] = (int(data[1]), # ourMask
-                                     int(data[2]), # friendlyMask
-                                     int(data[3])) # hostileMask
+    #for data in factionList:
+    for _data in a:
+        try:
+            print("line: " + _data)
+            _data = _data.lstrip().rstrip().split(",")
+            data = _data
+            factionDict[int(data[0])] = (int(data[3]), # ourMask
+                                     int(data[4]), # friendlyMask
+                                     int(data[5])) # hostileMask
+            print(factionDict[int(data[0])])
+        except:
+            print("Error parsing " + str(_data))
     return factionDict
 
 factionTemplate = getFactionTemplate()
@@ -57,6 +68,7 @@ class Npc():
     waypointErrors = []
     def __init__(self, npc, dicts, extractSpawns, translation=False):
         self.id = npc[0]
+        self.debug = self.id == 19261
         self.name = escapeQuotes(npc[1])
         self.minlevel = npc[2]
         self.maxlevel = npc[3]
@@ -81,6 +93,8 @@ class Npc():
             for spawn in dicts['npc']:
                 # id, map, position_x, position_y, guid
                 if (spawn[0] == self.id):
+                    if self.debug:
+                        print("SDBG: " + str(spawn))
                     # get spawns
                     if spawn[4] in zones:
                         spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
@@ -100,7 +114,7 @@ class Npc():
                         temp = []
                         for wp in sorted(list(wpSort)):
                             temp.append(wpSort[wp])
-                        waypoints.append(CoordList(temp))
+                        waypoints.append(CoordList(temp, debug=self.debug))
                     elif (len(wpSort) == 1):
                         print(f'Discarded single-point path for GUID {spawn[4]}')
 

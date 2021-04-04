@@ -91,7 +91,7 @@ class Quest():
                 if not translations:
                     continue
                 if dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)] != None:
-                    self.locales_ObjectiveTexts[x][y] = escapeDoubleQuotes(dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)])
+                    self.locales_ObjectiveTexts[x][y] = escapeDoubleQuotes(dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)]).replace("\n","\\n")
         self.ReqCreatureId = []
         if ((quest[29] > 0)):
             self.ReqCreatureId.append((quest[29], escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))

@@ -55,7 +55,7 @@ class NpcList():
 
     def getNpcTables(self, cursor, dictCursor):
         print("Selecting NPC related MySQL tables...")
-        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags FROM creature_template")
+        cursor.execute("SELECT `entry`, `name`, `minlevel`, `maxlevel`, `minlevelhealth`, `maxlevelhealth`, `rank`, `Faction`, `SubName`, `NpcFlags` FROM `creature_template`")
         npc_tpl = []
         for a in cursor.fetchall():
             npc_tpl.append(a)
