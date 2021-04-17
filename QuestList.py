@@ -36,7 +36,7 @@ class QuestList():
         count = len(dicts['quest_template'])
         print(f'Caching {count} quests...')
         for quest in dicts['quest_template']:
-            self.__addQuest(quest, dicts, areaTrigger)
+            self.__addQuest(quest, dicts, areaTrigger, cursor)
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
@@ -122,9 +122,9 @@ class QuestList():
                 bits.insert(0, -x)
         return bits
 
-    def __addQuest(self, quest, tables, areaTrigger):
+    def __addQuest(self, quest, tables, areaTrigger, cursor):
         """only used by constructor"""
-        newQuest = Quest(quest, tables, areaTrigger)
+        newQuest = Quest(quest, tables, areaTrigger, cursor)
         self.qList[newQuest.id] = newQuest
 
     def findQuest(self, **kwargs):
@@ -402,6 +402,18 @@ QuestieDB.questKeys = {
                 outfile.write("{"+str(quest.RepObjectiveFaction)+","+str(quest.RepObjectiveValue)+"},")
             else:
                 outfile.write("nil,")
+
+
+            if (hasattr(quest, "killCreditData")):
+                outfile.write("{{")
+                for kills in quest.killCreditData[0]:
+                    outfile.write(str(kills)+",")
+                outfile.write(str(quest.killCreditData[1][0])+",")
+                if len(quest.killCreditData[1][1]) > 0:
+                    outfile.write("},"+str(quest.killCreditData[1][0]) + ","+"\""+quest.killCreditData[1][1]+"\"},")
+                else:
+                    outfile.write("},"+str(quest.killCreditData[1][0]) + "},")
+
             outfile.write("},")
             if (hasattr(quest, "SrcItemId")): #SrcItemId = 11
                 outfile.write(str(quest.SrcItemId)+",")

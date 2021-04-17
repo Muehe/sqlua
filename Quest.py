@@ -2,7 +2,7 @@ from CoordList import *
 from Utilities import *
 
 class Quest():
-    def __init__(self, quest, dicts, areaTrigger, translations=False):
+    def __init__(self, quest, dicts, areaTrigger, cursor, translations=False):
         self.id = quest[0]
         self.MinLevel = quest[1]
         self.QuestLevel = quest[2]
@@ -109,6 +109,83 @@ class Quest():
             self.ReqCreatureId.append((quest[32], escapeDoubleQuotes(quest[48]), self.locales_ObjectiveTexts[4]))
             self.ObjectiveList[3]['type'] = 'monster'
             self.ObjectiveList[3]['id'] = quest[32]
+
+
+        if False:
+            cursor.execute("SELECT `entry` FROM `creature_template` WHERE `trainertype`=0 AND `trainerclass`=11")
+            for a in cursor.fetchall():
+                print(a[0],end=', ')
+            print()
+            exit()
+
+
+        cleaned = []
+        killCreditMobs = []
+        killCreditRoot = None
+        for id in self.ReqCreatureId:
+            cursor.execute("SELECT `Entry`, `KillCredit2`  FROM `creature_template` WHERE `KillCredit1`="+str(id[0]))
+            isCreditMob = False
+            for a in cursor.fetchall():
+                killCreditRoot = id
+                isCreditMob = True
+                killCreditMobs.append(a[0]) # KillCredit2 is always 0 in cmangos-tbc
+            if not isCreditMob:
+                cleaned.append(id)
+
+        if len(killCreditMobs) > 0:
+            print(self.Title + " [" + str(self.id) + "] = ", end='')
+            print(killCreditMobs)
+            self.killCreditData = (killCreditMobs, killCreditRoot)
+            print(self.killCreditData)
+        self.ReqCreatureId = cleaned
+
+        
+
+
+        if False:
+            _ReqCreatureId = []
+            _killCredit = []
+            def scanID(killable, id):
+                #if id in killable:
+                    #print("Already in killable")
+                    #return True
+                if id == 21161:
+                    print("Scanning " + str(id))
+                cursor.execute("SELECT `KillCredit1`, `KillCredit2` FROM `creature_template` WHERE Entry="+str(id))
+                for a in cursor.fetchall():
+                    #print(a)
+                    if a[0] != 0:
+                        if a[0] not in killable:
+                            killable.append(a[0])
+                            scanID(killable, a[0])
+                    if a[1] != 0:
+                        if a[1] not in killable:
+                            killable.append(a[1])
+                            scanID(killable, a[1])
+                return len(killable) > 0
+                    #print(a)
+
+            for id in self.ReqCreatureId:
+                killable = []
+                #print(id)
+                if scanID(killable, id[0]):
+                    if id[0] not in _killCredit:
+                        _killCredit.append(id[0])
+                    _killCredit += killable
+                else:
+                    _ReqCreatureId.append(id)
+
+            self.ReqCreatureId = _ReqCreatureId
+
+            _cleaned = []
+            for k in _killCredit:
+                if k not in _cleaned:
+                    _cleaned.append(k)
+            
+            if len(_cleaned) > 0:
+                print(self.Title + " [" + str(self.id) + "] = ", end='')
+                print(_cleaned)
+
         if (self.ReqCreatureId == []):
             del self.ReqCreatureId
         self.ReqGOId = []
