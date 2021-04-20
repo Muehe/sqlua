@@ -10,6 +10,7 @@ class ObjList():
     def __init__(self, cursor, dictCursor, version, extractSpawns=True, recache=False):
         self.version = version
         if (not os.path.isfile(f'data/{version}/objects.pkl') or recache):
+            print('Caching objects...')
             self.cacheObjects(cursor, dictCursor, extractSpawns)
         else:
             try:
@@ -17,7 +18,7 @@ class ObjList():
                     self.objectList = pickle.load(f)
                 print('Using cached objects.')
             except:
-                print('ERROR: Something went wrong while loading cached objects. Recaching.')
+                print('ERROR: Something went wrong while loading cached objects. Re-caching.')
                 self.cacheObjects(cursor, dictCursor, extractSpawns)
 
     def cacheObjects(self, cursor, dictCursor, extractSpawns=True):
@@ -35,7 +36,7 @@ class ObjList():
         print("Done caching objects.")
 
     def addObj(self, obj, dicts, extractSpawns):
-        newObj = Obj(obj, dicts, extractSpawns)
+        newObj = Obj(obj, dicts, extractSpawns, self.version)
         self.objectList[newObj.id] = newObj
 
     def findObj(self, **kwargs):

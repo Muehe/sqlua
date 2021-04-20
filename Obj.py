@@ -2,7 +2,7 @@ from CoordList import *
 from Utilities import *
 import csv
 
-def getObjectZones(file="data/gameobject_preExtract.csv"):
+def getObjectZones(file):
     infile = open(file, "r")
     reader = csv.reader(infile)
     # skip header line
@@ -13,11 +13,17 @@ def getObjectZones(file="data/gameobject_preExtract.csv"):
     infile.close()
     return zoneDict
 
-objectZones = getObjectZones()
+objectZonesClassic = getObjectZones('data/classic/gameobject_preExtract.csv')
+objectZonesTBC = getObjectZones('data/tbc/gameobject_preExtract.csv')
 
 class Obj():
     spawnErrors = [] # Holds IDs of objects without spawns entry, name, type, faction, data1
-    def __init__(self, obj, dicts, extractSpawns, translation=False, debug=False):
+    def __init__(self, obj, dicts, extractSpawns, version, translation=False, debug=False):
+        self.version = version
+        if version == 'classic':
+            objectZones = objectZonesClassic
+        elif version == 'tbc':
+            objectZones = objectZonesTBC
         self.id = obj[0]
         self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]

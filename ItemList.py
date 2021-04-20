@@ -7,6 +7,7 @@ class ItemList():
     def __init__(self, dictCursor, version, locale = "enGB", recache = False):
         self.version = version
         if (not os.path.isfile(f'data/{version}/items.pkl') or recache):
+            print('Caching items...')
             self.cacheItems(dictCursor, locale)
         else:
             try:
@@ -14,7 +15,7 @@ class ItemList():
                     self.itemList = pickle.load(f)
                 print('Using cached items.')
             except:
-                print('ERROR: Something went wrong while loading cached items. Recaching.')
+                print('ERROR: Something went wrong while loading cached items. Re-caching.')
                 self.cacheItems(dictCursor, locale)
 
     def cacheItems(self, dictCursor, locale = 'enGB'):

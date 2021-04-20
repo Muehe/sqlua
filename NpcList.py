@@ -10,6 +10,7 @@ class NpcList():
         self.version = version
         self.debug = debug
         if (not os.path.isfile(f'data/{version}/npcs.pkl') or recache):
+            print('Caching NPCs...')
             self.cacheNpcs(cursor, dictCursor, extractSpawns)
         else:
             try:
@@ -17,7 +18,7 @@ class NpcList():
                     self.nList = pickle.load(f)
                 print('Using cached NPCs.')
             except:
-                print('ERROR: Something went wrong while loading cached NPCs. Recaching.')
+                print('ERROR: Something went wrong while loading cached NPCs. Re-caching.')
                 self.cacheNpcs(cursor, dictCursor, extractSpawns)
 
 
@@ -36,7 +37,7 @@ class NpcList():
         print("Done caching NPCs.")
 
     def addNpc(self, npc, tables, extractSpawns):
-        newNpc = Npc(npc, tables, extractSpawns, debug=self.debug)
+        newNpc = Npc(npc, tables, extractSpawns, self.version, debug=self.debug)
         self.nList[newNpc.id] = newNpc
 
     def findNpc(self, **kwargs):

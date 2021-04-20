@@ -113,15 +113,15 @@ class Quest():
         cleaned = []
         killCreditMobs = []
         killCreditRoot = None
-        for id in self.ReqCreatureId:
+        for rootid in self.ReqCreatureId:
             cursor.execute("SELECT `Entry`, `KillCredit2`  FROM `creature_template` WHERE `KillCredit1`="+str(id[0]))
             isCreditMob = False
             for a in cursor.fetchall():
-                killCreditRoot = id
+                killCreditRoot = rootid
                 isCreditMob = True
                 killCreditMobs.append(a[0]) # KillCredit2 is always 0 in cmangos-tbc
             if not isCreditMob:
-                cleaned.append(id)
+                cleaned.append(rootid)
 
         if len(killCreditMobs) > 0:
             print(self.Title + " [" + str(self.id) + "] = ", end='')

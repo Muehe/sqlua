@@ -11,7 +11,7 @@ class QuestList():
     def __init__(self, cursor, dictCursor, version, recache=False):
         self.version = version
         if (not os.path.isfile(f'data/{version}/quests.pkl') or recache):
-            print("Cache file doesnt exist!")
+            print('Caching quests...')
             self.cacheQuests(cursor, dictCursor)
         else:
             try:
@@ -19,14 +19,14 @@ class QuestList():
                     self.qList = pickle.load(f)
                 print('Using cached quests.')
             except:
-                print('ERROR: Something went wrong while loading cached quests. Recaching.')
+                print('ERROR: Something went wrong while loading cached quests. Re-caching.')
                 self.cacheQuests(cursor, dictCursor)
 
     def cacheQuests(self, cursor, dictCursor):
         self.qList = {}
         self.dictCursor = dictCursor
         dicts = self.__getQuestTables(cursor, dictCursor)
-        infile = open("data/AreaTrigger.dbc.CSV", "r")
+        infile = open(f'data/{self.version}/AreaTrigger.dbc.CSV', 'r')
         a = infile.read()
         infile.close()
         b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),", a)

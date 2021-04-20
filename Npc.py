@@ -3,7 +3,7 @@ from Utilities import *
 import re
 import csv
 
-def getCreatureZones(file="data/creature_preExtract.csv"):
+def getCreatureZones(file):
     infile = open(file, "r")
     reader = csv.reader(infile)
     # skip header line
@@ -14,9 +14,10 @@ def getCreatureZones(file="data/creature_preExtract.csv"):
     infile.close()
     return zoneDict
 
-zones = getCreatureZones()
+zonesClassic = getCreatureZones('data/classic/creature_preExtract.csv')
+zonesTBC = getCreatureZones('data/tbc/creature_preExtract.csv')
 
-def getCreatureWaypoints(file="data/creature_movement_preExtract.csv"):
+def getCreatureWaypoints(file):
     infile = open(file, "r")
     reader = csv.reader(infile)
     # skip header line
@@ -33,10 +34,13 @@ def getCreatureWaypoints(file="data/creature_movement_preExtract.csv"):
     infile.close()
     return zoneDict
 
-movementZones = getCreatureWaypoints()
-movementTemplateZones = getCreatureWaypoints("data/creature_movement_template_preExtract.csv")
+movementZonesClassic = getCreatureWaypoints('data/classic/creature_movement_preExtract.csv')
+movementTemplateZonesClassic = getCreatureWaypoints('data/classic/creature_movement_template_preExtract.csv')
 
-def getFactionTemplate(file="data/FactionTemplate.dbc.CSV"):
+movementZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_preExtract.csv')
+movementTemplateZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_template_preExtract.csv')
+
+def getFactionTemplate(file):
     content = ""
     with open(file, "r") as infile:
         content = infile.read()
@@ -51,12 +55,24 @@ def getFactionTemplate(file="data/FactionTemplate.dbc.CSV"):
     print(f'Found {len(factionDict)} factions.')
     return factionDict
 
-factionTemplate = getFactionTemplate()
+factionTemplateClassic = getFactionTemplate('data/classic/FactionTemplate.dbc.CSV')
+factionTemplateTBC = getFactionTemplate('data/tbc/FactionTemplate.dbc.CSV')
 
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
     waypointErrors = []
-    def __init__(self, npc, dicts, extractSpawns, translation=False, debug=False):
+    def __init__(self, npc, dicts, extractSpawns, version, translation=False, debug=False):
+        self.version = version
+        if version == 'classic':
+            zones = zonesClassic
+            movementZones = movementZonesClassic
+            movementTemplateZones = movementTemplateZonesClassic
+            factionTemplate = factionTemplateClassic
+        elif version == 'tbc':
+            zones = zonesTBC
+            movementZones = movementZonesTBC
+            movementTemplateZones = movementTemplateZonesTBC
+            factionTemplate = factionTemplateTBC
         self.id = npc[0]
         self.debug = debug
         self.name = escapeQuotes(npc[1])
