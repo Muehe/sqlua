@@ -17,9 +17,8 @@ objectZones = getObjectZones()
 
 class Obj():
     spawnErrors = [] # Holds IDs of objects without spawns entry, name, type, faction, data1
-    def __init__(self, obj, dicts, extractSpawns, translation=False):
+    def __init__(self, obj, dicts, extractSpawns, translation=False, debug=False):
         self.id = obj[0]
-        isMetal = self.id == 182798
         self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]
         self.faction = obj[3]
@@ -32,14 +31,10 @@ class Obj():
                         spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]]))
                     else:
                         spawns.append((spawn[1], spawn[2], spawn[3]))
-        if isMetal:
-            print(spawns)
         if (spawns == []):
             Obj.spawnErrors.append(self.id)
         elif extractSpawns:
-            self.spawns = CoordList(spawns, debug=isMetal)
-        if isMetal:
-            print(self.spawns)
+            self.spawns = CoordList(spawns, debug=debug)
         self.start = []
         for pair in dicts['object_start']:
             if pair[0] == self.id:

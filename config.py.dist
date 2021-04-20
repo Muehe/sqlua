@@ -1,5 +1,8 @@
 # Which database to use, may also be passed as argument to the main script
+# Accepts 'classic' or 'tbc'
 version = 'classic'
+# Toggle debug messages
+debug = False
 # MySQL information
 dbInfo = {
     'host': 'localhost',

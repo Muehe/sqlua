@@ -6,8 +6,9 @@ import pickle
 
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, version, extractSpawns=True, recache=False):
+    def __init__(self, cursor, dictCursor, version, extractSpawns=True, recache=False, debug=False):
         self.version = version
+        self.debug = debug
         if (not os.path.isfile(f'data/{version}/npcs.pkl') or recache):
             self.cacheNpcs(cursor, dictCursor, extractSpawns)
         else:
@@ -35,7 +36,7 @@ class NpcList():
         print("Done caching NPCs.")
 
     def addNpc(self, npc, tables, extractSpawns):
-        newNpc = Npc(npc, tables, extractSpawns)
+        newNpc = Npc(npc, tables, extractSpawns, debug=self.debug)
         self.nList[newNpc.id] = newNpc
 
     def findNpc(self, **kwargs):

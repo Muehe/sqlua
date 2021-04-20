@@ -147,9 +147,9 @@ QuestieDB.items = {
         for itemID in self.itemList:
             fo.write(f'[{itemID}] = {{')
             item = self.itemList[itemID]
-           
-            fo.write("'"+item.name.replace("'","\\'")+"',")  #fo.write(f"'{item.name}',") #1
-            #fo.write(",\n")
+
+            name = item.name.replace("'","\\'")
+            fo.write(f"'{name}',") #1
             fo.write(f"{item.flags}," if item.flags != 0 else 'nil,') #2
             fo.write(f"{item.startquest}," if item.startquest != 0 else 'nil,') #3
             fo.write(f"{item.foodtype}," if item.foodtype != 0 else 'nil,') #4

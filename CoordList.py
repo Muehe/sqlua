@@ -13,9 +13,7 @@ class CoordList():
                 self.addCoord(coord[0], coord[1], coord[2])
 
     def addCoord(self, map, x, y, zone=False):
-        newCoord = Coord(map, x, y, zone,debug=self.debug)
-        #if self.debug:
-        #    print(newCoord)
+        newCoord = Coord(map, x, y, zone, debug=self.debug)
         if not newCoord.noZone:
             self.cList.append(newCoord)
             for zone in newCoord.zoneList:

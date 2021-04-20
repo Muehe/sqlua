@@ -10,12 +10,12 @@ class QuestList():
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
     def __init__(self, cursor, dictCursor, version, recache=False):
         self.version = version
-        if (not os.path.isfile(f'data/tbc/quests.pkl') or recache):
+        if (not os.path.isfile(f'data/{version}/quests.pkl') or recache):
             print("Cache file doesnt exist!")
             self.cacheQuests(cursor, dictCursor)
         else:
             try:
-                with open(f'data/tbc/quests.pkl', 'rb') as f:
+                with open(f'data/{version}/quests.pkl', 'rb') as f:
                     self.qList = pickle.load(f)
                 print('Using cached quests.')
             except:
