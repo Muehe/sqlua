@@ -5,3 +5,4 @@ __pycache__
 *.lua
 *coords.csv
 *area.csv
+venv/
