@@ -1,19 +1,19 @@
-from Coord import *
+from db.Coord import *
 
 class CoordList():
     """Holds a list of Coord() objects."""
-    def __init__(self, coordTable, debug=False):
+    def __init__(self, coordTable, version, debug=False):
         self.cList = []
         self.cByZone = {}
         self.debug = debug
         for coord in coordTable:
             if len(coord) > 3:
-                self.addCoord(coord[0], coord[1], coord[2], coord[3])
+                self.addCoord(coord[0], coord[1], coord[2], version, coord[3])
             else:
-                self.addCoord(coord[0], coord[1], coord[2])
+                self.addCoord(coord[0], coord[1], coord[2], version)
 
-    def addCoord(self, map, x, y, zone=False):
-        newCoord = Coord(map, x, y, zone, debug=self.debug)
+    def addCoord(self, map, x, y, version, zone=False):
+        newCoord = Coord(map, x, y,version, zone, debug=self.debug)
         if not newCoord.noZone:
             self.cList.append(newCoord)
             for zone in newCoord.zoneList:

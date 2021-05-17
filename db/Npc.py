@@ -1,5 +1,5 @@
-from CoordList import *
-from Utilities import *
+from db.CoordList import *
+from db.Utilities import *
 import re
 import csv
 
@@ -40,9 +40,9 @@ movementTemplateZonesClassic = getCreatureWaypoints('data/classic/creature_movem
 movementZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_preExtract.csv')
 movementTemplateZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_template_preExtract.csv')
 
-def getFactionTemplate(file):
+def getFactionTemplate(fac):
     content = ""
-    with open(file, "r") as infile:
+    with open(fac, "r") as infile:
         content = infile.read()
     # 1,1,72,3,2,12,0,0,0.000000,0.000000,0,0,0,0,
     # id,name,?,ourMask,friendlyMask,hostileMask,etc...
@@ -52,7 +52,7 @@ def getFactionTemplate(file):
         factionDict[int(data[0])] = (int(data[1]), # ourMask
                                      int(data[2]), # friendlyMask
                                      int(data[3])) # hostileMask
-    print(f'Found {len(factionDict)} factions.')
+    print(f'Found {len(factionDict)} factions in {fac}')
     return factionDict
 
 factionTemplateClassic = getFactionTemplate('data/classic/FactionTemplate.dbc.CSV')
@@ -118,7 +118,7 @@ class Npc():
                         temp = []
                         for wp in sorted(list(wpSort)):
                             temp.append(wpSort[wp])
-                        waypoints.append(CoordList(temp, debug=self.debug))
+                        waypoints.append(CoordList(temp, version, debug=self.debug))
                     elif (len(wpSort) == 1):
                         # TODO implement checking for "non-moving" waypoints that are abused for script
                         if self.debug: print(f'DEBUG: Discarded single-point path for GUID {spawn[4]}')
@@ -141,12 +141,14 @@ class Npc():
                 temp = []
                 for wp in sorted(list(wptSort)):
                     temp.append(wptSort[wp])
-                waypoints.append(CoordList(temp))
+                waypoints.append(CoordList(temp, version))
             # persist spawns and waypoints
             if (spawns == []):
                 Npc.spawnErrors.append(self.id)
+                self.noSpawn = True
+                self.spawns = CoordList([], version)
             else:
-                self.spawns = CoordList(spawns)
+                self.spawns = CoordList(spawns, version)
             if (waypoints != []):
                 self.waypoints = waypoints
             if(wpError):

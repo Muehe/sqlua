@@ -1,8 +1,9 @@
-from CoordList import *
-from Utilities import *
+from db.CoordList import *
+from db.Utilities import *
 
 class Quest():
-    def __init__(self, quest, dicts, areaTrigger, cursor, translations=False):
+    def __init__(self, quest, dicts, areaTrigger, cursor, version, translations=False):
+        self.version = version
         self.id = quest[0]
         self.MinLevel = quest[1]
         self.QuestLevel = quest[2]
@@ -50,7 +51,7 @@ class Quest():
                 if not translations:
                     continue
                 self.locales_Objectives[x] = dicts['locales_quest'][self.id]['Objectives_loc'+str(x)]
-        self.ObjectiveList = [{},{},{},{}]
+        self.ObjectiveList = [{},{},{},{},{}]
         self.ObjectiveList[0]['text'] = escapeDoubleQuotes(quest[45])
         self.ObjectiveList[1]['text'] = escapeDoubleQuotes(quest[46])
         self.ObjectiveList[2]['text'] = escapeDoubleQuotes(quest[47])
@@ -110,25 +111,23 @@ class Quest():
             self.ObjectiveList[3]['type'] = 'monster'
             self.ObjectiveList[3]['id'] = quest[32]
 
-        cleaned = []
-        killCreditMobs = []
-        killCreditRoot = None
-        for rootid in self.ReqCreatureId:
-            cursor.execute("SELECT `Entry`, `KillCredit2`  FROM `creature_template` WHERE `KillCredit1`="+str(id[0]))
-            isCreditMob = False
-            for a in cursor.fetchall():
-                killCreditRoot = rootid
-                isCreditMob = True
-                killCreditMobs.append(a[0]) # KillCredit2 is always 0 in cmangos-tbc
-            if not isCreditMob:
-                cleaned.append(rootid)
+        if self.version != 'classic':
+            cleaned = []
+            killCreditMobs = []
+            killCreditRoot = None
+            for rootid in self.ReqCreatureId:
+                cursor.execute("SELECT `Entry`, `KillCredit2`  FROM `creature_template` WHERE `KillCredit1`="+str(rootid[0]))
+                isCreditMob = False
+                for a in cursor.fetchall():
+                    killCreditRoot = rootid
+                    isCreditMob = True
+                    killCreditMobs.append(a[0]) # KillCredit2 is always 0 in cmangos-tbc
+                if not isCreditMob:
+                    cleaned.append(rootid)
 
-        if len(killCreditMobs) > 0:
-            print(self.Title + " [" + str(self.id) + "] = ", end='')
-            print(killCreditMobs)
-            self.killCreditData = (killCreditMobs, killCreditRoot)
-            print(self.killCreditData)
-        self.ReqCreatureId = cleaned
+            if len(killCreditMobs) > 0:
+                self.killCreditData = (killCreditMobs, killCreditRoot)
+            self.ReqCreatureId = cleaned
 
         if (self.ReqCreatureId == []):
             del self.ReqCreatureId
@@ -166,6 +165,9 @@ class Quest():
             self.ObjectiveList[3]['reqSpellCast'] = quest[36]
         if (self.ReqSpellCast == []):
             del self.ReqSpellCast
+        for i in range(0, 4):
+            if len(self.ObjectiveList[i]) == 1:
+                self.ObjectiveList[i] = False
         if (quest[37] != 0):
             self.PointMapId = quest[37]
             self.PointX = quest[38]
@@ -210,7 +212,7 @@ class Quest():
             if (questId == self.id):
                 for trigger in areaTrigger:
                     if trigger[0] == triggerId:
-                        triggers.append(trigger[1:])
+                        triggers.append((trigger[1], trigger[2], trigger[3]))
         if (triggers == []):
             del self.triggerEnd
         else:
@@ -219,7 +221,8 @@ class Quest():
                 text = self.Objectives
             else:
                 text = escapeDoubleQuotes(quest[49])
-            self.triggerEnd = (text, CoordList(triggers))
+            self.triggerEnd = (text, CoordList(triggers, version))
+            self.ObjectiveList[4] = {'text': text, 'type': 'areaTrigger', 'coords': CoordList(triggers, version)}
             self.locales_EndText = {}
             for x in range(1, 9):
                 if not translations:

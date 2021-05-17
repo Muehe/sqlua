@@ -1,14 +1,18 @@
-from CoordData import *
+from db.CoordData import *
 
 class Coord():
     """This class takes a (x,y) point from the continent maps and creates a dictionary of all possible zone (x,y) coordinates.
        If the map/zone belongs to an instance a dummy is added."""
-    def __init__(self, mapId, x, y, zoneId=False, debug=False):
+    def __init__(self, mapId, x, y, version, zoneId=False, debug=False):
         self.pointList = []
         self.zoneList = {}
         self.isInstance = False
         self.isMulti = False
         self.noZone = False
+        if version == 'classic':
+            mapBorders = mapBordersClassic
+        elif version == 'tbc':
+            mapBorders = mapBordersTBC
         for mapSet in mapBorders:
             zone = int(mapSet[0])
             if (not (zoneId == False)) and (zone != zoneId):
@@ -46,7 +50,7 @@ class Coord():
         return points
 
 
-def worldToZone(mapId, x, y, zone=False):
-    a = Coord(mapId, x, y, zone)
+def worldToZone(mapId, x, y, version, zone=False):
+    a = Coord(mapId, x, y, zone, version)
     for point in a.pointList:
         print(point)

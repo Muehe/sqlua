@@ -1,5 +1,5 @@
-from Obj import *
-from Utilities import *
+from db.Obj import *
+from db.Utilities import *
 
 import os.path
 import pickle

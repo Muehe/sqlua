@@ -1,5 +1,5 @@
-from Npc import *
-from Utilities import *
+from db.Npc import *
+from db.Utilities import *
 
 import os.path
 import pickle

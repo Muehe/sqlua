@@ -1,5 +1,5 @@
-from Quest import *
-from Utilities import *
+from db.Quest import *
+from db.Utilities import *
 
 import re
 import os.path
@@ -29,7 +29,7 @@ class QuestList():
         infile = open(f'data/{self.version}/AreaTrigger.dbc.CSV', 'r')
         a = infile.read()
         infile.close()
-        b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),", a)
+        b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),?\n", a)
         areaTrigger = []
         for x in b:
             areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5]), float(x[6]), float(x[7]), float(x[8]), float(x[9])))
@@ -124,7 +124,7 @@ class QuestList():
 
     def __addQuest(self, quest, tables, areaTrigger, cursor):
         """only used by constructor"""
-        newQuest = Quest(quest, tables, areaTrigger, cursor)
+        newQuest = Quest(quest, tables, areaTrigger, cursor, self.version)
         self.qList[newQuest.id] = newQuest
 
     def findQuest(self, **kwargs):

@@ -1,8 +1,8 @@
-from QuestList import *
-from NpcList import *
-from ObjList import *
-from CoordList import *
-from ItemList import *
+from db.QuestList import *
+from db.NpcList import *
+from db.ObjList import *
+from db.CoordList import *
+from db.ItemList import *
 from preExtract.CoordPreExtract import printCoordFiles
 
 import sys
@@ -39,6 +39,23 @@ def main(recache):
     print("Done.")
     return 0
 
+def getCursors(v):
+    connection = pymysql.connect(
+        host=config.dbInfo['host'],
+        user=config.dbInfo['user'],
+        password=config.dbInfo['password'],
+        database=config.dbInfo[v],
+        charset='utf8'
+    )
+    c = connection.cursor()
+    dc = connection.cursor(pymysql.cursors.DictCursor)
+
+    return c, dc
+
+def preExtract(v):
+    c, dc = getCursors(v)
+    printCoordFiles(c, v)
+
 # DB connection needs to be set up first and globally, but after CLI 
 # arguments are checked, in case the argument differs from the config
 # file, so the main function being run is delayed by use of this variable
@@ -56,6 +73,7 @@ if __name__ == "__main__":
     runMain = True
 
 # Set up MySQL connection
+"""
 connection = pymysql.connect(
     host=config.dbInfo['host'],
     user=config.dbInfo['user'],
@@ -65,6 +83,8 @@ connection = pymysql.connect(
 )
 cursor = connection.cursor()
 dictCursor = connection.cursor(pymysql.cursors.DictCursor)
+"""
+cursor, dictCursor = getCursors(version)
 
 if runMain:
     main(True)

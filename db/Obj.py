@@ -1,5 +1,5 @@
-from CoordList import *
-from Utilities import *
+from db.CoordList import *
+from db.Utilities import *
 import csv
 
 def getObjectZones(file):
@@ -39,8 +39,10 @@ class Obj():
                         spawns.append((spawn[1], spawn[2], spawn[3]))
         if (spawns == []):
             Obj.spawnErrors.append(self.id)
+            self.noSpawn = True
+            self.spawns = CoordList([], version)
         elif extractSpawns:
-            self.spawns = CoordList(spawns, debug=debug)
+            self.spawns = CoordList(spawns, version, debug=debug)
         self.start = []
         for pair in dicts['object_start']:
             if pair[0] == self.id:
