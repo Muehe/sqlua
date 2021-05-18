@@ -128,19 +128,19 @@ local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
 
 QuestieDB.itemKeys = {
     ['name'] = 1, -- string
-    ['flags'] = 2, -- int or nil, see: https://github.com/cmangos/issues/wiki/Item_template#flags
-    ['startQuest'] = 3, -- int or nil, ID of the quest started by this item
-    ['foodType'] = 4, -- int or nil, see https://github.com/cmangos/issues/wiki/Item_template#foodtype
-    ['itemLevel'] = 5 -- int, the level of this item
-    ['requiredLevel'] = 6 -- int, the level required to equip/use this item
-    ['ammoType'] = 7, -- int,
-    ['class'] = 8, -- int,
-    ['subClass'] = 9, -- int,
-    ['npcDrops'] = 10, -- table or nil, NPC IDs
-    ['objectDrops'] = 11, -- table or nil, object IDs
-    ['itemDrops'] = 12, -- table or nil, item IDs
-    ['vendors'] = 13, -- table or nil, NPC IDs
-    ['questRewards'] = 14, -- table or nil, quest IDs
+    ['npcDrops'] = 2, -- table or nil, NPC IDs
+    ['objectDrops'] = 3, -- table or nil, object IDs
+    ['itemDrops'] = 4, -- table or nil, item IDs
+    ['startQuest'] = 5, -- int or nil, ID of the quest started by this item
+    ['questRewards'] = 6, -- table or nil, quest IDs
+    ['flags'] = 7, -- int or nil, see: https://github.com/cmangos/issues/wiki/Item_template#flags
+    ['foodType'] = 8, -- int or nil, see https://github.com/cmangos/issues/wiki/Item_template#foodtype
+    ['itemLevel'] = 9, -- int, the level of this item
+    ['requiredLevel'] = 10, -- int, the level required to equip/use this item
+    ['ammoType'] = 11, -- int,
+    ['class'] = 12, -- int,
+    ['subClass'] = 13, -- int,
+    ['vendors'] = 14, -- table or nil, NPC IDs
 
 QuestieDB.items = {
 """)
@@ -151,18 +151,7 @@ QuestieDB.items = {
 
             name = item.name.replace("'","\\'")
             fo.write(f"'{name}',") #1
-            fo.write(f"{item.flags}," if item.flags != 0 else 'nil,') #2
-            fo.write(f"{item.startquest}," if item.startquest != 0 else 'nil,') #3
-            fo.write(f"{item.foodtype}," if item.foodtype != 0 else 'nil,') #4
-            fo.write(f"{item.itemlevel},") #5
-            fo.write(f"{item.requiredlevel},") #6
-            fo.write(f"{item.ammoType},") #7
-            fo.write(f"{item.cls},") #8
-            fo.write(f"{item.subClass},") #9
-            if item.drops == 0:
-                fo.write('},\n')
-                continue
-            #10
+            #2
             if item.npcs:
                 fo.write('{')
                 for npc in item.npcs:
@@ -170,7 +159,7 @@ QuestieDB.items = {
                 fo.write('},',)
             else:
                 fo.write('nil,')
-            #11
+            #3
             if item.objects:
                 fo.write('{')
                 for objectID in item.objects:
@@ -178,21 +167,32 @@ QuestieDB.items = {
                 fo.write('},',)
             else:
                 fo.write('nil,')
-            self.writeList(fo, item.items) #12
-            if len(item.vendors) > 0: #13
-                fo.write('{')
-                for thing in item.vendors:
-                    fo.write(f'{thing["id"]},')
-                fo.write('},',)
-            else:
-                fo.write('nil,')
-            if len(item.quests) > 0: #14
+            self.writeList(fo, item.items) #4
+            fo.write(f"{item.startquest}," if item.startquest != 0 else 'nil,') #5
+            if len(item.quests) > 0: #6
                 fo.write('{')
                 for thing in item.quests:
                     fo.write(f'{thing},')
                 fo.write('},',)
             else:
                 fo.write('nil,')
+            fo.write(f"{item.flags}," if item.flags != 0 else 'nil,') #7
+
+            fo.write(f"{item.foodtype}," if item.foodtype != 0 else 'nil,') #8
+            fo.write(f"{item.itemlevel},") #9
+            fo.write(f"{item.requiredlevel},") #10
+            fo.write(f"{item.ammoType},") #11
+            fo.write(f"{item.cls},") #12
+            fo.write(f"{item.subClass},") #13
+
+            if len(item.vendors) > 0: #14
+                fo.write('{')
+                for thing in item.vendors:
+                    fo.write(f'{thing["id"]},')
+                fo.write('},',)
+            else:
+                fo.write('nil,')
+
             fo.write('},\n')
         # EOF
         fo.write('}\n')

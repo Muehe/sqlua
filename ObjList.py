@@ -106,7 +106,7 @@ QuestieDB.objectKeys = {
         outfile.write("QuestieDB.objectData = {\n")
         for objId in sorted(self.objectList):
             obj = self.objectList[objId]
-            if obj.type not in [2, 3, 5, 8, 10]:
+            if obj.type not in [2, 3, 5, 8, 10, 19]:
                 continue
             #if not hasattr(obj, 'spawns'):
             #    continue
@@ -152,5 +152,7 @@ QuestieDB.objectKeys = {
             else:
                 outfile.write("nil,")
             outfile.write(str(zoneId)+",") #5
+            if obj.type == 19: # mailboxes
+                outfile.write(str(obj.faction)+",") #5
             outfile.write("},\n")
         outfile.write("}\n")
