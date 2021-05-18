@@ -32,10 +32,10 @@ def main(recache):
     """Extracts and prints quest related data"""
     quests, npcs, objects, items = getClassInstances(recache)
     print("Printing files...")
-    quests.printQuestFile(f'output/{version}/questDB.lua')
-    npcs.printNpcFile(f'output/{version}/spawnDB.lua')
-    objects.printObjFile(f'output/{version}/objectDB.lua')
-    items.writeFile(f'output/{version}/itemDB.lua')
+    quests.printQuestFile(f'output/{version}/{version}QuestDB.lua')
+    npcs.printNpcFile(f'output/{version}/{version}NpcDB.lua')
+    objects.printObjFile(f'output/{version}/{version}ObjectDB.lua')
+    items.writeFile(f'output/{version}/{version}ItemDB.lua')
     print("Done.")
     return 0
 
