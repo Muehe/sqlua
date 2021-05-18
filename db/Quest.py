@@ -206,13 +206,27 @@ class Quest():
                 self.itemStart.append(itemId)
         if (self.itemStart == []):
             del self.itemStart
+
+        # AreaTriggers
         self.triggerEnd = []
         triggers = []
+        triggerZoneDict = {}
+        if version == 'tbc': #TODO: Get Classic preExtract
+            with open(f'data/{version}/areaTrigger_preExtract.csv', 'r') as infile:
+                import csv
+                reader = csv.reader(infile)
+                next(reader)
+                for row in reader:
+                    triggerZoneDict[int(row[0])] = int(row[1])
+                infile.close()
         for (triggerId, questId) in dicts['areatrigger_involvedrelation']:
             if (questId == self.id):
                 for trigger in areaTrigger:
                     if trigger[0] == triggerId:
-                        triggers.append((trigger[1], trigger[2], trigger[3]))
+                        if triggerId in triggerZoneDict:
+                            triggers.append((trigger[1], trigger[2], trigger[3], triggerZoneDict[triggerId]))
+                        else:
+                            triggers.append((trigger[1], trigger[2], trigger[3]))
         if (triggers == []):
             del self.triggerEnd
         else:
@@ -228,6 +242,7 @@ class Quest():
                 if not translations:
                     continue
                 self.locales_EndText[x] = dicts['locales_quest'][self.id]['EndText_loc'+str(x)]
+
         self.Details = escapeDoubleQuotes(quest[50])
         self.locales_Details = {}
         for x in range(1, 9):
