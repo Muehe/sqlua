@@ -141,13 +141,13 @@ QuestieDB.npcKeys = {
                                                   +str(npc.minlevel)+"," #4
                                                   +str(npc.maxlevel)+"," #5
                                                   +str(npc.rank)+",") #6
-            if hasattr(npc, "spawns"): #7
+            if hasattr(npc, "spawns") and len(npc.spawns.cList) > 0: #7
                 outfile.write("{")
                 for zone in npc.spawns.cByZone:
                     if not zone in validZoneList:
                         if zoneId == 0:
                             zoneId = zone
-                        outfile.write("["+str(zone)+"]={{-1, -1}},")
+                        outfile.write("["+str(zone)+"]={{-1,-1}},")
                         continue
                     if len(npc.spawns.cByZone[zone]) > lenSpawns:
                         lenSpawns = len(npc.spawns.cByZone[zone])

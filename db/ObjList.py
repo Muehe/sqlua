@@ -133,13 +133,13 @@ QuestieDB.objectKeys = {
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if hasattr(obj, "spawns"): #4
+            if hasattr(obj, "spawns") and len(obj.spawns.cList) > 0: #4
                 outfile.write("{")
                 for zone in obj.spawns.cByZone:
                     if not zone in validZoneList:
                         if zoneId == 0:
                             zoneId = zone
-                        outfile.write("["+str(zone)+"]={{-1, -1}},")
+                        outfile.write("["+str(zone)+"]={{-1,-1}},") # ,"+str(len(obj.spawns.cByZone[zone]))+"
                         continue
                     if len(obj.spawns.cByZone[zone]) > lenSpawns:
                         lenSpawns = len(obj.spawns.cByZone[zone])
