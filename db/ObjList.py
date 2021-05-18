@@ -88,11 +88,14 @@ class ObjList():
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
--------------------------
---Import modules.
--------------------------
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+
+local isTBCClient = string.byte(GetBuildInfo(), 1) == 50;
+
+if (not isTBCClient) then
+    return
+end
 
 QuestieDB.objectKeys = {
     ['name'] = 1, -- string
@@ -100,10 +103,11 @@ QuestieDB.objectKeys = {
     ['questEnds'] = 3, -- table {questID(int),...}
     ['spawns'] = 4, -- table {[zoneID(int)] = {coordPair(floatVector2D),...},...}
     ['zoneID'] = 5, -- guess as to where this object is most common
+    ['factionID'] = 6, -- faction restriction mask (same as spawndb factionid)
 }
 
+QuestieDB.objectData = [[return {
 """)
-        outfile.write("QuestieDB.objectData = {\n")
         for objId in sorted(self.objectList):
             obj = self.objectList[objId]
             if obj.type not in [2, 3, 5, 8, 10, 19]:
@@ -155,4 +159,4 @@ QuestieDB.objectKeys = {
             if obj.type == 19: # mailboxes
                 outfile.write(str(obj.faction)+",") #5
             outfile.write("},\n")
-        outfile.write("}\n")
+        outfile.write("}]]\n")

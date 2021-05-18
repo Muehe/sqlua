@@ -251,11 +251,14 @@ class QuestList():
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
--------------------------
---Import modules.
--------------------------
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+
+local isTBCClient = string.byte(GetBuildInfo(), 1) == 50;
+
+if (not isTBCClient) then
+    return
+end
 
 QuestieDB.questKeys = {
     ['name'] = 1, -- string
@@ -277,6 +280,7 @@ QuestieDB.questKeys = {
         --['objectObjective'] = 2, -- table {{object(int), text(string)},...}
         --['itemObjective'] = 3, -- table {{item(int), text(string)},...}
         --['reputationObjective'] = 4, -- table: {faction(int), value(int)}
+        --['killCreditObjective'] = 5, -- table: {{creature(int), ...}, baseCreatureID, baseCreatureText}
     ['sourceItemId'] = 11, -- int, item provided by quest starter
     ['preQuestGroup'] = 12, -- table: {quest(int)}
     ['preQuestSingle'] = 13, -- table: {quest(int)}
@@ -292,9 +296,11 @@ QuestieDB.questKeys = {
     ['questFlags'] = 23, -- bitmask: see https://github.com/cmangos/issues/wiki/Quest_template#questflags
     ['specialFlags'] = 24, -- bitmask: 1 = Repeatable, 2 = Needs event, 4 = Monthly reset (req. 1). See https://github.com/cmangos/issues/wiki/Quest_template#specialflags
     ['parentQuest'] = 25, -- int, the ID of the parent quest that needs to be active for the current one to be available. See also 'childQuests' (field 14)
+    ['extraObjectives'] = 26, -- table: {{spawnlist, iconFile, text},...}, a list of hidden special objectives for a quest. Similar to requiredSourceItems
 }
+
+QuestieDB.questData = [[return {
 """)
-        outfile.write("QuestieDB.questData = {\n")
         #excluded = self.checkStartEnd()
         for id in sorted(self.qList):
             quest = self.qList[id]
@@ -363,9 +369,11 @@ QuestieDB.questKeys = {
                 outfile.write("nil,")
             if (hasattr(quest, "triggerEnd")): #trigger = 9
                 outfile.write("{\""+quest.triggerEnd[0]+"\",{")
-                for tri in quest.triggerEnd[1].cByZone:
-                    outfile.write("["+str(tri)+"]={")
-                    for c in quest.triggerEnd[1].cByZone[tri]:
+                for zone in quest.triggerEnd[1].cByZone:
+                    if zone not in validZoneList:
+                        continue
+                    outfile.write("["+str(zone)+"]={")
+                    for c in quest.triggerEnd[1].cByZone[zone]:
                         outfile.write("{"+str(c[0])+","+str(c[1])+"},")
                     outfile.write("},")
                 outfile.write("}},")
@@ -403,8 +411,7 @@ QuestieDB.questKeys = {
             else:
                 outfile.write("nil,")
 
-
-            if (hasattr(quest, "killCreditData")):
+            if (hasattr(quest, "killCreditData")): #multi-creatureID = objectives5
                 outfile.write("{{")
                 for kills in quest.killCreditData[0]:
                     outfile.write(str(kills)+",")
@@ -498,7 +505,7 @@ QuestieDB.questKeys = {
             else:
                 outfile.write('nil,')
             outfile.write("},\n")
-        outfile.write("};\n")
+        outfile.write("}]]\n")
         outfile.close();
 
     def pfQuestFile(self, file='quests.lua', locale='enGB'):

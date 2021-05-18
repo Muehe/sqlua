@@ -120,11 +120,14 @@ class ItemList():
 
         fo.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
--------------------------
---Import modules.
--------------------------
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+
+local isTBCClient = string.byte(GetBuildInfo(), 1) == 50;
+
+if (not isTBCClient) then
+    return
+end
 
 QuestieDB.itemKeys = {
     ['name'] = 1, -- string
@@ -141,10 +144,11 @@ QuestieDB.itemKeys = {
     ['class'] = 12, -- int,
     ['subClass'] = 13, -- int,
     ['vendors'] = 14, -- table or nil, NPC IDs
+    ['relatedQuests'] = 15, -- table or nil, IDs of quests that are related to this item
+}
 
-QuestieDB.items = {
+QuestieDB.itemData = [[return {
 """)
-
         for itemID in self.itemList:
             fo.write(f'[{itemID}] = {{')
             item = self.itemList[itemID]
@@ -195,7 +199,7 @@ QuestieDB.items = {
 
             fo.write('},\n')
         # EOF
-        fo.write('}\n')
+        fo.write('}]]\n')
 
 
     def writeList(self, fd, theList):

@@ -99,11 +99,14 @@ class NpcList():
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
--------------------------
---Import modules.
--------------------------
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+
+local isTBCClient = string.byte(GetBuildInfo(), 1) == 50;
+
+if (not isTBCClient) then
+    return
+end
 
 QuestieDB.npcKeys = {
     ['name'] = 1, -- string
@@ -124,8 +127,8 @@ QuestieDB.npcKeys = {
                        -- For flag values see https://github.com/cmangos/mangos-classic/blob/172c005b0a69e342e908f4589b24a6f18246c95e/src/game/Entities/Unit.h#L536
 }
 
+QuestieDB.npcData = [[return {
 """)
-        outfile.write("QuestieDB.npcData = {\n")
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
             #if (not hasattr(npc, "spawns")) and (not hasattr(npc, "waypoints")):
@@ -244,4 +247,4 @@ QuestieDB.npcKeys = {
             else:
                 outfile.write("nil,")
             outfile.write("},\n")
-        outfile.write("}\n")
+        outfile.write("}]]\n")
