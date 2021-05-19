@@ -102,11 +102,6 @@ class ObjList():
                 loc_obj[a[0]] = []
                 loc_obj[a[0]].append(a)
 
-        #count = dictCursor.execute("SELECT * FROM locales_gameobject")
-        #loc_obj = {}
-        #for _ in range(0, count):
-        #    q = dictCursor.fetchone()
-        #    loc_obj[q['entry']] = q
         print("Done.")
         return {'object_template':obj_tpl,
                 'object':obj,

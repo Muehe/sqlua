@@ -103,12 +103,6 @@ class ItemList():
         print("  SELECT reference_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM reference_loot_template")
         ret['reference_loot_template'] = dictCursor.fetchall()
-        #for a in dictCursor.fetchall():
-        #    if(a['id'] in ret['reference_loot_template']):
-        #        ret['reference_loot_template'][a['id']].append(a)
-        #    else:
-        #        ret['reference_loot_template'][a['id']] = []
-        #        ret['reference_loot_template'][a['id']].append(a)
 
         print("  SELECT gameobject_template")
         dictCursor.execute("SELECT entry AS id, data1 FROM gameobject_template WHERE type IN(3, 25)")

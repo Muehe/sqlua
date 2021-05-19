@@ -18,7 +18,6 @@ class Item():
             self.lootable = False
 
         # create list of NPC loot table entries containing this item
-        #lootIDs = self.get(self.id, 'item', tables['creature_loot_template'])
         # translate LootId (id) field to NPC IDs
         self.npcs = []
         if self.id in tables['creature_loot_template']:
@@ -29,7 +28,6 @@ class Item():
                             self.npcs.append(npcID)
 
         # create list of object loot table entries containing this item
-        #dates = self.get(self.id, 'item', tables['gameobject_loot_template'])
         # translate data1 (id) field to object IDs
         self.objects = []
         if self.id in tables['gameobject_loot_template']:
@@ -43,25 +41,20 @@ class Item():
                             self.objects.append(objectID)
 
 
-        self.items = [] #self.get(self.id, 'item', tables['item_loot_template'])
+        self.items = []
         if self.id in tables['item_loot_template']:
             self.items = self.get(self.id, 'item', tables['item_loot_template'][self.id])
 
         # self.references = self.get(self.id, 'item', tables['reference_loot_template'])
         # TODO merging references
 
-        self.vendors = []#list(filter(lambda step: step['item'] == self.id, tables['npc_vendor']))
+        self.vendors = []
         if self.id in tables['npc_vendor']:
             self.vendors = tables['npc_vendor'][self.id]
 
         self.quests = []
         if self.id in tables['quest_template']:
             self.quests = tables['quest_template'][self.id]
-        #for quest in tables['quest_template']:
-        #    for key in quest:
-        #        if key != 'id' and quest[key] == self.id:
-        #            self.quests.append(quest['id'])
-        #            break
 
         self.drops = len(self.npcs) + len(self.objects) + len(self.items) + len(self.vendors) + len(self.quests)
 

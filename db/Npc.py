@@ -98,16 +98,12 @@ class Npc():
             # spawns and spawn waypoints
             if self.id in dicts['npc']:
                 rawSpawns = dicts['npc'][self.id]
-                #suggestedZone = None
                 for spawn in rawSpawns:
                     # id, map, position_x, position_y, guid
                     if (spawn[0] == self.id):
                         # get spawns
                         if spawn[4] in zones:
                             spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
-                            #suggestedZone = zones[spawn[4]]
-                        #elif suggestedZone != None:
-                        #    spawns.append((spawn[1], spawn[2], spawn[3], suggestedZone))
                         else:
                             spawns.append((spawn[1], spawn[2], spawn[3]))
                         # get waypoints

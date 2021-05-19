@@ -122,15 +122,6 @@ class Quest():
                     for credit in dicts['creature_killcredit'][rootid[0]]:
                         killCreditRoot = rootid
                         killCreditMobs.append(credit[0]) # KillCredit2 is always 0 in cmangos-tbc
-                    
-                    #cursor.execute("SELECT `Entry`, `KillCredit2`  FROM `creature_template` WHERE `KillCredit1`="+str(rootid[0]))
-                    #isCreditMob = False
-                    #for a in cursor.fetchall():
-                    #    killCreditRoot = rootid
-                    #    isCreditMob = True
-                    #    killCreditMobs.append(a[0]) # KillCredit2 is always 0 in cmangos-tbc
-                    #if not isCreditMob:
-                    #    cleaned.append(rootid)
                 else:
                     cleaned.append(rootid)
 

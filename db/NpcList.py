@@ -59,11 +59,7 @@ class NpcList():
         print("Selecting NPC related MySQL tables...")
 
         print("  SELECT creature_template")
-        #Mangos
         cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
-        #Elysium
-        #Factions are wrong
-        #cursor.execute("SELECT entry, name, minlevel, maxlevel, minhealth, maxhealth, rank, faction_A, subname, npcflag FROM creature_template")
         npc_tpl = []
         for a in cursor.fetchall():
             npc_tpl.append(a)
