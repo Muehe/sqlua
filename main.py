@@ -47,6 +47,7 @@ def getCursors(v):
         user=config.dbInfo['user'],
         password=config.dbInfo['password'],
         database=config.dbInfo[v],
+        port=config.dbInfo["port"],
         charset='utf8'
     )
     c = connection.cursor()

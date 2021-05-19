@@ -8,6 +8,7 @@ dbInfo = {
     'host': 'localhost',
     'user': 'mangos',
     'password': 'mangos',
+    'port': 3306,
     'classic': 'classicmangos',
     'tbc': 'tbcmangos',
 }
