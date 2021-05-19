@@ -129,8 +129,15 @@ QuestieDB.npcKeys = {
 
 QuestieDB.npcData = [[return {
 """)
+        excludeTags = ['[DND]', '[ph]', '[PH]', '[PH[', '[UNUSED]', '[Unused]', '[DNT]', '[NOT USED]', '[VO]', '(DND)']
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
+            foundTag = False
+            for tag in excludeTags:
+                if tag in npc.name:
+                    foundTag = True
+            if foundTag:
+                continue
             #if (not hasattr(npc, "spawns")) and (not hasattr(npc, "waypoints")):
             #    continue
             zoneId = 0
