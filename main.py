@@ -9,6 +9,8 @@ import sys
 import pymysql
 import config
 
+import time
+
 version = config.version
 debug = config.debug
 
@@ -87,6 +89,8 @@ dictCursor = connection.cursor(pymysql.cursors.DictCursor)
 cursor, dictCursor = getCursors(version)
 
 if runMain:
+    start_time = time.time()
     main(True)
+    print("--- %s seconds ---" % (time.time() - start_time))
 else:
     print(f'Using version {version}')

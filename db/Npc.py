@@ -96,46 +96,60 @@ class Npc():
             spawns = []
             waypoints = []
             # spawns and spawn waypoints
-            for spawn in dicts['npc']:
-                # id, map, position_x, position_y, guid
-                if (spawn[0] == self.id):
-                    # get spawns
-                    if spawn[4] in zones:
-                        spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
-                    else:
-                        spawns.append((spawn[1], spawn[2], spawn[3]))
-                    # get waypoints
-                    wpSort = {}
-                    for waypoint in dicts['npc_movement']:
-                        # point, guid, position_x, position_y
-                        if (waypoint[1] == spawn[4]):
-                            if (spawn[4] in movementZones) and (waypoint[0] in movementZones[spawn[4]]):
-                                wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3], movementZones[spawn[4]][waypoint[0]])
-                            else:
-                                wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3])
-                    # sort waypoints if there is more than one, discard single-point pathes
-                    if (len(wpSort) > 1):
-                        temp = []
-                        for wp in sorted(list(wpSort)):
-                            temp.append(wpSort[wp])
-                        waypoints.append(CoordList(temp, version, debug=self.debug))
-                    elif (len(wpSort) == 1):
-                        # TODO implement checking for "non-moving" waypoints that are abused for script
-                        if self.debug: print(f'DEBUG: Discarded single-point path for GUID {spawn[4]}')
+            if self.id in dicts['npc']:
+                rawSpawns = dicts['npc'][self.id]
+                #suggestedZone = None
+                for spawn in rawSpawns:
+                    # id, map, position_x, position_y, guid
+                    if (spawn[0] == self.id):
+                        # get spawns
+                        if spawn[4] in zones:
+                            spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
+                            #suggestedZone = zones[spawn[4]]
+                        #elif suggestedZone != None:
+                        #    spawns.append((spawn[1], spawn[2], spawn[3], suggestedZone))
+                        else:
+                            spawns.append((spawn[1], spawn[2], spawn[3]))
+                        # get waypoints
+                        
+                        npcMovement = None
+                        if self.id in dicts['npc_movement']:
+                            npcMovement = dicts['npc_movement'][self.id] #by NPCID
+                        if spawn[4] in dicts['npc_movement']:
+                            npcMovement = dicts['npc_movement'][spawn[4]] #by GUID
+                        if npcMovement is not None and len(dicts['npc'][self.id]) <= 2: #Less than 2 spawns only, otherwise we get EVERYTHIIIIINNNGGGG
+                            wpSort = {}
+                            for waypoint in npcMovement:
+                                # point, guid, position_x, position_y
+                                if (waypoint[1] == spawn[4]):
+                                    if (spawn[4] in movementZones) and (waypoint[0] in movementZones[spawn[4]]):
+                                        wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3], movementZones[spawn[4]][waypoint[0]])
+                                    else:
+                                        wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3])
+                            # sort waypoints if there is more than one, discard single-point pathes
+                            if (len(wpSort) > 1):
+                                temp = []
+                                for wp in sorted(list(wpSort)):
+                                    temp.append(wpSort[wp])
+                                waypoints.append(CoordList(temp, version, debug=self.debug))
+                            elif (len(wpSort) == 1):
+                                # TODO implement checking for "non-moving" waypoints that are abused for script
+                                if self.debug: print(f'DEBUG: Discarded single-point path for GUID {spawn[4]}')
 
             # template waypoints
             wpError = False
             # get waypoints
             wptSort = {}
-            for waypoint in dicts['npc_movement_template']:
-                # point, entry, position_x, position_y
-                if (waypoint[1] == self.id) and (len(spawns) > 0):
-                    if (self.id in movementTemplateZones) and (waypoint[0] in movementTemplateZones[self.id]):
-                        wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3], movementTemplateZones[self.id][waypoint[0]])
+            if self.id in dicts['npc_movement_template']:
+                for waypoint in dicts['npc_movement_template'][self.id]:
+                    # point, entry, position_x, position_y
+                    if (waypoint[1] == self.id) and (len(spawns) > 0):
+                        if (self.id in movementTemplateZones) and (waypoint[0] in movementTemplateZones[self.id]):
+                            wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3], movementTemplateZones[self.id][waypoint[0]])
+                        else:
+                            wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3])
                     else:
-                        wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3])
-                else:
-                    wpError = True
+                        wpError = True
             # sort waypoints
             if (len(wptSort) > 0):
                 temp = []
@@ -153,18 +167,26 @@ class Npc():
                 self.waypoints = waypoints
             if(wpError):
                 Npc.waypointErrors.append(self.id)
+        
+        #Start
         self.start = []
-        for pair in dicts['npc_start']:
-            if pair[0] == self.id:
-                self.start.append(pair[1])
+        if self.id in dicts['npc_start']:
+            for pair in dicts['npc_start'][self.id]:
+                if pair[0] == self.id:
+                    self.start.append(pair[1])
         if self.start == []:
             del self.start
+
+        #End
         self.end = []
-        for pair in dicts['npc_end']:
-            if pair[0] == self.id:
-                self.end.append(pair[1])
+        if self.id in dicts['npc_end']:
+            for pair in dicts['npc_end'][self.id]:
+                if pair[0] == self.id:
+                    self.end.append(pair[1])
         if self.end == []:
             del self.end
+
+        #locale
         if self.id in dicts['locales_npc']:
             self.locales = dicts['locales_npc'][self.id]
         else:

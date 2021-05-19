@@ -93,6 +93,8 @@ class Quest():
                     continue
                 if dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)] != None:
                     self.locales_ObjectiveTexts[x][y] = escapeDoubleQuotes(dicts['locales_quest'][self.id]['ObjectiveText'+str(x)+'_loc'+str(y)]).replace("\n","\\n")
+
+        #ReqCreatureId
         self.ReqCreatureId = []
         if ((quest[29] > 0)):
             self.ReqCreatureId.append((quest[29], escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
@@ -116,13 +118,20 @@ class Quest():
             killCreditMobs = []
             killCreditRoot = None
             for rootid in self.ReqCreatureId:
-                cursor.execute("SELECT `Entry`, `KillCredit2`  FROM `creature_template` WHERE `KillCredit1`="+str(rootid[0]))
-                isCreditMob = False
-                for a in cursor.fetchall():
-                    killCreditRoot = rootid
-                    isCreditMob = True
-                    killCreditMobs.append(a[0]) # KillCredit2 is always 0 in cmangos-tbc
-                if not isCreditMob:
+                if rootid[0] in dicts['creature_killcredit']:
+                    for credit in dicts['creature_killcredit'][rootid[0]]:
+                        killCreditRoot = rootid
+                        killCreditMobs.append(credit[0]) # KillCredit2 is always 0 in cmangos-tbc
+                    
+                    #cursor.execute("SELECT `Entry`, `KillCredit2`  FROM `creature_template` WHERE `KillCredit1`="+str(rootid[0]))
+                    #isCreditMob = False
+                    #for a in cursor.fetchall():
+                    #    killCreditRoot = rootid
+                    #    isCreditMob = True
+                    #    killCreditMobs.append(a[0]) # KillCredit2 is always 0 in cmangos-tbc
+                    #if not isCreditMob:
+                    #    cleaned.append(rootid)
+                else:
                     cleaned.append(rootid)
 
             if len(killCreditMobs) > 0:
@@ -131,6 +140,8 @@ class Quest():
 
         if (self.ReqCreatureId == []):
             del self.ReqCreatureId
+
+        #ReqGoId
         self.ReqGOId = []
         if ((quest[29] < 0)):
             self.ReqGOId.append((abs(quest[29]), escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
@@ -150,6 +161,8 @@ class Quest():
             self.ObjectiveList[3]['id'] = abs(quest[32])
         if (self.ReqGOId == []):
             del self.ReqGOId
+        
+        #ReqSpellCast
         self.ReqSpellCast = []
         if (quest[33] != 0):
             self.ReqSpellCast.append((quest[33], quest[29], escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
@@ -165,9 +178,12 @@ class Quest():
             self.ObjectiveList[3]['reqSpellCast'] = quest[36]
         if (self.ReqSpellCast == []):
             del self.ReqSpellCast
+        #??? what is this
         for i in range(0, 4):
             if len(self.ObjectiveList[i]) == 1:
                 self.ObjectiveList[i] = False
+
+        
         if (quest[37] != 0):
             self.PointMapId = quest[37]
             self.PointX = quest[38]
@@ -176,34 +192,49 @@ class Quest():
             self.SrcItemId = quest[42]
         if (quest[43] != 0):
             self.ZoneOrSort = quest[43]
+
+        #CreatureEnd
         self.creatureEnd = []
-        for (creatureId, questId) in dicts['creature_involvedrelation']:
-            if (questId == self.id):
-                self.creatureEnd.append(creatureId)
+        if self.id in dicts['creature_involvedrelation']:
+            for (creatureId, questId) in dicts['creature_involvedrelation'][self.id]:
+                if (questId == self.id):
+                    self.creatureEnd.append(creatureId)
         if (self.creatureEnd == []):
             del self.creatureEnd
+
+        #CreatureStart
         self.creatureStart = []
-        for (creatureId, questId) in dicts['creature_questrelation']:
-            if (questId == self.id):
-                self.creatureStart.append(creatureId)
+        if self.id in dicts['creature_questrelation']:
+            for (creatureId, questId) in dicts['creature_questrelation'][self.id]:
+                if (questId == self.id):
+                    self.creatureStart.append(creatureId)
         if (self.creatureStart == []):
             del self.creatureStart
+        
+        #goEnd
         self.goEnd = []
-        for (goId, questId) in dicts['gameobject_involvedrelation']:
-            if (questId == self.id):
-                self.goEnd.append(goId)
+        if self.id in dicts['gameobject_involvedrelation']:
+            for (goId, questId) in dicts['gameobject_involvedrelation'][self.id]:
+                if (questId == self.id):
+                    self.goEnd.append(goId)
         if (self.goEnd == []):
             del self.goEnd
+        
+        #goStart
         self.goStart = []
-        for (goId, questId) in dicts['gameobject_questrelation']:
-            if (questId == self.id):
-                self.goStart.append(goId)
+        if self.id in dicts['gameobject_questrelation']:
+            for (goId, questId) in dicts['gameobject_questrelation'][self.id]:
+                if (questId == self.id):
+                    self.goStart.append(goId)
         if (self.goStart == []):
             del self.goStart
+
+        #itemStart
         self.itemStart = []
-        for (itemId, questId) in dicts['item_questrelation']:
-            if (questId == self.id):
-                self.itemStart.append(itemId)
+        if self.id in dicts['item_questrelation']:
+            for (itemId, questId) in dicts['item_questrelation'][self.id]:
+                if (questId == self.id):
+                    self.itemStart.append(itemId)
         if (self.itemStart == []):
             del self.itemStart
 
@@ -219,14 +250,16 @@ class Quest():
                 for row in reader:
                     triggerZoneDict[int(row[0])] = int(row[1])
                 infile.close()
-        for (triggerId, questId) in dicts['areatrigger_involvedrelation']:
-            if (questId == self.id):
-                for trigger in areaTrigger:
-                    if trigger[0] == triggerId:
-                        if triggerId in triggerZoneDict:
-                            triggers.append((trigger[1], trigger[2], trigger[3], triggerZoneDict[triggerId]))
-                        else:
-                            triggers.append((trigger[1], trigger[2], trigger[3]))
+                
+        if self.id in dicts['areatrigger_involvedrelation']:
+            for (triggerId, questId) in dicts['areatrigger_involvedrelation'][self.id]:
+                if (questId == self.id):
+                    for trigger in areaTrigger:
+                        if trigger[0] == triggerId:
+                            if triggerId in triggerZoneDict:
+                                triggers.append((trigger[1], trigger[2], trigger[3], triggerZoneDict[triggerId]))
+                            else:
+                                triggers.append((trigger[1], trigger[2], trigger[3]))
         if (triggers == []):
             del self.triggerEnd
         else:

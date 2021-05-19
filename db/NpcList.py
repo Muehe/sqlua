@@ -57,35 +57,74 @@ class NpcList():
 
     def getNpcTables(self, cursor, dictCursor):
         print("Selecting NPC related MySQL tables...")
-        cursor.execute("SELECT `entry`, `name`, `minlevel`, `maxlevel`, `minlevelhealth`, `maxlevelhealth`, `rank`, `Faction`, `SubName`, `NpcFlags` FROM `creature_template`")
+
+        print("  SELECT creature_template")
+        #Mangos
+        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
+        #Elysium
+        #Factions are wrong
+        #cursor.execute("SELECT entry, name, minlevel, maxlevel, minhealth, maxhealth, rank, faction_A, subname, npcflag FROM creature_template")
         npc_tpl = []
         for a in cursor.fetchall():
             npc_tpl.append(a)
+
+        print("  SELECT creature")
         cursor.execute("SELECT id, map, position_x, position_y, guid FROM creature")
-        npc = []
+        npc = {}
         for a in cursor.fetchall():
-            npc.append(a)
+            if(a[0] in npc):
+                npc[a[0]].append(a)
+            else:
+                npc[a[0]] = []
+                npc[a[0]].append(a)
+
+        print("  SELECT creature_questrelation")
         cursor.execute("SELECT * FROM creature_questrelation")
-        npc_start = []
+        npc_start = {}
         for a in cursor.fetchall():
-            npc_start.append(a)
+            if(a[0] in npc_start):
+                npc_start[a[0]].append(a)
+            else:
+                npc_start[a[0]] = []
+                npc_start[a[0]].append(a)
+
+        print("  SELECT creature_involvedrelation")
         cursor.execute("SELECT * FROM creature_involvedrelation")
-        npc_end = []
+        npc_end = {}
         for a in cursor.fetchall():
-            npc_end.append(a)
+            if(a[0] in npc_end):
+                npc_end[a[0]].append(a)
+            else:
+                npc_end[a[0]] = []
+                npc_end[a[0]].append(a)
+
+        print("  SELECT creature_movement")
         cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
-        npc_mov = []
+        npc_mov = {}
         for a in cursor.fetchall():
-            npc_mov.append(a)
+            if(a[1] in npc_mov):
+                npc_mov[a[1]].append(a)
+            else:
+                npc_mov[a[1]] = []
+                npc_mov[a[1]].append(a)
+
+        print("  SELECT creature_movement_template")
         cursor.execute("SELECT point, entry, position_x, position_y FROM creature_movement_template")
-        npc_mov_tpl = []
+        npc_mov_tpl = {}
         for a in cursor.fetchall():
-            npc_mov_tpl.append(a)
+            if(a[1] in npc_mov_tpl):
+                npc_mov_tpl[a[1]].append(a)
+            else:
+                npc_mov_tpl[a[1]] = []
+                npc_mov_tpl[a[1]].append(a)
+
+        print("  SELECT locales_creature")
         count = dictCursor.execute("SELECT * FROM locales_creature")
         loc_npc = {}
         for _ in range(0, count):
             q = dictCursor.fetchone()
             loc_npc[q['entry']] = q
+
         print("Done.")
         return {'npc_template':npc_tpl,
                 'npc':npc,
@@ -129,8 +168,15 @@ QuestieDB.npcKeys = {
 
 QuestieDB.npcData = [[return {
 """)
+        excludeTags = ['[DND]', '[ph]', '[PH]', '[PH[', '[UNUSED]', '[Unused]', '[DNT]', '[NOT USED]', '[VO]', '(DND)']
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
+            foundTag = False
+            for tag in excludeTags:
+                if tag in npc.name:
+                    foundTag = True
+            if foundTag:
+                continue
             #if (not hasattr(npc, "spawns")) and (not hasattr(npc, "waypoints")):
             #    continue
             zoneId = 0
