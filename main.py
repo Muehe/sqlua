@@ -72,21 +72,9 @@ if __name__ == "__main__":
     print(f'Using version {version}')
     runMain = True
 
-# Set up MySQL connection
-"""
-connection = pymysql.connect(
-    host=config.dbInfo['host'],
-    user=config.dbInfo['user'],
-    password=config.dbInfo['password'],
-    database=config.dbInfo[version],
-    charset='utf8'
-)
-cursor = connection.cursor()
-dictCursor = connection.cursor(pymysql.cursors.DictCursor)
-"""
 cursor, dictCursor = getCursors(version)
 
 if runMain:
-    main(True)
+    main(False)
 else:
     print(f'Using version {version}')
