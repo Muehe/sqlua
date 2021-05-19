@@ -31,30 +31,40 @@ class Obj():
         self.data1 = obj[4]
         spawns = []
         if extractSpawns:
-            for spawn in dicts['object']:
-                if (spawn[0] == self.id):
-                    if spawn[4] in objectZones:
-                        spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]]))
-                    else:
-                        spawns.append((spawn[1], spawn[2], spawn[3]))
+            if self.id in dicts['object']:
+                rawSpawn = dicts['object'][self.id]
+                for spawn in rawSpawn:
+                    if (spawn[0] == self.id):
+                        if spawn[4] in objectZones:
+                            spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]]))
+                        else:
+                            spawns.append((spawn[1], spawn[2], spawn[3]))
         if (spawns == []):
             Obj.spawnErrors.append(self.id)
             self.noSpawn = True
             self.spawns = CoordList([], version)
         elif extractSpawns:
             self.spawns = CoordList(spawns, version, debug=debug)
+        
+        #Start
         self.start = []
-        for pair in dicts['object_start']:
-            if pair[0] == self.id:
-                self.start.append(pair[1])
+        if self.id in dicts['object_start']:
+            for pair in dicts['object_start'][self.id]:
+                if pair[0] == self.id:
+                    self.start.append(pair[1])
         if self.start == []:
             del self.start
+
+        #End
         self.end = []
-        for pair in dicts['object_end']:
-            if pair[0] == self.id:
-                self.end.append(pair[1])
+        if self.id in dicts['object_end']:
+            for pair in dicts['object_end'][self.id]:
+                if pair[0] == self.id:
+                    self.end.append(pair[1])
         if self.end == []:
             del self.end
+        
+        #locales
         if self.id in dicts['locales_object']:
             self.locales = dicts['locales_object'][self.id]
         else:

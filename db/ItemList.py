@@ -66,21 +66,51 @@ class ItemList():
 
         ret = {}
 
+        print("  SELECT item_template")
         dictCursor.execute("SELECT entry AS id, name, Flags, startquest, FoodType, ItemLevel, RequiredLevel, ammo_type, class, subclass FROM item_template")
         ret['item_template'] = dictCursor.fetchall()
 
+        print("  SELECT creature_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM creature_loot_template")
-        ret['creature_loot_template'] = dictCursor.fetchall()
+        ret['creature_loot_template'] = {}#dictCursor.fetchall()
+        for a in dictCursor.fetchall():
+            if(a['item'] in ret['creature_loot_template']):
+                ret['creature_loot_template'][a['item']].append(a)
+            else:
+                ret['creature_loot_template'][a['item']] = []
+                ret['creature_loot_template'][a['item']].append(a)
 
+        print("  SELECT gameobject_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM gameobject_loot_template")
-        ret['gameobject_loot_template'] = dictCursor.fetchall()
+        ret['gameobject_loot_template'] = {}#dictCursor.fetchall()
+        for a in dictCursor.fetchall():
+            if(a['item'] in ret['gameobject_loot_template']):
+                ret['gameobject_loot_template'][a['item']].append(a)
+            else:
+                ret['gameobject_loot_template'][a['item']] = []
+                ret['gameobject_loot_template'][a['item']].append(a)
 
+        print("  SELECT item_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM item_loot_template")
-        ret['item_loot_template'] = dictCursor.fetchall()
+        ret['item_loot_template'] = {}#dictCursor.fetchall()
+        for a in dictCursor.fetchall():
+            if(a['item'] in ret['item_loot_template']):
+                ret['item_loot_template'][a['item']].append(a)
+            else:
+                ret['item_loot_template'][a['item']] = []
+                ret['item_loot_template'][a['item']].append(a)
 
+        print("  SELECT reference_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM reference_loot_template")
         ret['reference_loot_template'] = dictCursor.fetchall()
+        #for a in dictCursor.fetchall():
+        #    if(a['id'] in ret['reference_loot_template']):
+        #        ret['reference_loot_template'][a['id']].append(a)
+        #    else:
+        #        ret['reference_loot_template'][a['id']] = []
+        #        ret['reference_loot_template'][a['id']].append(a)
 
+        print("  SELECT gameobject_template")
         dictCursor.execute("SELECT entry AS id, data1 FROM gameobject_template WHERE type IN(3, 25)")
         a = dictCursor.fetchall()
         # create loot lookup dict for objects
@@ -91,6 +121,9 @@ class ItemList():
             b[x['data1']].append(x['id'])
         ret['gameobject_template'] = a
         ret['data1'] = b
+
+        
+        print("  SELECT creature_template")
         dictCursor.execute("SELECT entry AS id, LootId, VendorTemplateId FROM creature_template") # PickpocketLootId and SkinningLootId might be good...
         a = dictCursor.fetchall()
         # create loot lookup table for NPCs
@@ -102,14 +135,33 @@ class ItemList():
         ret['creature_template'] = a
         ret['lootIDs'] = b
 
+        print("  SELECT npc_vendor_template")
         dictCursor.execute("SELECT entry AS id, item, maxcount, incrtime FROM npc_vendor_template")
         ret['npc_vendor_template'] = dictCursor.fetchall()
 
+        print("  SELECT npc_vendor")
         dictCursor.execute("SELECT entry AS id, item, maxcount, incrtime FROM npc_vendor")
-        ret['npc_vendor'] = dictCursor.fetchall()
+        ret['npc_vendor'] = {}#dictCursor.fetchall()
+        for a in dictCursor.fetchall():
+            if(a['item'] in ret['npc_vendor']):
+                ret['npc_vendor'][a['item']].append(a)
+            else:
+                ret['npc_vendor'][a['item']] = []
+                ret['npc_vendor'][a['item']].append(a)
 
+        print("  SELECT quest_template")
         dictCursor.execute("SELECT entry AS id, RewChoiceItemId1, RewChoiceItemId2, RewChoiceItemId3,RewChoiceItemId4 ,RewChoiceItemId5, RewChoiceItemId6, RewItemId1, RewItemId2, RewItemId3, RewItemId4 FROM quest_template")
         ret['quest_template'] = dictCursor.fetchall()
+        qtemplate = {}
+        for quest in ret['quest_template']:
+            for key in quest:
+                if key != 'id' and quest[key] != 0:
+                    if quest[key] in qtemplate:
+                        qtemplate[quest[key]].append(quest['id'])
+                    else:
+                        qtemplate[quest[key]] = []
+                        qtemplate[quest[key]].append(quest['id'])
+        ret['quest_template'] = qtemplate
 
         print("Done getting tables.")
 
