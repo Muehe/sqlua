@@ -20,37 +20,46 @@ class Item():
         # create list of NPC loot table entries containing this item
         # translate LootId (id) field to NPC IDs
         self.npcs = []
-        if self.id in tables['creature_loot_template']:
-            for loot in tables['creature_loot_template'][self.id]:
-                if not (loot['mincountOrRef'] < 0):
-                    for npcID in tables['lootIDs'][loot['id']]:
-                        if npcID not in self.npcs:
-                            self.npcs.append(npcID)
+        if self.id in tables["nlootIDs"]:
+            self.npcs = tables["nlootIDs"][self.id]
+
+        # Add loots for quest items only.
+        # This is basically culling information, otherwise the file explodes in size
+        if self.id in tables["nlootIDsRef"] and len(tables["nlootIDsRef"][self.id]) > 0 and self.cls == 12:
+            self.npcs += tables["nlootIDsRef"][self.id]
+            #print(str(self.id) + " : " + self.name)
 
         # create list of object loot table entries containing this item
         # translate data1 (id) field to object IDs
         self.objects = []
-        if self.id in tables['gameobject_loot_template']:
-            for loot in tables['gameobject_loot_template'][self.id]:
-                if not (loot['mincountOrRef'] < 0):
-                    if loot['id'] not in tables['data1']:
-                        print(f'No object found for {loot} of item {self.name} ({self.id})')
-                        continue
-                    for objectID in tables['data1'][loot['id']]:
-                        if objectID not in self.objects:
-                            self.objects.append(objectID)
+        if self.id in tables["ObjectlootIDs"]:
+            self.objects = tables["ObjectlootIDs"][self.id]
+
+        # Add loots for quest items only.
+        # This is basically culling information, otherwise the file explodes in size
+        if self.id in tables["ObjectlootIDsRef"] and len(tables["ObjectlootIDsRef"][self.id]) > 0 and self.cls == 12:
+            self.objects += tables["ObjectlootIDsRef"][self.id]
+            #print(str(self.id) + " : " + self.name)
 
 
         self.items = []
         if self.id in tables['item_loot_template']:
             self.items = self.get(self.id, 'item', tables['item_loot_template'][self.id])
 
-        # self.references = self.get(self.id, 'item', tables['reference_loot_template'])
-        # TODO merging references
-
+        # create list of NPC vendor table entries containing this item
         self.vendors = []
         if self.id in tables['npc_vendor']:
-            self.vendors = tables['npc_vendor'][self.id]
+            for vendor in tables['npc_vendor'][self.id]:
+                self.vendors.append(vendor["id"])
+
+        # translate VendorTemplateId (id) field to NPC IDs
+        if self.id in tables['npc_vendor_template']:
+            for vendor in tables['npc_vendor_template'][self.id]:
+                if vendor['id'] in tables['vendorTempIDs']:
+                    for npcID in tables['vendorTempIDs'][vendor['id']]:
+                        if npcID not in self.vendors:
+                            self.vendors.append(npcID)
+        
 
         self.quests = []
         if self.id in tables['quest_template']:

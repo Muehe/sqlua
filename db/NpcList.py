@@ -131,6 +131,7 @@ class NpcList():
                 'locales_npc':loc_npc}
 
     def printNpcFile(self, file='output/spawnDB.lua', locale='enGB'):
+        print("  Printing NPC file '%s'" % file)
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
@@ -170,9 +171,12 @@ QuestieDB.npcData = [[return {
             foundTag = False
             for tag in excludeTags:
                 if tag in npc.name:
-                    foundTag = True
-            if foundTag:
+                    foundTag = tag
+                    break
+            if foundTag != False:
+                #print("Excluding %d : %s because of tag '%s'" % (npcId, npc.name, foundTag))
                 continue
+
             #if (not hasattr(npc, "spawns")) and (not hasattr(npc, "waypoints")):
             #    continue
             zoneId = 0

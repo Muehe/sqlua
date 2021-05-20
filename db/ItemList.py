@@ -73,16 +73,24 @@ class ItemList():
         print("  SELECT creature_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM creature_loot_template")
         ret['creature_loot_template'] = {}#dictCursor.fetchall()
+        creature_loot_template_lootid = {}#dictCursor.fetchall()
         for a in dictCursor.fetchall():
             if(a['item'] in ret['creature_loot_template']):
                 ret['creature_loot_template'][a['item']].append(a)
             else:
                 ret['creature_loot_template'][a['item']] = []
                 ret['creature_loot_template'][a['item']].append(a)
+            
+            if(a['id'] in creature_loot_template_lootid):
+                creature_loot_template_lootid[a['id']].append(a)
+            else:
+                creature_loot_template_lootid[a['id']] = []
+                creature_loot_template_lootid[a['id']].append(a)
 
         print("  SELECT gameobject_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM gameobject_loot_template")
         ret['gameobject_loot_template'] = {}#dictCursor.fetchall()
+        gameobject_loot_template_lootid = {}#dictCursor.fetchall()
         for a in dictCursor.fetchall():
             if(a['item'] in ret['gameobject_loot_template']):
                 ret['gameobject_loot_template'][a['item']].append(a)
@@ -90,9 +98,16 @@ class ItemList():
                 ret['gameobject_loot_template'][a['item']] = []
                 ret['gameobject_loot_template'][a['item']].append(a)
 
+            if(a['id'] in gameobject_loot_template_lootid):
+                gameobject_loot_template_lootid[a['id']].append(a)
+            else:
+                gameobject_loot_template_lootid[a['id']] = []
+                gameobject_loot_template_lootid[a['id']].append(a)
+
         print("  SELECT item_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM item_loot_template")
         ret['item_loot_template'] = {}#dictCursor.fetchall()
+        #item_loot_template_lootid = {}
         for a in dictCursor.fetchall():
             if(a['item'] in ret['item_loot_template']):
                 ret['item_loot_template'][a['item']].append(a)
@@ -100,38 +115,86 @@ class ItemList():
                 ret['item_loot_template'][a['item']] = []
                 ret['item_loot_template'][a['item']].append(a)
 
+            #TODO: Gotta use this to check reference_loot_template
+            #if(a['id'] in item_loot_template_lootid):
+            #    item_loot_template_lootid[a['id']].append(a)
+            #else:
+            #    item_loot_template_lootid[a['id']] = []
+            #    item_loot_template_lootid[a['id']].append(a)
+
         print("  SELECT reference_loot_template")
         dictCursor.execute("SELECT entry AS id, item, ChanceOrQuestChance, groupid, mincountOrRef FROM reference_loot_template")
-        ret['reference_loot_template'] = dictCursor.fetchall()
+
+        ret['reference_loot_template'] = {}#dictCursor.fetchall()
+        for a in dictCursor.fetchall():
+            if(a['id'] in ret['reference_loot_template']):
+                ret['reference_loot_template'][a['id']].append(a)
+            else:
+                ret['reference_loot_template'][a['id']] = []
+                ret['reference_loot_template'][a['id']].append(a)
 
         print("  SELECT gameobject_template")
-        dictCursor.execute("SELECT entry AS id, data1 FROM gameobject_template WHERE type IN(3, 25)")
-        a = dictCursor.fetchall()
+        dictCursor.execute("SELECT entry AS id, data1, type FROM gameobject_template WHERE type IN(3, 25)")
+        oTemplate = dictCursor.fetchall()
         # create loot lookup dict for objects
-        b = {}
-        for x in a:
-            if x['data1'] not in b:
-                b[x['data1']] = []
-            b[x['data1']].append(x['id'])
-        ret['gameobject_template'] = a
-        ret['data1'] = b
+        ret["ObjectlootIDs"] = {}
+        ret["ObjectlootIDsRef"] = {}
+        for gameobject in oTemplate:
+            if gameobject["data1"] in gameobject_loot_template_lootid:
+                for cLootTable in gameobject_loot_template_lootid[gameobject["data1"]]:
+                    if cLootTable["mincountOrRef"] > 0:
+                        if cLootTable["item"] not in ret["ObjectlootIDs"]:
+                            ret["ObjectlootIDs"][cLootTable["item"]] = []
+                        if gameobject["id"] not in ret["ObjectlootIDs"][cLootTable["item"]]:
+                            ret["ObjectlootIDs"][cLootTable["item"]].append(gameobject["id"])
+                    else:
+                        refID = abs(cLootTable["mincountOrRef"])
+                        for rLootTable in ret['reference_loot_template'][refID]:
+                            if rLootTable["mincountOrRef"] > 0:
+                                if rLootTable["item"] not in ret["ObjectlootIDsRef"]:
+                                    ret["ObjectlootIDsRef"][rLootTable["item"]] = []
+                                if gameobject["id"] not in ret["ObjectlootIDsRef"][rLootTable["item"]]:
+                                    ret["ObjectlootIDsRef"][rLootTable["item"]].append(gameobject["id"])
 
         
         print("  SELECT creature_template")
         dictCursor.execute("SELECT entry AS id, LootId, VendorTemplateId FROM creature_template") # PickpocketLootId and SkinningLootId might be good...
-        a = dictCursor.fetchall()
+        cTemplate = dictCursor.fetchall()
         # create loot lookup table for NPCs
-        b = {}
-        for x in a:
-            if x['LootId'] not in b:
-                b[x['LootId']] = []
-            b[x['LootId']].append(x['id'])
-        ret['creature_template'] = a
-        ret['lootIDs'] = b
+        ret["nlootIDs"] = {}
+        ret["nlootIDsRef"] = {}
+        for creature in cTemplate:
+            if creature["LootId"] in creature_loot_template_lootid:
+                for cLootTable in creature_loot_template_lootid[creature["LootId"]]:
+                    if cLootTable["mincountOrRef"] > 0:
+                        if cLootTable["item"] not in ret["nlootIDs"]:
+                            ret["nlootIDs"][cLootTable["item"]] = []
+                        if creature["id"] not in ret["nlootIDs"][cLootTable["item"]]:
+                            ret["nlootIDs"][cLootTable["item"]].append(creature["id"])
+                    else:
+                        refID = abs(cLootTable["mincountOrRef"])
+                        for rLootTable in ret['reference_loot_template'][refID]:
+                            if rLootTable["mincountOrRef"] > 0:
+                                if rLootTable["item"] not in ret["nlootIDsRef"]:
+                                    ret["nlootIDsRef"][rLootTable["item"]] = []
+                                if creature["id"] not in ret["nlootIDsRef"][rLootTable["item"]]:
+                                    ret["nlootIDsRef"][rLootTable["item"]].append(creature["id"])
+
+        ret['vendorTempIDs'] = {}
+        for creature in cTemplate:
+            if creature['VendorTemplateId'] not in ret['vendorTempIDs']:
+                ret['vendorTempIDs'][creature['VendorTemplateId']] = []
+            ret['vendorTempIDs'][creature['VendorTemplateId']].append(creature['id'])
 
         print("  SELECT npc_vendor_template")
         dictCursor.execute("SELECT entry AS id, item, maxcount, incrtime FROM npc_vendor_template")
-        ret['npc_vendor_template'] = dictCursor.fetchall()
+        ret['npc_vendor_template'] = {}
+        for a in dictCursor.fetchall():
+            if(a['item'] in ret['npc_vendor_template']):
+                ret['npc_vendor_template'][a['item']].append(a)
+            else:
+                ret['npc_vendor_template'][a['item']] = []
+                ret['npc_vendor_template'][a['item']].append(a)
 
         print("  SELECT npc_vendor")
         dictCursor.execute("SELECT entry AS id, item, maxcount, incrtime FROM npc_vendor")
@@ -162,6 +225,7 @@ class ItemList():
         return ret
 
     def writeFile(self, file = 'output/itemDB.lua'):
+        print("  Printing Item file '%s'" % file)
         fo = open(file, "w")
 
         fo.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
@@ -204,7 +268,7 @@ QuestieDB.itemData = [[return {
             #2
             if item.npcs:
                 fo.write('{')
-                for npc in item.npcs:
+                for npc in sorted(item.npcs):
                     fo.write(f'{npc},')
                 fo.write('},',)
             else:
@@ -212,7 +276,7 @@ QuestieDB.itemData = [[return {
             #3
             if item.objects:
                 fo.write('{')
-                for objectID in item.objects:
+                for objectID in sorted(item.objects):
                     fo.write(f'{objectID},')
                 fo.write('},',)
             else:
@@ -221,8 +285,8 @@ QuestieDB.itemData = [[return {
             fo.write(f"{item.startquest}," if item.startquest != 0 else 'nil,') #5
             if len(item.quests) > 0: #6
                 fo.write('{')
-                for thing in item.quests:
-                    fo.write(f'{thing},')
+                for quest in sorted(item.quests):
+                    fo.write(f'{quest},')
                 fo.write('},',)
             else:
                 fo.write('nil,')
@@ -237,8 +301,8 @@ QuestieDB.itemData = [[return {
 
             if len(item.vendors) > 0: #14
                 fo.write('{')
-                for thing in item.vendors:
-                    fo.write(f'{thing["id"]},')
+                for npcId in sorted(item.vendors):
+                    fo.write(f'{npcId},')
                 fo.write('},',)
             else:
                 fo.write('nil,')
