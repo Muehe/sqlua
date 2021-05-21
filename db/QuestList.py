@@ -299,6 +299,8 @@ class QuestList():
         return actualRequiredRaces
 
     def printQuestFile(self, file="output/questDB.lua", locale="enGB"):
+        print("  Printing Quests file '%s'" % file)
+
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
@@ -403,6 +405,12 @@ QuestieDB.questData = [[return {
             outfile.write("},")
             outfile.write(str(quest.MinLevel)+",") #minLevel = 4
             outfile.write(str(quest.QuestLevel)+",") #level = 5
+
+            #If you remove goblin from all races we get 1791, there are 11 quests in the TBC DB with this RequiredRaces
+            #We just normalize the database by using 2047 instead.
+            if(quest.RequiredRaces == 1791):
+                print("    Quest %d\thas a required races of %d, changing to %d." % (id, quest.RequiredRaces, 2047))
+                quest.RequiredRaces = 2047
             outfile.write(f'{quest.RequiredRaces},') #RequiredRaces = 6
             if (hasattr(quest, "RequiredClasses")): #RequiredClasses = 7
                 outfile.write(f"{quest.RequiredClasses},")
