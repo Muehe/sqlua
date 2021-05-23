@@ -1,0 +1,23 @@
+{% extends 'map.html' %}
+
+{% block content %}
+<div class='header'><h1>{{data.item.name}} ({{data.item.id}})</h1></div>
+<div class='col-2'>
+    <b>Class: </b> {{data.itemClass[data.item.cls]}} ({{data.item.cls}}) <br />
+    <b>Subclass:</b> {{data.itemSubclass[data.item.cls][data.item.subClass]}} ({{data.item.subClass}})<br />
+    {% if data.item.foodtype != 0 %}<b>Food type:</b> {{data.foodType[data.item.foodtype]}} ({{data.item.foodtype}})<br />{% endif %}
+    {% if data.item.ammoType != 0 %}<b>Ammo Type:</b> {{data.ammoType[data.item.ammoType]}} ({{data.item.ammoType}})<br />{% endif %}
+    <b>Item Level: </b> {{data.item.itemlevel}} <br />
+    {% if data.item.requiredlevel != 0 %}<b>Required Level: </b> {{data.item.requiredlevel}}<br />{% endif %}
+    <b>Flags: </b>
+    <ul>
+        {% for flag in data.activeFlags %}
+        <li>{{flag}}</li>
+        {% endfor %}
+    </ul>
+    {% if data.item.startquest != 0 %}<b>Starts quest:</b> {{data.item.startquest}}<br />{% endif %}
+</div>
+<div class='col-6'>
+    {{ super() }}
+</div>
+{% endblock %}

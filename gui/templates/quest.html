@@ -1,0 +1,110 @@
+{% extends "map.html" %}
+
+{% block content %}
+<div class='header'><h1>{{data.quest.Title}} ({{data.quest.id}})</h1></div>
+<div class='col-2'>
+    <b>Required Level: </b> {{data.quest.MinLevel}}<br />
+    <b>Quest Level: </b> {{data.quest.QuestLevel}}<br />
+    <b>Quest Type: </b> {{data.quest.Type}}<br />
+    <br />
+    {% for objective in data.quest.ObjectiveList if objective %}
+    {% if objective.type is equalto('item') %}
+    <b>Item: </b> <a href='/item/{{objective.id}}'>{{data.itms.itemList[objective.id].name}} ({{objective.id}})</a><br />
+    {% endif %}
+    {% if objective.type is equalto('monster') %}
+    <b>NPC: </b> <a href='/npc/{{objective.id}}'>{{data.npcs.nList[objective.id].name}} ({{objective.id}})</a><br />
+    {% endif %}
+    {% if objective.type is equalto('object') %}
+    <b>Object: </b> <a href='/object/{{objective.id}}'>{{data.objects.objectList[objective.id].name}} ({{objective.id}})</a><br />
+    {% endif %}
+    {% if objective.type is equalto('areaTrigger') %}
+    <b>Explore: </b> {{objective.text}}<br />
+    {% endif %}
+    {% endfor %}
+    <br />
+    {% if data.quest.Objectives is defined %}<b>Objectives Text: </b> {{data.quest.Objectives}}<br />{% endif %}
+    <br />
+    {% if data.quest.Details is defined %}<b>Details Text: </b> {{data.quest.Details.replace('$B', '<br />').replace('$c', 'PLAYER_CLASS').replace('$N', 'PLAYER_NAME')|safe}}<br />{% endif %}
+    <br />
+    {% if data.quest.creatureStart is defined %}
+    <b>Started by Creature:</b>
+    <ul>
+        {% for id in data.quest.creatureStart %}
+        <li><a href='/npc/{{id}}'>{{data.npcs.nList[id].name}} ({{id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if data.quest.goStart is defined %}
+    <b>Started by Object:</b>
+    <ul>
+        {% for id in data.quest.goStart %}
+        <li><a href='/object/{{id}}'>{{data.objects.objectList[id].name}} ({{id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if data.quest.itemStart is defined %}
+    <b>Started by Item:</b>
+    <ul>
+        {% for id in data.quest.itemStart %}
+        <li><a href='/item/{{id}}'>Item {{id}}</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <br />
+    {% if data.quest.creatureEnd is defined %}
+    <b>Finished by Creature:</b>
+    <ul>
+        {% for id in data.quest.creatureEnd %}
+        <li><a href='/npc/{{id}}'>{{data.npcs.nList[id].name}} ({{id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if data.quest.goEnd is defined %}
+    <b>Finished by Object:</b>
+    <ul>
+        {% for id in data.quest.goEnd %}
+        <li><a href='/object/{{id}}'>{{data.objects.objectList[id].name}} ({{id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <br />
+    {% if data.quest.PreQuestGroup is defined %}
+    <b>Finish all off these to unlock: </b>
+    <ul>
+        {% for id in data.quest.PreQuestGroup %}
+        <li><a href='/quest/{{id}}'>{{data.quests.qList[id].Title}} ({{id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if data.quest.PreQuestSingle is defined %}
+    <b>Finish one off these to unlock: </b>
+    <ul>
+        {% for id in data.quest.PreQuestSingle %}
+        <li><a href='/quest/{{id}}'>{{data.quests.qList[id].Title}} ({{id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if data.quest.ChildQuests is defined %}
+    <b>Quests that are available while this quest is active:</b>
+    <ul>
+        {% for id in data.quest.ChildQuests %}
+        <li><a href='/quest/{{id}}'>{{data.quests.qList[id].Title}} ({{id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if data.quest.ExclusiveTo is defined %}
+    <b>Quests that are not available while this quest is active or finished:</b>
+    <ul>
+        {% for id in data.quest.ChildQuests %}
+        <li><a href='/quest/{{id}}'>{{data.quests.qList[id].Title}} ({{id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if data.quest.NextQuestId is defined %}<b>NextQuestId: </b> <a href='/quest/{{data.quest.NextQuestId}}'>{{data.quests.qList[data.quest.NextQuestId].Title}} ({{data.quest.NextQuestId}})</a><br />{% endif %}
+    {% if data.quest.NextQuestInChain is defined %}<b>NextQuestInChain: </b> <a href='/quest/{{data.quest.NextQuestInChain}}'>{{data.quests.qList[data.quest.NextQuestInChain].Title}} ({{data.quest.NextQuestInChain}})</a><br />{% endif %}
+    <br />
+</div>
+<div class='col-6'>
+    {{ super() }}
+</div>
+{% endblock content %}

@@ -1,0 +1,152 @@
+/* adapted from http://youmightnotneedjs.com/*/
+/*
+
+Maps
+
+Display an image and a number of smaller child images on top.
+
+*/
+
+.map-parent{
+    width: 100%;
+    height: auto;
+    position: relative;
+}
+
+.map-display{
+    width: 100%;
+}
+
+.child-img{
+    position: absolute;
+    /*width: .75%; /* half this width needs to be subtracted from pin coordinates */
+    height: auto;
+}
+
+/*
+
+Tabs
+
+Cycleable tabs based on radio buttons. Since the main content container
+is positioned absolutely it's height is not included in the the parent,
+so this is not useful for dynamic content, unless you overwrite the
+height of 'tabs' or place it at the end of the page.
+
+Since maps have a static resolution it's an easy fix for that use-case.
+
+*/
+
+.tabs {
+    position: relative;
+    width: 100%;
+}
+
+.tab {
+    float: left;
+    border-width: 3px;
+    border-color: black;
+    border-style: solid;
+}
+
+.tab label {
+    padding-inline: 1em;
+    top: 1em;
+    right: 1em;
+}
+
+.tab [type=radio] {
+    position: absolute;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+}
+
+.content {
+    position: absolute;
+    bottom: 0; left: 0;
+    opacity: 0;
+    width: 100%;
+    height: auto;
+}
+
+[type=radio]:checked ~ label {
+    z-index: 2;
+    background-color: grey;
+}
+
+[type=radio]:checked ~ label ~ .content {
+    z-index: 1;
+    opacity: 1;
+}
+
+/*
+
+Responsive columns
+
+By using divs with the 'col-*' class, the page content can be divided
+into up to 8 columns. A div with class 'col-8' spans the full available
+width so it's a row on its own. You can use smaller columns to fill
+a row, e.g. a 'col-1', 'col-1', 'col-4', 'col-2' will make a full row.
+
+These divs will stay next to each other in their "row", until the
+viewport gets to small, which is when they will expand to the full
+available width, so they are displayed below each other.
+
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: Calibri, sans-serif;
+}
+
+.row::after {
+    content: '';
+    clear: both;
+    display: table;
+}
+
+[class*="col-"] {
+    float: left;
+    padding: 1em;
+}
+
+.col-1 {width: 12.5%;}
+.col-2 {width: 25%;}
+.col-3 {width: 37.5%;}
+.col-4 {width: 50%;}
+.col-5 {width: 62.5%;}
+.col-6 {width: 75%;}
+.col-7 {width: 87.5%;}
+.col-8 {width: 100%;}
+
+.header {
+    background-color: gold;
+    padding: .5em;
+}
+
+.menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu li {
+    padding: .5em;
+    margin-bottom: .5em;
+    background-color: indigo;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.menu li:hover {
+    background-color: fuchsia;
+}
+
+@media only screen and (max-width: 768px) {
+    [class*="col-"] {
+        width: 100%;
+    }
+}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="tabs">
+    <div class="tab">
+        <input type="radio" name="tabgroup" id="tab-quests" checked>
+        <label for="tab-quests"><b>Quests ({{data.quests.qList|length}})</b></label>
+        <div class="content" style="top:1.5em;">
+            <div style="height: calc(100vh - 2em); overflow-y: scroll;">
+            {% for questID in data.quests.qList %}
+            <a href="/quest/{{questID}}">{{data.quests.qList[questID].Title}} ({{questID}})</a><br />
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="tab">
+        <input type="radio" name="tabgroup" id="tab-npcs" checked>
+        <label for="tab-npcs"><b>NPCs ({{data.npcs.nList|length}})</b></label>
+        <div class="content" style="top:1.5em">
+            <div style="height: calc(100vh - 2em); overflow-y: scroll;">
+            {% for npcID in data.npcs.nList %}
+            <a href="/npc/{{npcID}}">{{data.npcs.nList[npcID].name}} ({{npcID}})</a><br />
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="tab">
+        <input type="radio" name="tabgroup" id="tab-objects" checked>
+        <label for="tab-objects"><b>Objects  ({{data.objects.objectList|length}})</b></label>
+        <div class="content" style="top:1.5em">
+            <div style="height: calc(100vh - 2em); overflow-y: scroll;">
+            {% for objID in data.objects.objectList %}
+            <a href="/object/{{objID}}">{{data.objects.objectList[objID].name}} ({{objID}})</a><br />
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="tab">
+        <input type="radio" name="tabgroup" id="tab-items" checked>
+        <label for="tab-items"><b>Items  ({{data.itms.itemList|length}})</b></label>
+        <div class="content" style="top:1.5em">
+            <div style="height: calc(100vh - 2em); overflow-y: scroll;">
+            {% for itemID in data.itms.itemList %}
+            <a href="/item/{{itemID}}">{{data.itms.itemList[itemID].name}} ({{itemID}})</a><br />
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock  content %}

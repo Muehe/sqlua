@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if not data.pinList is defined %}
+<h4>No known points of interest</h4>
+{% else %}
+<div class="tabs">
+    {% for zone in data.pinList %}
+    <div class="tab">
+        <input type="radio" name="tabgroup" id="tab-{{zone}}" checked>
+        <label for="tab-{{zone}}"><b>{{data.zoneNames[zone]}} ({{ data.pinList[zone]|length }})</b></label>
+        <div class="content">
+            <div class='map-parent'>
+                <img src='/static/maps/{{zone}}.jpg' class='map-display' />
+                {% for pin in data.pinList[zone] %}<img src='/static/pins/{{pin.imgSrc}}.png' class='child-img' style='filter: opacity({{pin.opacity}}) drop-shadow(0 0 0 {{pin.color}}); left: {{pin.x}}%; top: {{pin.y}}%; width: {{pin.width}}%;' title='{{pin.text}}' />{% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <!--hack to get height on parent container-->
+    <img src='/static/maps/1377.jpg' style="opacity: 0; width: 100%; height:auto; position: relative;" />
+</div>
+{% endif %}
+{% endblock content %}

@@ -32,3 +32,11 @@ Invoke `python -m main`. This will start extraction and printing, then quit.
 2. Enter the command `from main import *`.
 
 See `main.py` for the functions you can use.
+
+#### Web GUI
+
+Go to the base dir and run `./webgui.sh`.
+
+Alternatively run the command you find inside it directly.
+
+Then go to [http://127.0.0.1:5000](http://127.0.0.1:5000).

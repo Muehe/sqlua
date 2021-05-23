@@ -1,0 +1,28 @@
+{% extends 'map.html' %}
+
+{% block content %}
+<div class='header'><h1>{{obj.name}} ({{obj.id}})</h1></div>
+<div class='col-2'>
+    <b>Type: </b> {{obj.type}} <br />
+    <b>Faction: </b> {{obj.faction}} <br />
+    {% if data.hasStart %}
+    <b>Starts quest:</b>
+    <ul>
+        {% for quest in data.starts %}
+        <li><a href='/quest/{{quest.id}}' title='Go to quest detail page'>{{quest.Title}} ({{quest.id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% if data.hasEnd %}
+    <b>Finishes quest:</b>
+    <ul>
+        {% for quest in data.ends %}
+        <li><a href='/quest/{{quest.id}}' title='Go to quest detail page'>{{quest.Title}} ({{quest.id}})</a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+<div class='col-6'>
+    {{ super() }}
+</div>
+{% endblock %}
