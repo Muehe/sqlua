@@ -163,7 +163,7 @@ QuestieDB.npcKeys = {
                        -- For flag values see https://github.com/cmangos/mangos-classic/blob/172c005b0a69e342e908f4589b24a6f18246c95e/src/game/Entities/Unit.h#L536
 }
 
-QuestieDB.npcData = [[return {
+QuestieDB.npcDataTBC = [[return {
 """)
         excludeTags = ['[DND]', '[ph]', '[PH]', '[PH[', '[UNUSED]', '[Unused]', '[DNT]', '[NOT USED]', '[VO]', '(DND)']
         for npcId in sorted(self.nList):

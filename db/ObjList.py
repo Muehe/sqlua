@@ -132,7 +132,7 @@ QuestieDB.objectKeys = {
     ['factionID'] = 6, -- faction restriction mask (same as spawndb factionid)
 }
 
-QuestieDB.objectData = [[return {
+QuestieDB.objectDataTBC = [[return {
 """)
         for objId in sorted(self.objectList):
             obj = self.objectList[objId]

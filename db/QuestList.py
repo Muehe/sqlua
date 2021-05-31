@@ -352,7 +352,7 @@ QuestieDB.questKeys = {
     ['extraObjectives'] = 26, -- table: {{spawnlist, iconFile, text},...}, a list of hidden special objectives for a quest. Similar to requiredSourceItems
 }
 
-QuestieDB.questData = [[return {
+QuestieDB.questDataTBC = [[return {
 """)
         #excluded = self.checkStartEnd()
         for id in sorted(self.qList):

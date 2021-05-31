@@ -257,7 +257,7 @@ QuestieDB.itemKeys = {
     ['relatedQuests'] = 15, -- table or nil, IDs of quests that are related to this item
 }
 
-QuestieDB.itemData = [[return {
+QuestieDB.itemDataTBC = [[return {
 """)
         for itemID in self.itemList:
             fo.write(f'[{itemID}] = {{')
