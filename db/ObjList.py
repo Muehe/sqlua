@@ -136,7 +136,7 @@ QuestieDB.objectDataTBC = [[return {
 """)
         for objId in sorted(self.objectList):
             obj = self.objectList[objId]
-            if obj.type not in [2, 3, 5, 8, 10, 19]:
+            if obj.type not in [2, 3, 5, 8, 10, 19, 25]:
                 continue
             #if not hasattr(obj, 'spawns'):
             #    continue
