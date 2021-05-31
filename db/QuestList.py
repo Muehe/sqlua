@@ -4,6 +4,10 @@ from db.Utilities import *
 import re
 import os.path
 import pickle
+import json
+
+import config
+from data.RaceIDs import raceKeys
 
 
 class QuestList():
@@ -155,6 +159,14 @@ class QuestList():
         for a in cursor.fetchall():
             quest_template.append(a)
 
+        classic_quest_template = {}
+        if config.version == "tbc":
+            print("  SELECT classic quest_template")
+            # SrcItemId needed to check for spell_script_target (type and targetEntry) via item_template.spellId
+            dictCursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags FROM "+ config.dbInfo['classic']+".quest_template")
+            for a in dictCursor.fetchall():
+                classic_quest_template[a["entry"]] = a
+
         print("  SELECT creature_template")
         cursor.execute("SELECT entry, KillCredit1, KillCredit2 FROM creature_template")
         creature_killcredit = {}
@@ -234,6 +246,7 @@ class QuestList():
             loc_quests[q['entry']] = q
         print("Done.")
         return {'quest_template':quest_template,
+                'classic_quest_template':classic_quest_template,
                 'creature_killcredit': creature_killcredit,
                 'creature_involvedrelation':creature_involvedrelation,
                 'gameobject_involvedrelation':gameobject_involvedrelation,
@@ -301,6 +314,82 @@ class QuestList():
     def printQuestFile(self, file="output/questDB.lua", locale="enGB"):
         print("  Printing Quests file '%s'" % file)
 
+        print("  Loading NPC pickle")
+        nList = {}
+        with open("data/" + str(config.version) +'/npcs.pkl', 'rb') as f:
+            nList = pickle.load(f)
+
+        QuestCorrections = {}
+        if config.version == "tbc":
+            quest_data_minLevel_xp_json = open("data/tbc/quest_data_tbc_mLvl_xp.json", "r")
+            wowheadQuestJSON = json.loads(quest_data_minLevel_xp_json.read())
+            for quest in wowheadQuestJSON:
+                questId = int(quest["id"])
+                if("reqlevel" in quest):
+                    if questId not in QuestCorrections:
+                        QuestCorrections[questId] = {}
+                    if questId in QuestCorrections and not hasattr(QuestCorrections[questId], "MinLevel"):
+                        QuestCorrections[questId]["MinLevel"] = int(quest["reqlevel"])
+                if("xp" in quest):
+                    if questId not in QuestCorrections:
+                        QuestCorrections[questId] = {}   
+                    if questId in QuestCorrections and not hasattr(QuestCorrections[questId], "experience"):
+                        QuestCorrections[questId]["experience"] = int(quest["xp"])
+                
+            quest_data_all_quests = open("data/tbc/quest_data_all_quests.json", "r")
+            wowheadQuestJSON = json.loads(quest_data_all_quests.read())
+            for quest in wowheadQuestJSON:
+                questId = int(quest["id"])
+                #if "starters" in quest and quest["starters"] != None:
+                #    if questId not in QuestCorrections:
+                #        QuestCorrections[questId] = {}
+                #    if questId in QuestCorrections:
+                #        QuestCorrections[questId]["starters"] = quest["starters"]
+                #if "finishers" in quest and quest["finishers"] != None:
+                #    if questId not in QuestCorrections:
+                #        QuestCorrections[questId] = {}
+                #    if questId in QuestCorrections:
+                #        QuestCorrections[questId]["finishers"] = quest["finishers"]
+
+            quest_data_all_quests_reqRaces = open("data/tbc/quest_data_all_quests_reqRaces.json", "r")
+            wowheadQuestJSON = json.loads(quest_data_all_quests_reqRaces.read())
+            for quest in wowheadQuestJSON:
+                questId = int(quest["id"])
+                if("reqrace" in quest and "side" in quest):
+                    #if(quest["reqrace"] == 0 and quest["side"] == 1):
+                    #    if questId not in QuestCorrections:
+                    #        QuestCorrections[questId] = {}
+                    #    if questId in QuestCorrections and not hasattr(QuestCorrections[questId], "RequiredRaces"):
+                    #        QuestCorrections[questId]["RequiredRaces"] = raceKeys["ALL_ALLIANCE"]
+                    #elif(quest["reqrace"] == 0 and quest["side"] == 2):
+                    #    if questId not in QuestCorrections:
+                    #        QuestCorrections[questId] = {}
+                    #    if questId in QuestCorrections and not hasattr(QuestCorrections[questId], "RequiredRaces"):
+                    #        QuestCorrections[questId]["RequiredRaces"] = raceKeys["ALL_HORDE"]
+                    if(quest["reqrace"] != 0):
+                        if questId not in QuestCorrections:
+                            QuestCorrections[questId] = {}
+                        if questId in QuestCorrections and not hasattr(QuestCorrections[questId], "RequiredRaces"):
+                            QuestCorrections[questId]["RequiredRaces"] = int(quest["reqrace"])
+                    #elif(quest["reqrace"] == 0 and quest["side"] == 3):
+                    #    if questId not in QuestCorrections:
+                    #        QuestCorrections[questId] = {}
+                    #    if questId in QuestCorrections and not hasattr(QuestCorrections[questId], "RequiredRaces"):
+                    #        QuestCorrections[questId]["RequiredRaces"] = int(raceKeys["ALL"])
+                #if "finishers" in quest and quest["finishers"] != None:
+                #    if questId not in QuestCorrections:
+                #        QuestCorrections[questId] = {}
+                #    if questId in QuestCorrections:
+                #        QuestCorrections[questId]["finishers"] = quest["finishers"]
+                #This one doesn't seem entierly correct, keeping it to check in the future.
+                #if "reqclass" in quest and quest["reqclass"] != 0:
+                #    if questId not in QuestCorrections:
+                #        QuestCorrections[questId] = {}   
+                #    if questId in QuestCorrections and not hasattr(QuestCorrections[questId], "RequiredClasses"):
+                #        QuestCorrections[questId]["RequiredClasses"] = int(quest["reqclass"])
+
+
+
         outfile = open(file, "w")
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
@@ -357,31 +446,82 @@ QuestieDB.questDataTBC = [[return {
         #excluded = self.checkStartEnd()
         for id in sorted(self.qList):
             quest = self.qList[id]
+
+            if id == 9299:
+                print("wt")
+
+            if id in QuestCorrections:
+                for correctionKey in QuestCorrections[id]:
+                    correction = QuestCorrections[id][correctionKey]
+                    if correction is None and hasattr(quest, correctionKey):
+                        delattr(quest, correctionKey)
+                    elif correction != None:
+                        #Special treatment for RequiredRaces
+                        if correctionKey != "RequiredRaces":
+                            setattr(quest, correctionKey, correction)
+
             #if quest in excluded:
             #    continue
             outfile.write("["+str(quest.id)+"] = {") #key
             title = quest.Title
             if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
                 title = escapeDoubleQuotes(quest.locales_Title[localesMap[locale]])
+            #Remove OLD from the start see 4489
+            title = title.replace("OLD ", "")
             outfile.write("\""+title+"\",") #name = 1
+
+            
             outfile.write("{") #starts = 2
-            if (hasattr(quest, "creatureStart")):
+            if (hasattr(quest, "creatureStart") or (hasattr(quest, "starters") and "npcStart" in quest.starters)):
                 outfile.write("{") #npc = starts1
-                for npc in quest.creatureStart:
+                writeList = []
+                if hasattr(quest, "creatureStart"):
+                    for npc in quest.creatureStart:
+                        #outfile.write(str(npc)+",")
+                        if str(npc) not in writeList:
+                            writeList.append(str(npc))
+                if (hasattr(quest, "starters") and "npcStart" in quest.starters): #npc = starts1
+                    for npc in quest.starters["npcStart"]:
+                        #outfile.write(str(npc)+",")
+                        if str(npc) not in writeList:
+                            writeList.append(str(npc))
+                for npc in writeList:
                     outfile.write(str(npc)+",")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "goStart")):
+            if (hasattr(quest, "goStart") or (hasattr(quest, "starters") and "objectStart" in quest.starters)):
                 outfile.write("{") #obj = starts2
-                for obj in quest.goStart:
+                writeList = []
+                if hasattr(quest, "goStart"):
+                    for obj in quest.goStart:
+                        #outfile.write(str(obj)+",")
+                        if str(obj) not in writeList:
+                            writeList.append(str(obj))
+                if (hasattr(quest, "starters") and "objectStart" in quest.starters): #obj = starts2
+                    for obj in quest.starters["objectStart"]:
+                        #outfile.write(str(obj)+",")
+                        if str(obj) not in writeList:
+                            writeList.append(str(obj))
+                for obj in writeList:
                     outfile.write(str(obj)+",")
                 outfile.write("},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "itemStart")):
+            if (hasattr(quest, "itemStart") or (hasattr(quest, "starters") and "itemStart" in quest.starters)):
                 outfile.write("{") #itm = starts3
-                for itm in quest.itemStart:
+                writeList = []
+                if hasattr(quest, "itemStart"):
+                    for itm in quest.itemStart:
+                        #outfile.write(str(itm)+",")
+                        if str(itm) not in writeList:
+                            writeList.append(str(itm))
+                if (hasattr(quest, "starters") and "itemStart" in quest.starters):  #itm = starts3
+                    for itm in quest.starters["itemStart"]:
+                        #outfile.write(str(itm)+",")
+                        if str(itm) not in writeList:
+                            writeList.append(str(itm))
+                for itm in writeList:
                     outfile.write(str(itm)+",")
                 outfile.write("},")
             else:
@@ -393,11 +533,21 @@ QuestieDB.questDataTBC = [[return {
                 for npc in quest.creatureEnd:
                     outfile.write(str(npc)+",")
                 outfile.write("},")
+            elif hasattr(quest, "finishers") and "npcEnd" in quest.finishers:
+                outfile.write("{") #npc = ends1
+                for npc in quest.finishers["npcEnd"]:
+                    outfile.write(str(npc)+",")
+                outfile.write("},")
             else:
                 outfile.write("nil,")
             if (hasattr(quest, "goEnd")): #obj = ends2
                 outfile.write("{")
                 for obj in quest.goEnd:
+                    outfile.write(str(obj)+",")
+                outfile.write("},")
+            elif hasattr(quest, "finishers") and "objEnd" in quest.finishers:
+                outfile.write("{") #obj = ends2
+                for npc in quest.finishers["objEnd"]:
                     outfile.write(str(obj)+",")
                 outfile.write("},")
             else:
@@ -406,16 +556,109 @@ QuestieDB.questDataTBC = [[return {
             outfile.write(str(quest.MinLevel)+",") #minLevel = 4
             outfile.write(str(quest.QuestLevel)+",") #level = 5
 
+            if id == 3087:
+                print("ss")
+
+            #Required Races block
+
+            # We add in blood elf and dranei if the regular TBC mangos thinks it should
+            # Fixes around 5 quests :P
+            if id in QuestCorrections and "RequiredRaces" in QuestCorrections[id]:
+                #if QuestCorrections[id]["RequiredRaces"] != quest.RequiredRaces and hasattr(quest, "RequiredClasses") and hasattr(quest, "RequiredRacesClassic") and quest.RequiredRacesClassic != QuestCorrections[id]["RequiredRaces"] and quest.RequiredClasses == 4:
+                #    print(id)
+                if  (quest.RequiredRaces != raceKeys["ALL_ALLIANCE"]
+                    and quest.RequiredRaces != raceKeys["ALL_HORDE"]
+                    and quest.RequiredRaces != raceKeys["ALL"]
+                    and config.version == "tbc"):
+                    if quest.RequiredRaces != QuestCorrections[id]["RequiredRaces"]:
+                        corrReqRaces = QuestCorrections[id]["RequiredRaces"]
+                        if quest.RequiredRaces & 1024 != 0 and corrReqRaces & 1024 == 0: # Draenei
+                            corrReqRaces += 1024
+                        if quest.RequiredRaces & 512 != 0 and corrReqRaces & 512 == 0: # Blood Elf
+                            corrReqRaces += 512
+                        quest.RequiredRaces = corrReqRaces
+                else:
+                    quest.RequiredRaces = QuestCorrections[id]["RequiredRaces"]
+
+
             #If you remove goblin from all races we get 1791, there are 11 quests in the TBC DB with this RequiredRaces
             #We just normalize the database by using 2047 instead.
-            if(quest.RequiredRaces == 1791):
+            if(quest.RequiredRaces == 1791 and config.version == "tbc"):
                 print("    Quest %d\thas a required races of %d, changing to %d." % (id, quest.RequiredRaces, 2047))
                 quest.RequiredRaces = 2047
+
+            if quest.RequiredRaces == 0 and hasattr(quest, "RequiredRacesClassic") and config.version == "tbc":
+                if quest.RequiredRacesClassic != 0:
+                    setRaces = quest.RequiredRacesClassic
+                    if quest.RequiredRacesClassic == 77 and config.version == "tbc":
+                        setRaces = 1101
+                    elif quest.RequiredRacesClassic == 178 and config.version == "tbc":
+                        setRaces = 690
+                    elif quest.RequiredRacesClassic == 255 and config.version == "tbc":
+                        setRaces = 2047
+                    elif config.version == "tbc":
+                        if quest.RequiredRaces & 1024 != 0 and setRaces & 1024 == 0: # Draenei
+                            setRaces += 1024
+                        if quest.RequiredRaces & 512 != 0 and setRaces & 512 == 0: # Blood Elf
+                            setRaces += 512
+                    quest.RequiredRaces = setRaces
+                
+            if hasattr(quest, "RequiredRacesClassic") and quest.RequiredRaces != 0 and quest.RequiredRacesClassic != 0 and config.version == "tbc":
+                setRaces = quest.RequiredRacesClassic
+                if quest.RequiredRacesClassic == 77 and config.version == "tbc":
+                    setRaces = 1101
+                elif quest.RequiredRacesClassic == 178 and config.version == "tbc":
+                    setRaces = 690
+                elif quest.RequiredRacesClassic == 255 and config.version == "tbc":
+                    setRaces = 2047
+                else:
+                    if quest.RequiredRaces & 1024 != 0 and setRaces & 1024 == 0: # Draenei
+                        setRaces += 1024
+                    if quest.RequiredRaces & 512 != 0 and setRaces & 512 == 0: # Blood Elf
+                        setRaces += 512
+                quest.RequiredRaces = min(quest.RequiredRaces, setRaces)
+
+            #If still 0 we check if the NPC is hostile to one of the factions
+            #If so set All Alliance / All Horde depending on hostility
+            #If friendly to both, set 0
+            if ((hasattr(quest, "creatureStart") or hasattr(quest, "creatureEnd")) and quest.RequiredRaces == 0):
+                hostileA = False
+                hostileH = False
+                if hasattr(quest, "creatureStart"):
+                    for npcId in quest.creatureStart:
+                        if(nList[npcId].hostileToA):
+                            hostileA = True
+                        elif(nList[npcId].hostileToH):
+                            hostileH = True
+                if hasattr(quest, "creatureEnd"):
+                    for npcId in quest.creatureEnd:
+                        if(nList[npcId].hostileToA):
+                            hostileA = True
+                        elif(nList[npcId].hostileToH):
+                            hostileH = True
+                
+                if(not hostileA and hostileH): #All Alliance
+                    quest.RequiredRaces = raceKeys["ALL_ALLIANCE"]
+                elif(not hostileH and hostileA): #All Horde
+                    quest.RequiredRaces = raceKeys["ALL_HORDE"]
+                elif(not hostileH and not hostileA):
+                    quest.RequiredRaces = raceKeys["ALL"]
+                elif(hostileH and hostileA):
+                    quest.RequiredRaces = raceKeys["ALL"]
+                    print("    " + str(id) + " : '" + title + "' quest giver and end is hostile to both factions?")
+
             outfile.write(f'{quest.RequiredRaces},') #RequiredRaces = 6
+
+            #Required Races block end
+
+
             if (hasattr(quest, "RequiredClasses")): #RequiredClasses = 7
                 outfile.write(f"{quest.RequiredClasses},")
+            elif (hasattr(quest, "RequiredClassesClassic") and config.version == "tbc"):
+                outfile.write(f"{quest.RequiredClassesClassic},")
             else:
                 outfile.write("nil,")
+
             if (hasattr(quest, "Objectives")): # and (len(self.allQuests(Title = quest.Title)) > 1): #objectives = 8
                 objectives = self.questieObjectivesText(quest.Objectives)
                 if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:

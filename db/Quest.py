@@ -9,6 +9,13 @@ class Quest():
         self.QuestLevel = quest[2]
         self.Type = quest[3]
         self.RequiredRaces = quest[5]
+        if self.id in dicts["classic_quest_template"]:
+            if dicts["classic_quest_template"][self.id]["RequiredRaces"] != 0:
+                self.RequiredRacesClassic = dicts["classic_quest_template"][self.id]["RequiredRaces"]
+            
+        if self.id in dicts["classic_quest_template"]:
+            if dicts["classic_quest_template"][self.id]["RequiredClasses"] != 0:
+                self.RequiredClassesClassic = dicts["classic_quest_template"][self.id]["RequiredClasses"]
         self.Title = escapeDoubleQuotes(quest[19])
         self.locales_Title = {}
         for x in range(1, 9):
