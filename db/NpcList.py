@@ -59,13 +59,13 @@ class NpcList():
         print("Selecting NPC related MySQL tables...")
 
         print("  SELECT creature_template")
-        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
+        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2, MovementType FROM creature_template")
         npc_tpl = []
         for a in cursor.fetchall():
             npc_tpl.append(a)
 
         print("  SELECT creature")
-        cursor.execute("SELECT id, map, position_x, position_y, guid FROM creature")
+        cursor.execute("SELECT id, map, position_x, position_y, guid, MovementType FROM creature")
         npc = {}
         for a in cursor.fetchall():
             if(a[0] in npc):

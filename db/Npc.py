@@ -3,6 +3,9 @@ from db.Utilities import *
 import re
 import csv
 
+
+import math
+
 def getCreatureZones(file):
     infile = open(file, "r")
     reader = csv.reader(infile)
@@ -58,6 +61,11 @@ def getFactionTemplate(fac):
 factionTemplateClassic = getFactionTemplate('data/classic/FactionTemplate.dbc.CSV')
 factionTemplateTBC = getFactionTemplate('data/tbc/FactionTemplate.dbc.CSV')
 
+def euclidDist(x1,y1, x2,y2):
+    xd = abs(x1 - x2)
+    yd = abs(y1 - y2)
+    return math.sqrt(xd * xd + yd * yd)
+
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
     waypointErrors = []
@@ -92,12 +100,15 @@ class Npc():
             self.hostileToH = False
         self.subName = npc[8]
         self.npcFlags = npc[9]
+        self.MovementType = npc[12]
+
         if extractSpawns:
             spawns = []
             waypoints = []
             # spawns and spawn waypoints
             if self.id in dicts['npc']:
                 rawSpawns = dicts['npc'][self.id]
+
                 for spawn in rawSpawns:
                     # id, map, position_x, position_y, guid
                     if (spawn[0] == self.id):
@@ -109,11 +120,14 @@ class Npc():
                         # get waypoints
                         
                         npcMovement = None
-                        if self.id in dicts['npc_movement']:
-                            npcMovement = dicts['npc_movement'][self.id] #by NPCID
+                        #byId = False
+                        #if self.id in dicts['npc_movement']:
+                        #    npcMovement = dicts['npc_movement'][self.id] #by NPCID
+                        #    byId = True
                         if spawn[4] in dicts['npc_movement']:
                             npcMovement = dicts['npc_movement'][spawn[4]] #by GUID
-                        if npcMovement is not None and len(dicts['npc'][self.id]) <= 2: #Less than 2 spawns only, otherwise we get EVERYTHIIIIINNNGGGG
+                            #byId = False
+                        if npcMovement is not None and spawn[5] == 2 and len(dicts['npc'][self.id]) <= 6:
                             wpSort = {}
                             for waypoint in npcMovement:
                                 # point, guid, position_x, position_y
@@ -123,11 +137,27 @@ class Npc():
                                     else:
                                         wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3])
                             # sort waypoints if there is more than one, discard single-point pathes
+                            totalDistance = 0
                             if (len(wpSort) > 1):
                                 temp = []
-                                for wp in sorted(list(wpSort)):
+                                lastPoint = None
+                                sortedListCleaned = sorted(list(wpSort))
+                                for wp in sortedListCleaned:
+                                    #euclid distance
+                                    if(lastPoint == None):
+                                        lastPoint = wpSort[wp]
+                                    xd = abs(wpSort[wp][1] - lastPoint[1])
+                                    yd = abs(wpSort[wp][2] - lastPoint[2])
+                                    totalDistance += math.sqrt(xd * xd + yd * yd)
                                     temp.append(wpSort[wp])
-                                waypoints.append(CoordList(temp, version, debug=self.debug))
+
+                                #print(str(self.id) + " : " + str(totalDistance))
+                                if self.hostileToA == True and self.hostileToH == True and totalDistance >= 1000:
+                                    waypoints.append(CoordList(temp, version, debug=self.debug))
+                                elif totalDistance >= 350 and (self.hostileToA == False or self.hostileToH == False):
+                                    waypoints.append(CoordList(temp, version, debug=self.debug))
+                                #elif totalDistance >= 2500 and byId:
+                                #    waypoints.append(CoordList(temp, version, debug=self.debug))
                             elif (len(wpSort) == 1):
                                 # TODO implement checking for "non-moving" waypoints that are abused for script
                                 if self.debug: print(f'DEBUG: Discarded single-point path for GUID {spawn[4]}')
@@ -147,11 +177,23 @@ class Npc():
                     else:
                         wpError = True
             # sort waypoints
-            if (len(wptSort) > 0):
+            if (len(wptSort) > 1): #and self.MovementType == 2
                 temp = []
+                lastPoint = None
+                totalDistance = 0
                 for wp in sorted(list(wptSort)):
+                    #euclid distance
+                    if(lastPoint == None):
+                        lastPoint = wptSort[wp]
+                    xd = abs(wptSort[wp][1] - lastPoint[1])
+                    yd = abs(wptSort[wp][2] - lastPoint[2])
+                    totalDistance += math.sqrt(xd * xd + yd * yd)
                     temp.append(wptSort[wp])
-                waypoints.append(CoordList(temp, version))
+                if self.hostileToA == True and self.hostileToH == True and totalDistance >= 1000:
+                    waypoints.append(CoordList(temp, version))
+                elif totalDistance >= 350 and (self.hostileToA == False or self.hostileToH == False):
+                    waypoints.append(CoordList(temp, version))
+                #print(str(self.id) + " : " + str(totalDistance))
             # persist spawns and waypoints
             if (spawns == []):
                 Npc.spawnErrors.append(self.id)
