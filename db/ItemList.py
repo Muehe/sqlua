@@ -259,7 +259,7 @@ QuestieDB.itemKeys = {
 
 QuestieDB.itemDataTBC = [[return {
 """)
-        for itemID in self.itemList:
+        for itemID in sorted(self.itemList):
             fo.write(f'[{itemID}] = {{')
             item = self.itemList[itemID]
 

@@ -165,7 +165,7 @@ QuestieDB.npcKeys = {
 
 QuestieDB.npcDataTBC = [[return {
 """)
-        excludeTags = ['[DND]', '[ph]', '[PH]', '[PH[', '[UNUSED]', '[Unused]', '[DNT]', '[NOT USED]', '[VO]', '(DND)']
+        excludeTags = []#'[DND]', '[ph]', '[PH]', '[PH[', '[UNUSED]', '[Unused]', '[DNT]', '[NOT USED]', '[VO]', '(DND)']
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
 
@@ -175,7 +175,7 @@ QuestieDB.npcDataTBC = [[return {
                     foundTag = tag
                     break
             #Only remove it if it doesn't have any spawns, some quests actually use PH npcs.
-            if foundTag != False and (not hasattr(npc, "spawns") or (hasattr(npc, "spawns") and len(npc.spawns.cByZone) == 0 and len(npc.spawns.cList) == 0) and npcId != 22145):
+            if foundTag != False and (not hasattr(npc, "spawns") or (hasattr(npc, "spawns") and len(npc.spawns.cByZone) == 0 and len(npc.spawns.cList) == 0) and npcId != 22145 and npcId != 22434):
                 #print("Excluding %d : %s because of tag '%s'" % (npcId, npc.name, foundTag))
                 continue
 
