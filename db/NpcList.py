@@ -95,7 +95,7 @@ class NpcList():
                 npc_end[a[0]].append(a)
 
         print("  SELECT creature_movement")
-        cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
+        cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
         npc_mov = {}
         for a in cursor.fetchall():
             if(a[1] in npc_mov):
@@ -105,7 +105,7 @@ class NpcList():
                 npc_mov[a[1]].append(a)
 
         print("  SELECT creature_movement_template")
-        cursor.execute("SELECT point, entry, position_x, position_y FROM creature_movement_template")
+        cursor.execute("SELECT point, entry, PositionX, PositionY, PathId FROM creature_movement_template")
         npc_mov_tpl = {}
         for a in cursor.fetchall():
             if(a[1] in npc_mov_tpl):

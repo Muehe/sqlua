@@ -1,5 +1,5 @@
 # Which database to use, may also be passed as argument to the main script
-# Accepts 'classic' or 'tbc'
+# Accepts 'classic' or 'tbc' or 'wotlk'
 version = 'classic'
 # Toggle debug messages
 debug = False
@@ -11,4 +11,5 @@ dbInfo = {
     'port': 3306,
     'classic': 'classicmangos',
     'tbc': 'tbcmangos',
+    'wotlk': 'wotlkmangos',
 }

@@ -13,6 +13,8 @@ class Coord():
             mapBorders = mapBordersClassic
         elif version == 'tbc':
             mapBorders = mapBordersTBC
+        elif version == 'wotlk':
+            mapBorders = mapBordersWotLK
         for mapSet in mapBorders:
             zone = int(mapSet[0])
             if (not (zoneId == False)) and (zone != zoneId):

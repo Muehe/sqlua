@@ -1,8 +1,35 @@
 import re
+import csv
 
 """
 
-These IDs are used to determine if a coordinate is on an instance map
+DBC functions
+
+"""
+
+def getAreaTriggers(version):
+    fi = f'data/{version}/AreaTrigger.dbc.CSV'
+    infile = open(fi, 'r')
+    a = infile.read()
+    infile.close()
+    b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),?\n", a)
+    areaTrigger = []
+    for x in b:
+        areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5]), float(x[6]), float(x[7]), float(x[8]), float(x[9])))
+    print(f'Found {len(areaTrigger)} area triggers in {fi}')
+    return areaTrigger
+
+def getMapBorders(version):
+    reader = csv.reader(open(f'data/{version}/WorldMapArea.dbc.CSV', 'r'))
+    wma = []
+    """(zoneId, zoneName, mapId, minX, maxX, minY, maxY)"""
+    for row in reader:
+        wma.append((int(row[2]), row[3], int(row[1]), float(row[4]), float(row[5]), float(row[6]), float(row[7])))
+    return wma
+
+"""
+
+These IDs are used to determine if a coordinate is on an instance map (that doesn't have an ingame map)
 
 """
 
@@ -86,10 +113,39 @@ Map borders
 
 """
 
-"""Classic"""
+mapBordersClassic = getMapBorders('classic')
+
+mapBordersTBC = getMapBorders('tbc')
+
+mapBordersWotLK = getMapBorders('wotlk')
+
+zoneNames = {}
+for m in mapBordersWotLK:
+    zoneNames[m[0]] = m[1]
+
+"""
+
+These zoneIds are subzones on the world (continent) maps.
+
+Used to prevent the print function from printing a long list of {-1, -1} for instance spawns
+
+"""
+
+# Classic
+#validZoneList = [1, 3, 4, 8, 10, 11, 12, 14, 15, 16, 17, 28, 33, 36, 38, 40, 41, 44, 45, 46, 47, 51, 85, 130, 139, 141, 148, 215, 267, 331, 357, 361, 400, 405, 406, 440, 490, 493, 618, 1377, 1497, 1519, 1537, 1637, 1638, 1657, 2597, 3277, 3358]
+# TBC hack
+#validZoneList = [ e for e in range(100000) ]
+# WotLK
+validZoneList = [1, 3, 4, 8, 10, 11, 12, 14, 15, 16, 17, 28, 33, 36, 38, 40, 41, 44, 45, 46, 47, 51, 65, 66, 67, 85, 130, 139, 141, 148, 206, 210, 215, 267, 331, 357, 361, 394, 400, 405, 406, 440, 490, 493, 495, 618, 1196, 1377, 1497, 1519, 1537, 1637, 1638, 1657, 2597, 2817, 3277, 3358, 3430, 3433, 3456, 3483, 3487, 3518, 3519, 3520, 3521, 3522, 3523, 3524, 3525, 3537, 3557, 3703, 3711, 3820, 4080, 4100, 4196, 4197, 4228, 4264, 4265, 4272, 4273, 4277, 4298, 4384, 4395, 4415, 4416, 4493, 4494, 4500, 4603, 4710, 4722, 4723, 4742, 4809, 4812, 4813, 4820, 4987]
+
+"""
+
+Unused data
+
+"""
 
 """(zoneId, zoneName, mapId, minX, maxX, minY, maxY)"""
-mapBordersClassic = [
+m1 = [
     (1, 'Dun Morogh', 0, 1802.08325195313, -3122.91650390625, -3877.08325195313, -7160.41650390625),
     (3, 'Badlands', 0, -2079.16650390625, -4566.66650390625, -5889.5830078125, -7547.91650390625),
     (4, 'Blasted Lands', 0, -1241.66662597656, -4591.66650390625, -10566.666015625, -12800),
@@ -208,35 +264,6 @@ mb2 = [(4,1,14,'Durotar',-1962.4999,-7249.9995,1808.3333,-1716.6666,-1),
 (482,566,3820,'NetherstormArena',2660.4165,389.5833,2918.75,1404.1666,-1),
 (499,530,4080,'Sunwell',-5302.083,-8629.166,13568.749,11350,0),]
 
-mapBordersTBC = []
-for m in mb2:
-    mapBordersTBC.append((m[2], m[3], m[1], m[4], m[5], m[6], m[7]))
-
-zoneNames = {}
-for m in mb2:
-    zoneNames[m[2]] = m[3]
-
-"""
-
-These zoneIds are subzones on the world (continent) maps.
-
-Used to prevent the print function from printing a long list of {-1, -1} for instance spawns
-
-"""
-
-# Classic
-#validZoneList = [1, 3, 4, 8, 10, 11, 12, 14, 15, 16, 17, 28, 33, 36, 38, 40, 41, 44, 45, 46, 47, 51, 85, 130, 139, 141, 148, 215, 267, 331, 357, 361, 400, 405, 406, 440, 490, 493, 618, 1377, 1497, 1519, 1537, 1637, 1638, 1657, 2597, 3277, 3358]
-# TBC hack
-#validZoneList = [ e for e in range(100000) ]
-validZoneList = [1, 3, 4, 8, 10, 11, 12, 14, 15, 16, 17, 28, 33, 36, 38, 40, 41, 44, 45, 46, 47, 51, 85, 130, 139, 141, 148, 215, 267, 331, 357, 361, 400, 405, 406, 440, 490, 493, 618, 1377, 1497, 1519, 1537, 1637, 1638, 1657, 2597, 3277, 3358, 3430, 3433, 3483, 3487, 3518, 3519, 3520, 3521, 3522, 3523, 3524, 3525, 3557, 3703, 3820, 4080]
-
-
-"""
-
-Unused data
-
-"""
-
 continentBorders = [(5, 'Eastern Kingdoms', 0, 16000, -19199.900390625, 7466.60009765625, -16000),
                     (6, 'Kalimdor', 1, 17066.599609375, -19733.2109375, 12799.900390625, -11733.2998046875),
                     (2597, 'Alterac Valley', 30, 1781.24987792969, -2456.25, 1085.41662597656, -1739.58325195313),
@@ -248,6 +275,7 @@ continentBorders = [(5, 'Eastern Kingdoms', 0, 16000, -19199.900390625, 7466.600
 (13,1,0,'Kalimdor',17066.6,-19733.21,12799.9,-11733.3,-1),
 (14,0,0,'Azeroth',18171.97,-22569.21,11176.344,-15973.344,-1),
 (466,530,0,'Expansion01',12996.039,-4468.039,5821.3594,-5821.3594,-1),
+(485,571,0,'Northrend',9217.152,-8534.246,10593.375,-1240.89,-1,0,0),
 """
 
 """Key for zoneIds that are subzones of an instance."""
@@ -329,15 +357,3 @@ zoneLevelList = [(1, 1, 10),
                  (1637, 1, 60),
                  (1638, 1, 60),
                  (1657, 1, 60)]
-
-def getAreaTriggers(version):
-    fi = f'data/{version}/AreaTrigger.dbc.CSV'
-    infile = open(fi, 'r')
-    a = infile.read()
-    infile.close()
-    b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),?\n", a)
-    areaTrigger = []
-    for x in b:
-        areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5]), float(x[6]), float(x[7]), float(x[8]), float(x[9])))
-    print(f'Found {len(areaTrigger)} area triggers in {fi}')
-    return areaTrigger

@@ -16,6 +16,7 @@ def getCreatureZones(file):
 
 zonesClassic = getCreatureZones('data/classic/creature_preExtract.csv')
 zonesTBC = getCreatureZones('data/tbc/creature_preExtract.csv')
+zonesWotLK = getCreatureZones('data/wotlk/creature_preExtract.csv')
 
 def getCreatureWaypoints(file):
     infile = open(file, "r")
@@ -34,11 +35,34 @@ def getCreatureWaypoints(file):
     infile.close()
     return zoneDict
 
+def getCreatureTemplateWaypoints(file):
+    infile = open(file, "r")
+    reader = csv.reader(infile)
+    # skip header line
+    next(reader)
+    zoneDict = {}
+    for row in reader:
+        # Split id#point strings
+        idAndPoint = re.split("\D", row[0])
+        cid = int(idAndPoint[0])
+        point = int(idAndPoint[1])
+        pathId = int(idAndPoint[2])
+        if cid not in zoneDict:
+            zoneDict[cid] = {}
+        if pathId not in zoneDict[cid]:
+            zoneDict[cid][pathId] = {}
+        zoneDict[cid][pathId][point] = int(row[1])
+    infile.close()
+    return zoneDict
+
 movementZonesClassic = getCreatureWaypoints('data/classic/creature_movement_preExtract.csv')
-movementTemplateZonesClassic = getCreatureWaypoints('data/classic/creature_movement_template_preExtract.csv')
+movementTemplateZonesClassic = getCreatureTemplateWaypoints('data/classic/creature_movement_template_preExtract.csv')
 
 movementZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_preExtract.csv')
-movementTemplateZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_template_preExtract.csv')
+movementTemplateZonesTBC = getCreatureTemplateWaypoints('data/tbc/creature_movement_template_preExtract.csv')
+
+movementZonesWotLK = getCreatureWaypoints('data/wotlk/creature_movement_preExtract.csv')
+movementTemplateZonesWotLK = getCreatureTemplateWaypoints('data/wotlk/creature_movement_template_preExtract.csv')
 
 def getFactionTemplate(fac):
     content = ""
@@ -57,6 +81,7 @@ def getFactionTemplate(fac):
 
 factionTemplateClassic = getFactionTemplate('data/classic/FactionTemplate.dbc.CSV')
 factionTemplateTBC = getFactionTemplate('data/tbc/FactionTemplate.dbc.CSV')
+factionTemplateWotLK = getFactionTemplate('data/wotlk/FactionTemplate.dbc.CSV')
 
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
@@ -73,6 +98,11 @@ class Npc():
             movementZones = movementZonesTBC
             movementTemplateZones = movementTemplateZonesTBC
             factionTemplate = factionTemplateTBC
+        elif version == 'wotlk':
+            zones = zonesWotLK
+            movementZones = movementZonesWotLK
+            movementTemplateZones = movementTemplateZonesWotLK
+            factionTemplate = factionTemplateWotLK
         self.id = npc[0]
         self.debug = debug
         self.name = escapeQuotes(npc[1])
@@ -109,17 +139,18 @@ class Npc():
                         # get waypoints
                         
                         npcMovement = None
-                        if self.id in dicts['npc_movement']:
-                            npcMovement = dicts['npc_movement'][self.id] #by NPCID
                         if spawn[4] in dicts['npc_movement']:
                             npcMovement = dicts['npc_movement'][spawn[4]] #by GUID
-                        if npcMovement is not None and len(dicts['npc'][self.id]) <= 2: #Less than 2 spawns only, otherwise we get EVERYTHIIIIINNNGGGG
+                        if npcMovement is not None and len(dicts['npc'][self.id]) <= 2: #Less than 3 spawns only, otherwise we get EVERYTHIIIIINNNGGGG
                             wpSort = {}
                             for waypoint in npcMovement:
                                 # point, guid, position_x, position_y
                                 if (waypoint[1] == spawn[4]):
                                     if (spawn[4] in movementZones) and (waypoint[0] in movementZones[spawn[4]]):
-                                        wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3], movementZones[spawn[4]][waypoint[0]])
+                                        zone = movementZones[spawn[4]][waypoint[0]]
+                                        if zone == 0 and spawn[4] in zones:
+                                            zone = zones[spawn[4]]
+                                        wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3], zone)
                                     else:
                                         wpSort[waypoint[0]] = (spawn[1], waypoint[2], waypoint[3])
                             # sort waypoints if there is more than one, discard single-point pathes
@@ -138,7 +169,7 @@ class Npc():
             wptSort = {}
             if self.id in dicts['npc_movement_template']:
                 for waypoint in dicts['npc_movement_template'][self.id]:
-                    # point, entry, position_x, position_y
+                    # point, entry, position_x, position_y, pathId
                     if (waypoint[1] == self.id) and (len(spawns) > 0):
                         if (self.id in movementTemplateZones) and (waypoint[0] in movementTemplateZones[self.id]):
                             wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3], movementTemplateZones[self.id][waypoint[0]])

@@ -14,7 +14,7 @@ import time
 version = config.version
 debug = config.debug
 
-if version not in ['classic', 'tbc']:
+if version not in ['classic', 'tbc', 'wotlk']:
     print(f'Unknown version {version}')
     sys.exit(1)
 
@@ -67,7 +67,7 @@ runMain = False
 if __name__ == "__main__":
     """Executes only if run as a script"""
     if len(sys.argv) > 1:
-        if sys.argv[1] in ['classic', 'tbc']:
+        if sys.argv[1] in ['classic', 'tbc', 'wotlk']:
             version = sys.argv[1]
         else:
             print(f'Unknown version {sys.argv[1]}')

@@ -44,7 +44,7 @@ class Quest():
             self.NextQuestInChain = quest[17]
         if (quest[18] != 0):
             self.ExclusiveGroup = quest[18]
-        if (quest[20] != ''):
+        if (quest[20] != '' and quest[20] != None):
             self.Objectives = self.objectivesText(quest[20])
             self.locales_Objectives = {}
             for x in range(1, 9):
@@ -233,14 +233,13 @@ class Quest():
         self.triggerEnd = []
         triggers = []
         triggerZoneDict = {}
-        if version == 'tbc': #TODO: Get Classic preExtract
-            with open(f'data/{version}/areaTrigger_preExtract.csv', 'r') as infile:
-                import csv
-                reader = csv.reader(infile)
-                next(reader)
-                for row in reader:
-                    triggerZoneDict[int(row[0])] = int(row[1])
-                infile.close()
+        with open(f'data/{version}/areaTrigger_preExtract.csv', 'r') as infile:
+            import csv
+            reader = csv.reader(infile)
+            next(reader)
+            for row in reader:
+                triggerZoneDict[int(row[0])] = int(row[1])
+            infile.close()
                 
         if self.id in dicts['areatrigger_involvedrelation']:
             for (triggerId, questId) in dicts['areatrigger_involvedrelation'][self.id]:

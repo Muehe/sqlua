@@ -15,6 +15,7 @@ def getObjectZones(file):
 
 objectZonesClassic = getObjectZones('data/classic/gameobject_preExtract.csv')
 objectZonesTBC = getObjectZones('data/tbc/gameobject_preExtract.csv')
+objectZonesWotLK = getObjectZones('data/wotlk/gameobject_preExtract.csv')
 
 class Obj():
     spawnErrors = [] # Holds IDs of objects without spawns entry, name, type, faction, data1
@@ -24,6 +25,8 @@ class Obj():
             objectZones = objectZonesClassic
         elif version == 'tbc':
             objectZones = objectZonesTBC
+        elif version == 'wotlk':
+            objectZones = objectZonesWotLK
         self.id = obj[0]
         self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]
