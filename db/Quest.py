@@ -277,6 +277,19 @@ class Quest():
         if (quest[51] != 0):
             self.SpecialFlags = quest[51]
 
+        #Reputation reward
+        self.RepReward = {}
+        if (quest[52+0] != 0):  #RewRepFaction1
+            self.RepReward[quest[52+0]] = quest[57+0]
+        if (quest[52+1] != 0):  #RewRepFaction2
+            self.RepReward[quest[52+1]] = quest[57+1]
+        if (quest[52+2] != 0):  #RewRepFaction3
+            self.RepReward[quest[52+2]] = quest[57+2]
+        if (quest[52+3] != 0):  #RewRepFaction4
+            self.RepReward[quest[52+3]] = quest[57+3]
+        if (quest[52+4] != 0):  #RewRepFaction5
+            self.RepReward[quest[52+4]] = quest[57+4]
+
     def __repr__(self):
         return str(self.id)
 

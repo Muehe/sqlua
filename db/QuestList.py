@@ -150,7 +150,7 @@ class QuestList():
         print("Selecting quest related MySQL tables...")
         print("  SELECT quest_template")
         # SrcItemId needed to check for spell_script_target (type and targetEntry) via item_template.spellId
-        cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags FROM quest_template")
+        cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5 FROM quest_template")
         quest_template = []
         for a in cursor.fetchall():
             quest_template.append(a)
@@ -345,7 +345,8 @@ QuestieDB.questKeys = {
     ['questFlags'] = 23, -- bitmask: see https://github.com/cmangos/issues/wiki/Quest_template#questflags
     ['specialFlags'] = 24, -- bitmask: 1 = Repeatable, 2 = Needs event, 4 = Monthly reset (req. 1). See https://github.com/cmangos/issues/wiki/Quest_template#specialflags
     ['parentQuest'] = 25, -- int, the ID of the parent quest that needs to be active for the current one to be available. See also 'childQuests' (field 14)
-    ['extraObjectives'] = 26, -- table: {{spawnlist, iconFile, text},...}, a list of hidden special objectives for a quest. Similar to requiredSourceItems
+    ['rewardReputation'] = 26, --table: {{faction(int), value(int)},...}, a list of reputation rewarded upon quest completion
+    ['extraObjectives'] = 27, -- table: {{spawnlist, iconFile, text},...}, a list of hidden special objectives for a quest. Similar to requiredSourceItems
 }
 
 QuestieDB.questData = [[return {
@@ -559,6 +560,14 @@ QuestieDB.questData = [[return {
                 outfile.write('nil,')
             if (hasattr(quest, 'ParentQuest')): # 25
                 outfile.write(f'{quest.ParentQuest},')
+            else:
+                outfile.write('nil,')
+
+            if hasattr(quest, 'RepReward') and len(quest.RepReward) > 0: #26
+                outfile.write('{')
+                for factionId in sorted(quest.RepReward):
+                    outfile.write("{" + str(factionId) + ","+ str(quest.RepReward[factionId])+"},")
+                outfile.write('},')
             else:
                 outfile.write('nil,')
             outfile.write("},\n")
