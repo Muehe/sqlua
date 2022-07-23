@@ -285,7 +285,8 @@ QuestieDB.npcData = [[return {
             else:
                 outfile.write(f'"{friendlyTo}",')
             if (hasattr(npc, "subName") and npc.subName != None): #14
-                outfile.write(f'"{npc.subName}",')
+                sn = npc.subName.replace('"', '\\"')
+                outfile.write(f'"{sn}",')
             else:
                 outfile.write("nil,")
             if hasattr(npc, "npcFlags"): #15
