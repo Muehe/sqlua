@@ -64,14 +64,18 @@ def preExtract(v):
 # file, so the main function being run is delayed by use of this variable
 runMain = False
 
+reCache = False
+
 if __name__ == "__main__":
     """Executes only if run as a script"""
     if len(sys.argv) > 1:
-        if sys.argv[1] in ['classic', 'tbc', 'wotlk']:
-            version = sys.argv[1]
-        else:
-            print(f'Unknown version {sys.argv[1]}')
-            sys.exit(1)
+        for arg in sys.argv[1:]:
+            if arg == '-r':
+                reCache = True
+            elif arg in ['classic', 'tbc', 'wotlk']:
+                version = sys.argv[1]
+            else:
+                print(f'Unknown argument "{arg}"')
     print(f'Using version {version}')
     runMain = True
 
@@ -79,7 +83,7 @@ cursor, dictCursor = getCursors(version)
 
 if runMain:
     start_time = time.time()
-    main(False)
+    main(reCache)
     print("--- %s seconds ---" % (time.time() - start_time))
 else:
     print(f'Using version {version}')
