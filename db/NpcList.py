@@ -138,12 +138,6 @@ class NpcList():
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
 
-local isTBCClient = string.byte(GetBuildInfo(), 1) == 50;
-
-if (not isTBCClient) then
-    return
-end
-
 QuestieDB.npcKeys = {
     ['name'] = 1, -- string
     ['minLevelHealth'] = 2, -- int

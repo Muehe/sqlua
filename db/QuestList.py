@@ -156,15 +156,17 @@ class QuestList():
             quest_template.append(a)
 
         print("  SELECT creature_template")
-        cursor.execute("SELECT entry, KillCredit1, KillCredit2 FROM creature_template")
+        cursor.execute("SELECT entry, KillCredit1, KillCredit2 FROM creature_template WHERE KillCredit1 != 0 OR KillCredit2 != 0")
         creature_killcredit = {}
         for a in cursor.fetchall():
             if a[1] != 0:
-                if(a[1] in creature_killcredit):
-                    creature_killcredit[a[1]].append(a)
-                else:
+                if not (a[1] in creature_killcredit):
                     creature_killcredit[a[1]] = []
-                    creature_killcredit[a[1]].append(a)
+                creature_killcredit[a[1]].append(a[0])
+            if a[2] != 0:
+                if not (a[2] in creature_killcredit):
+                    creature_killcredit[a[2]] = []
+                creature_killcredit[a[2]].append(a[0])
 
         print("  SELECT creature_involvedrelation")
         cursor.execute("SELECT id, quest FROM creature_involvedrelation")
@@ -307,12 +309,6 @@ class QuestList():
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
 
-local isTBCClient = string.byte(GetBuildInfo(), 1) == 50;
-
-if (not isTBCClient) then
-    return
-end
-
 QuestieDB.questKeys = {
     ['name'] = 1, -- string
     ['startedBy'] = 2, -- table
@@ -333,7 +329,7 @@ QuestieDB.questKeys = {
         --['objectObjective'] = 2, -- table {{object(int), text(string)},...}
         --['itemObjective'] = 3, -- table {{item(int), text(string)},...}
         --['reputationObjective'] = 4, -- table: {faction(int), value(int)}
-        --['killCreditObjective'] = 5, -- table: {{creature(int), ...}, baseCreatureID, baseCreatureText}
+        --['killCreditObjective'] = 5, -- table: {{{creature(int), ...}, baseCreatureID, baseCreatureText}, ...}
     ['sourceItemId'] = 11, -- int, item provided by quest starter
     ['preQuestGroup'] = 12, -- table: {quest(int)}
     ['preQuestSingle'] = 13, -- table: {quest(int)}
@@ -471,14 +467,16 @@ QuestieDB.questData = [[return {
                 outfile.write("nil,")
 
             if (hasattr(quest, "killCreditData")): #multi-creatureID = objectives5
-                outfile.write("{{")
-                for kills in quest.killCreditData[0]:
-                    outfile.write(str(kills)+",")
-                outfile.write(str(quest.killCreditData[1][0])+",")
-                if len(quest.killCreditData[1][1]) > 0:
-                    outfile.write("},"+str(quest.killCreditData[1][0]) + ","+"\""+quest.killCreditData[1][1]+"\"},")
-                else:
-                    outfile.write("},"+str(quest.killCreditData[1][0]) + "},")
+                outfile.write("{")
+                for collection in quest.killCreditData:
+                    outfile.write("{{")
+                    for mobId in collection[0]:
+                        outfile.write(str(mobId)+",")
+                    outfile.write("},")
+                    outfile.write(str(collection[1][0])+",")
+                    if len(collection[1][1]) > 0:
+                        outfile.write("\""+collection[1][1]+"\"")
+                    outfile.write("},")
 
             outfile.write("},")
             if (hasattr(quest, "SrcItemId")): #SrcItemId = 11

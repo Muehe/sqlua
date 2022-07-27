@@ -116,18 +116,14 @@ class Quest():
         if self.version != 'classic':
             cleaned = []
             killCreditMobs = []
-            killCreditRoot = None
             for rootid in self.ReqCreatureId:
                 if rootid[0] in dicts['creature_killcredit']:
-                    for credit in dicts['creature_killcredit'][rootid[0]]:
-                        killCreditRoot = rootid
-                        killCreditMobs.append(credit[0]) # KillCredit2 is always 0 in cmangos-tbc
+                    killCreditMobs.append((dicts['creature_killcredit'][rootid[0]], rootid))
                 else:
                     cleaned.append(rootid)
-
             if len(killCreditMobs) > 0:
-                self.killCreditData = (killCreditMobs, killCreditRoot)
-            self.ReqCreatureId = cleaned
+                self.killCreditData = killCreditMobs
+                self.ReqCreatureId = cleaned
 
         if (self.ReqCreatureId == []):
             del self.ReqCreatureId

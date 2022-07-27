@@ -233,12 +233,6 @@ class ItemList():
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
 
-local isTBCClient = string.byte(GetBuildInfo(), 1) == 50;
-
-if (not isTBCClient) then
-    return
-end
-
 QuestieDB.itemKeys = {
     ['name'] = 1, -- string
     ['npcDrops'] = 2, -- table or nil, NPC IDs

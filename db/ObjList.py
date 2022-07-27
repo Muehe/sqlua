@@ -117,12 +117,6 @@ class ObjList():
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
 
-local isTBCClient = string.byte(GetBuildInfo(), 1) == 50;
-
-if (not isTBCClient) then
-    return
-end
-
 QuestieDB.objectKeys = {
     ['name'] = 1, -- string
     ['questStarts'] = 2, -- table {questID(int),...}
