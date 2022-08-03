@@ -137,7 +137,6 @@ class Npc():
                         else:
                             spawns.append((spawn[1], spawn[2], spawn[3]))
                         # get waypoints
-                        
                         npcMovement = None
                         if spawn[4] in dicts['npc_movement']:
                             npcMovement = dicts['npc_movement'][spawn[4]] #by GUID
@@ -162,7 +161,6 @@ class Npc():
                             elif (len(wpSort) == 1):
                                 # TODO implement checking for "non-moving" waypoints that are abused for script
                                 if self.debug: print(f'DEBUG: Discarded single-point path for GUID {spawn[4]}')
-
             # template waypoints
             wpError = False
             # get waypoints
@@ -171,8 +169,8 @@ class Npc():
                 for waypoint in dicts['npc_movement_template'][self.id]:
                     # point, entry, position_x, position_y, pathId
                     if (waypoint[1] == self.id) and (len(spawns) > 0):
-                        if (self.id in movementTemplateZones) and (waypoint[0] in movementTemplateZones[self.id]):
-                            wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3], movementTemplateZones[self.id][waypoint[0]])
+                        if (self.id in movementTemplateZones) and (waypoint[0] in movementTemplateZones[self.id][waypoint[4]]):
+                            wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3], movementTemplateZones[self.id][waypoint[4]][waypoint[0]])
                         else:
                             wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3])
                     else:
