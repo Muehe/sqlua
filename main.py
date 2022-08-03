@@ -73,7 +73,7 @@ if __name__ == "__main__":
             if arg == '-r':
                 reCache = True
             elif arg in ['classic', 'tbc', 'wotlk']:
-                version = sys.argv[1]
+                version = arg
             else:
                 print(f'Unknown argument "{arg}"')
     print(f'Using version {version}')
