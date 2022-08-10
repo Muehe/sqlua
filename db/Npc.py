@@ -14,9 +14,9 @@ def getCreatureZones(file):
     infile.close()
     return zoneDict
 
-zonesClassic = getCreatureZones('data/classic/creature_preExtract.csv')
-zonesTBC = getCreatureZones('data/tbc/creature_preExtract.csv')
-zonesWotLK = getCreatureZones('data/wotlk/creature_preExtract.csv')
+zonesClassic = getCreatureZones('data/classic/creature_preExtract.csvzone_and_area.csv')
+zonesTBC = getCreatureZones('data/tbc/creature_preExtract.csvzone_and_area.csv')
+zonesWotLK = getCreatureZones('data/wotlk/creature_preExtract.csvzone_and_area.csv')
 
 def getCreatureWaypoints(file):
     infile = open(file, "r")
@@ -55,14 +55,14 @@ def getCreatureTemplateWaypoints(file):
     infile.close()
     return zoneDict
 
-movementZonesClassic = getCreatureWaypoints('data/classic/creature_movement_preExtract.csv')
-movementTemplateZonesClassic = getCreatureTemplateWaypoints('data/classic/creature_movement_template_preExtract.csv')
+movementZonesClassic = getCreatureWaypoints('data/classic/creature_movement_preExtract.csvzone_and_area.csv')
+movementTemplateZonesClassic = getCreatureTemplateWaypoints('data/classic/creature_movement_template_preExtract.csvzone_and_area.csv')
 
-movementZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_preExtract.csv')
-movementTemplateZonesTBC = getCreatureTemplateWaypoints('data/tbc/creature_movement_template_preExtract.csv')
+movementZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_preExtract.csvzone_and_area.csv')
+movementTemplateZonesTBC = getCreatureTemplateWaypoints('data/tbc/creature_movement_template_preExtract.csvzone_and_area.csv')
 
-movementZonesWotLK = getCreatureWaypoints('data/wotlk/creature_movement_preExtract.csv')
-movementTemplateZonesWotLK = getCreatureTemplateWaypoints('data/wotlk/creature_movement_template_preExtract.csv')
+movementZonesWotLK = getCreatureWaypoints('data/wotlk/creature_movement_preExtract.csvzone_and_area.csv')
+movementTemplateZonesWotLK = getCreatureTemplateWaypoints('data/wotlk/creature_movement_template_preExtract.csvzone_and_area.csv')
 
 def getFactionTemplate(fac):
     content = ""

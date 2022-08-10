@@ -4,5 +4,4 @@ __pycache__
 *.pkl
 *.lua
 *coords.csv
-*area.csv
 venv/

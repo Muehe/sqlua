@@ -229,7 +229,7 @@ class Quest():
         self.triggerEnd = []
         triggers = []
         triggerZoneDict = {}
-        with open(f'data/{version}/areaTrigger_preExtract.csv', 'r') as infile:
+        with open(f'data/{version}/areaTrigger_preExtract.csvzone_and_area.csv', 'r') as infile:
             import csv
             reader = csv.reader(infile)
             next(reader)
