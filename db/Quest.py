@@ -9,6 +9,17 @@ class Quest():
         self.QuestLevel = quest[2]
         self.Type = quest[3]
         self.RequiredRaces = quest[5]
+        # Fix TBC+ masks in Classic data, change quests available to all races to 0 (no requirements)
+        if version == 'classic':
+            if quest[5] == 690:
+                self.RequiredRaces = 178
+            if quest[5] == 1101:
+                self.RequiredRaces = 77
+            if quest[5] == 255:
+                self.RequiredRaces = 0
+        else:
+            if quest[5] == 1791:
+                self.RequiredRaces = 0
         self.Title = escapeDoubleQuotes(quest[19])
         self.locales_Title = {}
         for x in range(1, 9):

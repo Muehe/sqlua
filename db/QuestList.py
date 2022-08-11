@@ -10,6 +10,29 @@ class QuestList():
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
     def __init__(self, cursor, dictCursor, version, recache=False):
         self.version = version
+        self.raceIDs = {
+            'NONE': 0,
+            'HUMAN': 1,
+            'ORC': 2,
+            'DWARF': 4,
+            'NIGHT_ELF': 8,
+            'UNDEAD': 16,
+            'TAUREN': 32,
+            'GNOME': 64,
+            'TROLL': 128,
+            'GOBLIN': 256,
+            'BLOOD_ELF': 512,
+            'DRAENEI': 1024,
+            'WORGEN': 2097152,
+        }
+        if version == 'classic':
+            self.raceIDs['ALLIANCE'] = 77
+            self.raceIDs['HORDE'] = 178
+            self.raceIDs['ALL'] = 255
+        else:
+            self.raceIDs['ALLIANCE'] = 1101
+            self.raceIDs['HORDE'] = 690
+            self.raceIDs['ALL'] = 1791
         if (not os.path.isfile(f'data/{version}/quests.pkl') or recache):
             print('Caching quests...')
             self.cacheQuests(cursor, dictCursor)
@@ -286,17 +309,17 @@ class QuestList():
             tempRace = 0
             if hasattr(self.qList[quest], "creatureStart"):
                 for creature in self.qList[quest].creatureStart:
-                    if ((self.qList[quest].RequiredRaces & 77) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (77,178)) and npcs.nList[creature].hostileToA:
-                        tempRace = tempRace | 178
-                    if ((self.qList[quest].RequiredRaces & 178) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (77,178)) and npcs.nList[creature].hostileToH:
-                        tempRace = tempRace | 77
+                    if ((self.qList[quest].RequiredRaces & self.raceIDs['ALLIANCE']) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (self.raceIDs['ALLIANCE'],self.raceIDs['HORDE'])) and npcs.nList[creature].hostileToA:
+                        tempRace = tempRace | self.raceIDs['HORDE']
+                    if ((self.qList[quest].RequiredRaces & self.raceIDs['HORDE']) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (self.raceIDs['ALLIANCE'],self.raceIDs['HORDE'])) and npcs.nList[creature].hostileToH:
+                        tempRace = tempRace | self.raceIDs['ALLIANCE']
             if hasattr(self.qList[quest], "creatureEnd"):
                 for creature in self.qList[quest].creatureEnd:
-                    if ((self.qList[quest].RequiredRaces & 77) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (77,178)) and npcs.nList[creature].hostileToA:
-                        tempRace = tempRace | 178
-                    if ((self.qList[quest].RequiredRaces & 178) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (77,178)) and npcs.nList[creature].hostileToH:
-                        tempRace = tempRace | 77
-            if tempRace not in (0,255):
+                    if ((self.qList[quest].RequiredRaces & self.raceIDs['ALLIANCE']) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (self.raceIDs['ALLIANCE'],self.raceIDs['HORDE'])) and npcs.nList[creature].hostileToA:
+                        tempRace = tempRace | self.raceIDs['HORDE']
+                    if ((self.qList[quest].RequiredRaces & self.raceIDs['HORDE']) != 0 or self.qList[quest].RequiredRaces == 0) and (self.qList[quest].RequiredRaces not in (self.raceIDs['ALLIANCE'],self.raceIDs['HORDE'])) and npcs.nList[creature].hostileToH:
+                        tempRace = tempRace | self.raceIDs['ALLIANCE']
+            if tempRace not in (0,self.raceIDs['ALL']):
                 actualRequiredRaces[self.qList[quest].id] = tempRace
         return actualRequiredRaces
 
@@ -402,12 +425,6 @@ QuestieDB.questData = [[return {
             outfile.write("},")
             outfile.write(str(quest.MinLevel)+",") #minLevel = 4
             outfile.write(str(quest.QuestLevel)+",") #level = 5
-
-            #If you remove goblin from all races we get 1791, there are 11 quests in the TBC DB with this RequiredRaces
-            #We just normalize the database by using 2047 instead.
-            if(quest.RequiredRaces == 1791):
-                print("    Quest %d\thas a required races of %d, changing to %d." % (id, quest.RequiredRaces, 2047))
-                quest.RequiredRaces = 2047
             outfile.write(f'{quest.RequiredRaces},') #RequiredRaces = 6
             if (hasattr(quest, "RequiredClasses")): #RequiredClasses = 7
                 outfile.write(f"{quest.RequiredClasses},")
@@ -766,9 +783,9 @@ QuestieDB.questData = [[return {
         if requiredRaces == 0:
             return "AH"
         faction = ""
-        if requiredRaces & 77:
+        if requiredRaces & self.raceIDs['ALLIANCE']:
             faction += "A"
-        if requiredRaces & 178:
+        if requiredRaces & self.raceIDs['HORDE']:
             faction += "H"
         return faction
 
