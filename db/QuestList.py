@@ -483,7 +483,6 @@ QuestieDB.questData = [[return {
                 outfile.write("{"+str(quest.RepObjectiveFaction)+","+str(quest.RepObjectiveValue)+"},")
             else:
                 outfile.write("nil,")
-
             if (hasattr(quest, "killCreditData")): #multi-creatureID = objectives5
                 outfile.write("{")
                 for collection in quest.killCreditData:
@@ -495,8 +494,8 @@ QuestieDB.questData = [[return {
                     if len(collection[1][1]) > 0:
                         outfile.write("\""+collection[1][1]+"\"")
                     outfile.write("},")
-
-            outfile.write("},")
+                outfile.write("},")
+            outfile.write("},") #objectives = 10
             if (hasattr(quest, "SrcItemId")): #SrcItemId = 11
                 outfile.write(str(quest.SrcItemId)+",")
             else:
