@@ -489,6 +489,7 @@ QuestieDB.questData = [[return {
                     outfile.write("{{")
                     for mobId in collection[0]:
                         outfile.write(str(mobId)+",")
+                    outfile.write(str(collection[1][0])) # write baseID into spawns, because some baseIDs do have actual spawns
                     outfile.write("},")
                     outfile.write(str(collection[1][0])+",")
                     if len(collection[1][1]) > 0:
