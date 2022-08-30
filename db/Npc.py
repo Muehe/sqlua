@@ -140,7 +140,7 @@ class Npc():
                         npcMovement = None
                         if spawn[4] in dicts['npc_movement']:
                             npcMovement = dicts['npc_movement'][spawn[4]] #by GUID
-                        if npcMovement is not None and len(dicts['npc'][self.id]) <= 2: #Less than 3 spawns only, otherwise we get EVERYTHIIIIINNNGGGG
+                        if npcMovement is not None:
                             wpSort = {}
                             for waypoint in npcMovement:
                                 # point, guid, position_x, position_y

@@ -160,6 +160,7 @@ QuestieDB.npcKeys = {
 QuestieDB.npcData = [[return {
 """)
         excludeTags = ['[DND]', '[ph]', '[PH]', '[PH[', '[UNUSED]', '[Unused]', '[DNT]', '[NOT USED]', '[VO]', '(DND)']
+        skippedWaypoints = []
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
             foundTag = False
@@ -232,7 +233,10 @@ QuestieDB.npcData = [[return {
                         if lastZone not in waypointsByZone:
                             waypointsByZone[lastZone] = []
                         waypointsByZone[lastZone].append(path)
-                if (len(waypointsByZone) > 0):
+                if len(npc.spawns.cList) > 3: # Waypoints for NPCs with less than 4 spawns only, otherwise we get EVERYTHIIIIINNNGGGG
+                    outfile.write("nil,")
+                    skippedWaypoints.append(npc.id)
+                elif (len(waypointsByZone) > 0):
                     outfile.write("{")
                     for zone in waypointsByZone:
                         outfile.write('['+str(zone)+']={')
@@ -289,3 +293,4 @@ QuestieDB.npcData = [[return {
                 outfile.write("nil,")
             outfile.write("},\n")
         outfile.write("}]]\n")
+        #print(f"Skipped waypoint IDs ({len(skippedWaypoints)}):", skippedWaypoints)
