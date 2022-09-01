@@ -430,10 +430,10 @@ QuestieDB.questData = [[return {
                 outfile.write(f"{quest.RequiredClasses},")
             else:
                 outfile.write("nil,")
-            if (hasattr(quest, "Objectives")): # and (len(self.allQuests(Title = quest.Title)) > 1): #objectives = 8
-                objectives = self.questieObjectivesText(quest.Objectives)
+            if (hasattr(quest, 'Objectives')): #objectives = 8
+                objectives = quest.Objectives.split('\\n')
                 if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
-                    objectives = self.questieObjectivesText(quest.locales_Title[localesMap[locale]])
+                    objectives = quest.locales_Title[localesMap[locale]].split('\\n')
                 outfile.write('{')
                 for line in objectives:
                     outfile.write(f'"{line}",')
@@ -766,53 +766,3 @@ QuestieDB.questData = [[return {
                 outfile.write(str(id))
                 outfile.write("},\n")
             outfile.write(" },\n")
-
-        """
-        outfile.write("}\n\nQuestieHashMap = {\n")
-        for id in sorted(self.qList):
-            quest = self.qList[id]
-            if quest in excluded:
-                continue
-            outfile.write(" [")
-            outfile.write(str(id))
-            outfile.write("]={\n")
-        print("Done.")
-        """
-
-    def getFactionString(self, requiredRaces):
-        if requiredRaces == 0:
-            return "AH"
-        faction = ""
-        if requiredRaces & self.raceIDs['ALLIANCE']:
-            faction += "A"
-        if requiredRaces & self.raceIDs['HORDE']:
-            faction += "H"
-        return faction
-
-    def questieObjectivesText(self, objectives, cutName=True):
-        split = objectives.split('\\n')
-        target = []
-        for s in split:
-            if (s != '') and not (('$n' in s) and cutName):
-                target.append(s)
-        target2 = []
-        for s in target:
-            if '  ' in s:
-                split2 = s.split('  ')
-                for x in split2:
-                    target2.append(x)
-            else:
-                target2.append(s)
-        return target2
-
-    def lineWrap(self, source):
-        target = []
-        temp = source
-        while(len(temp)>80):
-            cutoff = 80
-            while(temp[cutoff] != ' '):
-                cutoff -= 1
-            target.append(temp[:cutoff])
-            temp = temp[cutoff+1:]
-        target.append(temp)
-        return target

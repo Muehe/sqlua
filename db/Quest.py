@@ -361,8 +361,8 @@ class Quest():
         return all(getattr(self,key) == val for (key, val) in kwargs.items())
 
     def objectivesText(self, objectives):
-        split = objectives.split('$B')
-        temp = '\\n'.join(split)
+        split0 = objectives.split('$B')
+        temp = '\\n'.join(split0)
         split1 = temp.split('$b')
         temp = '\\n'.join(split1)
         split2 = temp.split('$c')
@@ -371,6 +371,8 @@ class Quest():
         temp = '$R'.join(split3)
         split4 = temp.split('$n')
         temp = '$N'.join(split4)
+        split5 = temp.split('  ')
+        temp = ' '.join(split5)
         return escapeDoubleQuotes(temp)
 
     def addGroup(self, value):
