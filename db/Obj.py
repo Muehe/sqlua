@@ -37,7 +37,7 @@ class Obj():
             if self.id in dicts['object']:
                 rawSpawn = dicts['object'][self.id]
                 for spawn in rawSpawn:
-                    if (spawn[0] == self.id):
+                    if (spawn[0] == self.id) or (spawn[0] == 0):
                         if spawn[4] in objectZones:
                             spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]]))
                         else:

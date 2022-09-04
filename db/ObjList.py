@@ -23,7 +23,7 @@ class ObjList():
 
     def cacheObjects(self, cursor, dictCursor, extractSpawns=True):
         self.objectList = {}
-        dicts = self.__getObjTables(cursor, dictCursor)
+        dicts = self.getObjTables(cursor, dictCursor)
         count = len(dicts['object_template'])
         print(f'Caching {count} objects...')
         for obj in dicts['object_template']:
@@ -54,7 +54,7 @@ class ObjList():
     def __iterObj(self, **kwargs):
         return (self.objectList[obj] for obj in self.objectList if self.objectList[obj].match(**kwargs))
 
-    def __getObjTables(self, cursor, dictCursor):
+    def getObjTables(self, cursor, dictCursor):
         print("Selecting object related MySQL tables...")
         print("  SELECT gameobject_template")
         cursor.execute("SELECT entry, name, type, faction, data1 FROM gameobject_template")
@@ -62,15 +62,30 @@ class ObjList():
         for a in cursor.fetchall():
             obj_tpl.append(a)
 
+        print('  SELECT gameobject_spawn_entry')
+        cursor.execute('SELECT * FROM gameobject_spawn_entry')
+        obj_spawn_entry = {}
+        for guid, entry in cursor.fetchall():
+            if guid not in obj_spawn_entry:
+                obj_spawn_entry[guid] = []
+            obj_spawn_entry[guid].append(entry)
+
         print("  SELECT gameobject")
         cursor.execute("SELECT id, map, position_x, position_y, guid FROM gameobject")
         obj = {}
         for a in cursor.fetchall():
-            if(a[0] in obj):
-                obj[a[0]].append(a)
-            else:
+            if (a[0] == 0):
+                if a[4] in obj_spawn_entry:
+                    for entry in obj_spawn_entry[a[4]]:
+                        if entry not in obj:
+                            obj[entry] = []
+                        obj[entry].append(a)
+                #else:
+                    #print(f'Missing entry for GUID {a[4]}')
+                continue
+            elif(a[0] not in obj):
                 obj[a[0]] = []
-                obj[a[0]].append(a)
+            obj[a[0]].append(a)
 
         print("  SELECT gameobject_questrelation")
         cursor.execute("SELECT * FROM gameobject_questrelation")
