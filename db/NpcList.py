@@ -175,7 +175,7 @@ QuestieDB.npcKeys = {
 
 QuestieDB.npcData = [[return {
 """)
-        excludeTags = ['[DND]', '[ph]', '[PH]', '[PH[', '[UNUSED]', '[Unused]', '[DNT]', '[NOT USED]', '[VO]', '(DND)']
+        excludeTags =  ['[UNUSED]', '[Unused]', '[NOT USED]', '[VO]'] # These tags seem to be needed for some quests: ['[DND]', '[ph]', '[PH]', '[PH[', '[DNT]', '(DND)']
         skippedWaypoints = []
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
