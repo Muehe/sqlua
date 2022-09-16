@@ -143,8 +143,16 @@ QuestieDB.objectKeys = {
 
 QuestieDB.objectData = [[return {
 """)
+        mailBoxes = []
+        meetingStones = []
+        outString = ""
         for objId in sorted(self.objectList):
             obj = self.objectList[objId]
+            if obj.type == 19: #Mailbox
+                mailBoxes.append(objId)
+            elif obj.type == 23: #Meeting Stone
+                meetingStones.append(objId)
+
             if obj.type not in [2, 3, 5, 8, 10, 19, 23, 25, 32, 34]:
                 continue
             #if not hasattr(obj, 'spawns'):
@@ -203,4 +211,12 @@ QuestieDB.objectData = [[return {
         outString = outString.replace(",nil}", "}")
         outString = outString.replace("{}", "nil")
         outfile.write(outString)
+        outfile.close()
+
+        
+        outfile = open(file+".meta.lua", "w", encoding='utf-8')
+        outfile.write("local mailboxes = ")
+        outfile.write("{" + ",".join(map(str, sorted(mailBoxes))) + "}\n")
+        outfile.write("local meetingStones = ")
+        outfile.write("{" + ",".join(map(str, sorted(meetingStones))) + "}\n")
         outfile.close()
