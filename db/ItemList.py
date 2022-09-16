@@ -263,8 +263,6 @@ QuestieDB.itemData = [[return {
             #2
             if item.npcs:
                 outString += ('{')
-                # for npc in sorted(item.npcs):
-                #     outString += (f'{npc},')
                 outString += ",".join(map(str, sorted(item.npcs)))
                 outString += ('},')
             else:
@@ -272,8 +270,6 @@ QuestieDB.itemData = [[return {
             #3
             if item.objects:
                 outString += ('{')
-                # for objectID in sorted(item.objects):
-                #     outString += (f'{objectID},')
                 outString += ",".join(map(str, sorted(item.objects)))
                 outString += ('},')
             else:
@@ -287,8 +283,6 @@ QuestieDB.itemData = [[return {
 
             if len(item.quests) > 0: #6
                 outString += ('{')
-                # for quest in sorted(item.quests):
-                #     outString += (f'{quest},')
                 outString += ",".join(map(str, sorted(item.quests)))
                 outString += ('},')
             else:
@@ -311,8 +305,6 @@ QuestieDB.itemData = [[return {
 
             if len(item.vendors) > 0: #14
                 outString += ('{')
-                # for npcId in sorted(item.vendors):
-                #     outString += (f'{npcId},')
                 outString += ",".join(map(str, sorted(item.vendors)))
                 outString += ('},')
             else:
