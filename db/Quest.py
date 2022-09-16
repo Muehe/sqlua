@@ -289,17 +289,27 @@ class Quest():
             self.SpecialFlags = quest[51]
 
         #Reputation reward
+        self.RepReward = self.getRep(quest)
+            
+
+    def getRep(self, quest):
         self.RepReward = {}
-        if (quest[52+0] != 0):  #RewRepFaction1
-            self.RepReward[quest[52+0]] = quest[57+0]
-        if (quest[52+1] != 0):  #RewRepFaction2
-            self.RepReward[quest[52+1]] = quest[57+1]
-        if (quest[52+2] != 0):  #RewRepFaction3
-            self.RepReward[quest[52+2]] = quest[57+2]
-        if (quest[52+3] != 0):  #RewRepFaction4
-            self.RepReward[quest[52+3]] = quest[57+3]
-        if (quest[52+4] != 0):  #RewRepFaction5
-            self.RepReward[quest[52+4]] = quest[57+4]
+        if self.version == "wotlk":
+            data = [0, 10, 25, 75, 150, 250, 350, 500, 1000, 5]
+            for i in range(0, 5):
+                if (quest[52+i] != 0):  #RewRepFaction
+                    if quest[57+i] != 0 and quest[57+i] > 1000: #RewRepValue
+                        self.RepReward[quest[52+i]] = int(quest[57+i]/100)
+                    elif(quest[57+5+i] != 0): #RewRepValueId
+                        self.RepReward[quest[52+i]] = int(data[abs(quest[57+5+i])] * (quest[57+5+i] / abs(quest[57+5+i])))
+        else:
+            for i in range(0, 5):
+                if (quest[52+i] != 0): #RewRepFaction
+                    self.RepReward[quest[52+i]] = quest[57+i] #RewRepValueId
+
+        return self.RepReward
+
+
 
     def __repr__(self):
         return str(self.id)
