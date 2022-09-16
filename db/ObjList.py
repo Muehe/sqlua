@@ -126,7 +126,7 @@ class ObjList():
 
     def printObjFile(self, file='output/objectDB.lua', locale='enGB'):
         print("  Printing Object file '%s'" % file)
-        outfile = open(file, "w")
+        outfile = open(file, "w", encoding='utf-8')
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
 ---@type QuestieDB

@@ -326,7 +326,7 @@ class QuestList():
     def printQuestFile(self, file="output/questDB.lua", locale="enGB"):
         print("  Printing Quests file '%s'" % file)
 
-        outfile = open(file, "w")
+        outfile = open(file, "w", encoding='utf-8')
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
 ---@type QuestieDB

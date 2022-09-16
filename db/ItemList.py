@@ -226,7 +226,7 @@ class ItemList():
 
     def writeFile(self, file = 'output/itemDB.lua'):
         print("  Printing Item file '%s'" % file)
-        fo = open(file, "w")
+        fo = open(file, "w", encoding='utf-8')
 
         fo.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
