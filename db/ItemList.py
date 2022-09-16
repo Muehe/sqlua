@@ -226,9 +226,9 @@ class ItemList():
 
     def writeFile(self, file = 'output/itemDB.lua'):
         print("  Printing Item file '%s'" % file)
-        fo = open(file, "w", encoding='utf-8')
+        outfile = open(file, "w", encoding='utf-8')
 
-        fo.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
+        outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
@@ -253,57 +253,84 @@ QuestieDB.itemKeys = {
 
 QuestieDB.itemData = [[return {
 """)
+        outString = ""
         for itemID in self.itemList:
-            fo.write(f'[{itemID}] = {{')
+            outString += (f'[{itemID}] = {{')
             item = self.itemList[itemID]
 
             name = item.name.replace("'","\\'")
-            fo.write(f"'{name}',") #1
+            outString += (f"'{name}',") #1
             #2
             if item.npcs:
-                fo.write('{')
-                for npc in sorted(item.npcs):
-                    fo.write(f'{npc},')
-                fo.write('},',)
+                outString += ('{')
+                # for npc in sorted(item.npcs):
+                #     outString += (f'{npc},')
+                outString += ",".join(map(str, sorted(item.npcs)))
+                outString += ('},')
             else:
-                fo.write('nil,')
+                outString += ('nil,')
             #3
             if item.objects:
-                fo.write('{')
-                for objectID in sorted(item.objects):
-                    fo.write(f'{objectID},')
-                fo.write('},',)
+                outString += ('{')
+                # for objectID in sorted(item.objects):
+                #     outString += (f'{objectID},')
+                outString += ",".join(map(str, sorted(item.objects)))
+                outString += ('},')
             else:
-                fo.write('nil,')
-            self.writeList(fo, item.items) #4
-            fo.write(f"{item.startquest}," if item.startquest != 0 else 'nil,') #5
-            if len(item.quests) > 0: #6
-                fo.write('{')
-                for quest in sorted(item.quests):
-                    fo.write(f'{quest},')
-                fo.write('},',)
-            else:
-                fo.write('nil,')
-            fo.write(f"{item.flags}," if item.flags != 0 else 'nil,') #7
+                outString += ('nil,')
+            outString = self.getList(outString, item.items) #4
 
-            fo.write(f"{item.foodtype}," if item.foodtype != 0 else 'nil,') #8
-            fo.write(f"{item.itemlevel},") #9
-            fo.write(f"{item.requiredlevel},") #10
-            fo.write(f"{item.ammoType},") #11
-            fo.write(f"{item.cls},") #12
-            fo.write(f"{item.subClass},") #13
+            if hasattr(item, "startQuest") and item.startQuest != 0: #5
+                outString += (f'{item.startQuest},')
+            else:
+                outString += ('nil,')
+
+            if len(item.quests) > 0: #6
+                outString += ('{')
+                # for quest in sorted(item.quests):
+                #     outString += (f'{quest},')
+                outString += ",".join(map(str, sorted(item.quests)))
+                outString += ('},')
+            else:
+                outString += ('nil,')
+            
+            if hasattr(item, "flags") and item.flags != 0: #7
+                outString += (f'{item.flags},')
+            else:
+                outString += ('nil,')
+
+            if hasattr(item, "foodType") and item.foodType != 0: #8
+                outString += (f"{item.foodType},")
+            else:
+                outString += ('nil,')
+            outString += (f"{item.itemlevel},") #9
+            outString += (f"{item.requiredlevel},") #10
+            outString += (f"{item.ammoType},") #11
+            outString += (f"{item.cls},") #12
+            outString += (f"{item.subClass},") #13
 
             if len(item.vendors) > 0: #14
-                fo.write('{')
-                for npcId in sorted(item.vendors):
-                    fo.write(f'{npcId},')
-                fo.write('},',)
+                outString += ('{')
+                # for npcId in sorted(item.vendors):
+                #     outString += (f'{npcId},')
+                outString += ",".join(map(str, sorted(item.vendors)))
+                outString += ('},')
             else:
-                fo.write('nil,')
+                outString += ('nil,')
 
-            fo.write('},\n')
+            outString += ('},\n')
         # EOF
-        fo.write('}]]\n')
+        outString += ('}]]\n')
+
+        #Remove trailing comma/data
+        for i in range(1, 10): #That degree really pays off!
+            outString = outString.replace('nil,}', '}')
+        outString = outString.replace(',}', '}')
+        outString = outString.replace(",nil}", "}")
+        outString = outString.replace("{}", "nil")
+
+        outfile.write(outString)
+        outfile.close()
 
 
     def writeList(self, fd, theList):
@@ -319,3 +346,18 @@ QuestieDB.itemData = [[return {
             fd.write('},')
         else:
             fd.write('nil,')
+
+    def getList(self, fd, theList):
+        if len(theList) > 0:
+            fd += ('{')
+            for thing in theList:
+                val = 0
+                if thing['mincountOrRef'] < 0:
+                    val = thing['mincountOrRef']
+                else:
+                    val = thing['id']
+                fd += (f'{val},')
+            fd += ('},')
+        else:
+            fd += ('nil,')
+        return fd

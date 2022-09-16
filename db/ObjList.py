@@ -157,41 +157,50 @@ QuestieDB.objectData = [[return {
                     name = escapeDoubleQuotes(obj.locales['name_loc'+str(localesMap[locale])])
                 else:
                     print('Missing translation for Object:', obj.name, '('+str(obj.id)+')' )
-            outfile.write(f'[{obj.id}] = {{"{obj.name}",') #1
+            outString += (f'[{obj.id}] = {{"{obj.name}",') #1
             if hasattr(obj, "start"): #2
-                outfile.write("{")
+                outString += ("{")
                 for quest in obj.start:
-                    outfile.write(str(quest)+",")
-                outfile.write("},")
+                    outString += (str(quest)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if hasattr(obj, "end"): #3
-                outfile.write("{")
+                outString += ("{")
                 for quest in obj.end:
-                    outfile.write(str(quest)+",")
-                outfile.write("},")
+                    outString += (str(quest)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if hasattr(obj, "spawns") and len(obj.spawns.cList) > 0: #4
-                outfile.write("{")
+                outString += ("{")
                 for zone in obj.spawns.cByZone:
                     if not zone in validZoneList:
                         if zoneId == 0:
                             zoneId = zone
-                        outfile.write("["+str(zone)+"]={{-1,-1}},") # ,"+str(len(obj.spawns.cByZone[zone]))+"
+                        outString += ("["+str(zone)+"]={{-1,-1}},") # ,"+str(len(obj.spawns.cByZone[zone]))+"
                         continue
                     if len(obj.spawns.cByZone[zone]) > lenSpawns:
                         lenSpawns = len(obj.spawns.cByZone[zone])
                         zoneId = zone
-                    outfile.write("["+str(zone)+"]={")
+                    outString += ("["+str(zone)+"]={")
                     for coords in obj.spawns.cByZone[zone]:
-                        outfile.write("{"+str(coords[0])+","+str(coords[1])+"},")
-                    outfile.write("},")
-                outfile.write("},")
+                        outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
+                    outString += ("},")
+                outString += ("},")
             else:
-                outfile.write("nil,")
-            outfile.write(str(zoneId)+",") #5
+                outString += ("nil,")
+            outString += (str(zoneId)+",") #5
             if obj.type == 19: # mailboxes
-                outfile.write(str(obj.faction)+",") #5
-            outfile.write("},\n")
-        outfile.write("}]]\n")
+                outString += (str(obj.faction)+",") #5
+            outString += ("},\n")
+        outString += ("}]]\n")
+
+        #Remove trailing comma/data
+        for i in range(1, 10): #That degree really pays off!
+            outString = outString.replace('nil,}', '}')
+        outString = outString.replace(",}", "}")
+        outString = outString.replace(",nil}", "}")
+        outString = outString.replace("{}", "nil")
+        outfile.write(outString)
+        outfile.close()

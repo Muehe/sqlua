@@ -175,6 +175,7 @@ QuestieDB.npcKeys = {
 
 QuestieDB.npcData = [[return {
 """)
+        outString = ""
         excludeTags =  ['[UNUSED]', '[Unused]', '[NOT USED]', '[VO]'] # These tags seem to be needed for some quests: ['[DND]', '[ph]', '[PH]', '[PH[', '[DNT]', '(DND)']
         skippedWaypoints = []
         for npcId in sorted(self.nList):
@@ -195,30 +196,30 @@ QuestieDB.npcData = [[return {
             name = npc.name
             if locale != 'enGB' and hasattr(npc, 'locales') and npc.locales['name_loc'+str(localesMap[locale])] != None:
                 name = escapeQuotes(npc.locales['name_loc'+str(localesMap[locale])])
-            outfile.write("["+str(npc.id)+"] = {'"+name+"'," #1
+            outString += ("["+str(npc.id)+"] = {'"+name+"'," #1
                                                   +str(npc.minlevelhealth)+"," #2
                                                   +str(npc.maxlevelhealth)+"," #3
                                                   +str(npc.minlevel)+"," #4
                                                   +str(npc.maxlevel)+"," #5
                                                   +str(npc.rank)+",") #6
             if hasattr(npc, "spawns") and len(npc.spawns.cList) > 0: #7
-                outfile.write("{")
+                outString += ("{")
                 for zone in npc.spawns.cByZone:
                     if not zone in validZoneList:
                         if zoneId == 0:
                             zoneId = zone
-                        outfile.write("["+str(zone)+"]={{-1,-1}},")
+                        outString += ("["+str(zone)+"]={{-1,-1}},")
                         continue
                     if len(npc.spawns.cByZone[zone]) > lenSpawns:
                         lenSpawns = len(npc.spawns.cByZone[zone])
                         zoneId = zone
-                    outfile.write("["+str(zone)+"]={")
+                    outString += ("["+str(zone)+"]={")
                     for coords in npc.spawns.cByZone[zone]:
-                        outfile.write("{"+str(coords[0])+","+str(coords[1])+"},")
-                    outfile.write("},")
-                outfile.write("},")
+                        outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
+                    outString += ("},")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if hasattr(npc, "waypoints"): #8
                 waypointsByZone = {}
                 for route in npc.waypoints:
@@ -250,44 +251,44 @@ QuestieDB.npcData = [[return {
                             waypointsByZone[lastZone] = []
                         waypointsByZone[lastZone].append(path)
                 if len(npc.spawns.cList) > 3: # Waypoints for NPCs with less than 4 spawns only, otherwise we get EVERYTHIIIIINNNGGGG
-                    outfile.write("nil,")
+                    outString += ("nil,")
                     skippedWaypoints.append(npc.id)
                 elif (len(waypointsByZone) > 0):
-                    outfile.write("{")
+                    outString += ("{")
                     for zone in waypointsByZone:
-                        outfile.write('['+str(zone)+']={')
+                        outString += ('['+str(zone)+']={')
                         for path in waypointsByZone[zone]:
-                            outfile.write('{')
+                            outString += ('{')
                             for wp in path:
-                                outfile.write('{')
-                                outfile.write(f'{wp[0]},{wp[1]}')
-                                outfile.write('},')
-                            outfile.write('},')
-                        outfile.write("},")
-                    outfile.write("},")
+                                outString += ('{')
+                                outString += (f'{wp[0]},{wp[1]}')
+                                outString += ('},')
+                            outString += ('},')
+                        outString += ("},")
+                    outString += ("},")
                 else:
-                    outfile.write("nil,")
+                    outString += ("nil,")
             else:
-                outfile.write("nil,")
-            outfile.write(str(zoneId)+",") #9
+                outString += ("nil,")
+            outString += (str(zoneId)+",") #9
             if hasattr(npc, "start"): #10
-                outfile.write("{")
+                outString += ("{")
                 for quest in npc.start:
-                    outfile.write(str(quest)+",")
-                outfile.write("},")
+                    outString += (str(quest)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if hasattr(npc, "end"): #11
-                outfile.write("{")
+                outString += ("{")
                 for quest in npc.end:
-                    outfile.write(str(quest)+",")
-                outfile.write("},")
+                    outString += (str(quest)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if hasattr(npc, "faction"): #12
-                outfile.write(str(npc.faction)+",")
+                outString += (str(npc.faction)+",")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
                 print(f"Error: No faction found for NPC {npc.name} ({npc.id})")
             friendlyTo = ""
             if not npc.hostileToA:
@@ -295,18 +296,28 @@ QuestieDB.npcData = [[return {
             if not npc.hostileToH:
                 friendlyTo += "H"
             if friendlyTo == "": #13
-                outfile.write("nil,")
+                outString += ("nil,")
             else:
-                outfile.write(f'"{friendlyTo}",')
+                outString += (f'"{friendlyTo}",')
             if (hasattr(npc, "subName") and npc.subName != None): #14
                 sn = npc.subName.replace('"', '\\"')
-                outfile.write(f'"{sn}",')
+                outString += (f'"{sn}",')
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if hasattr(npc, "npcFlags"): #15
-                outfile.write(f'{str(npc.npcFlags)},')
+                outString += (f'{str(npc.npcFlags)},')
             else:
-                outfile.write("nil,")
-            outfile.write("},\n")
-        outfile.write("}]]\n")
+                outString += ("nil,")
+            outString += ("},\n")
+        outString += ("}]]\n")
+        
+        #Remove trailing comma/data
+        for i in range(1, 10): #That degree really pays off!
+            outString = outString.replace('nil,}', '}')
+        outString = outString.replace(",}", "}")
+        outString = outString.replace(",nil}", "}")
+        outString = outString.replace("{}", "nil")
+
+        outfile.write(outString)
+        outfile.close()
         #print(f"Skipped waypoint IDs ({len(skippedWaypoints)}):", skippedWaypoints)

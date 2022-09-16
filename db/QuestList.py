@@ -375,221 +375,235 @@ QuestieDB.questKeys = {
 QuestieDB.questData = [[return {
 """)
         #excluded = self.checkStartEnd()
+        outString = ""
         for id in sorted(self.qList):
             quest = self.qList[id]
             #if quest in excluded:
             #    continue
-            outfile.write("["+str(quest.id)+"] = {") #key
+            outString += ("["+str(quest.id)+"] = {") #key
             title = quest.Title
             if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
                 title = escapeDoubleQuotes(quest.locales_Title[localesMap[locale]])
-            outfile.write("\""+title+"\",") #name = 1
-            outfile.write("{") #starts = 2
+            outString += ("\""+title+"\",") #name = 1
+            outString += ("{") #starts = 2
             if (hasattr(quest, "creatureStart")):
-                outfile.write("{") #npc = starts1
+                outString += ("{") #npc = starts1
                 for npc in quest.creatureStart:
-                    outfile.write(str(npc)+",")
-                outfile.write("},")
+                    outString += (str(npc)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "goStart")):
-                outfile.write("{") #obj = starts2
+                outString += ("{") #obj = starts2
                 for obj in quest.goStart:
-                    outfile.write(str(obj)+",")
-                outfile.write("},")
+                    outString += (str(obj)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "itemStart")):
-                outfile.write("{") #itm = starts3
+                outString += ("{") #itm = starts3
                 for itm in quest.itemStart:
-                    outfile.write(str(itm)+",")
-                outfile.write("},")
+                    outString += (str(itm)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
-            outfile.write("},")
-            outfile.write("{") #ends = 3
+                outString += ("nil,")
+            outString += ("},")
+            outString += ("{") #ends = 3
             if (hasattr(quest, "creatureEnd")): #npc = ends1
-                outfile.write("{")
+                outString += ("{")
                 for npc in quest.creatureEnd:
-                    outfile.write(str(npc)+",")
-                outfile.write("},")
+                    outString += (str(npc)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "goEnd")): #obj = ends2
-                outfile.write("{")
+                outString += ("{")
                 for obj in quest.goEnd:
-                    outfile.write(str(obj)+",")
-                outfile.write("},")
+                    outString += (str(obj)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
-            outfile.write("},")
-            outfile.write(str(quest.MinLevel)+",") #minLevel = 4
-            outfile.write(str(quest.QuestLevel)+",") #level = 5
-            outfile.write(f'{quest.RequiredRaces},') #RequiredRaces = 6
+                outString += ("nil,")
+            outString += ("},")
+            outString += (str(quest.MinLevel)+",") #minLevel = 4
+            outString += (str(quest.QuestLevel)+",") #level = 5
+            outString += (f'{quest.RequiredRaces},') #RequiredRaces = 6
             if (hasattr(quest, "RequiredClasses")): #RequiredClasses = 7
-                outfile.write(f"{quest.RequiredClasses},")
+                outString += (f"{quest.RequiredClasses},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, 'Objectives')): #objectives = 8
                 objectives = quest.Objectives.split('\\n')
                 if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
                     objectives = quest.locales_Title[localesMap[locale]].split('\\n')
-                outfile.write('{')
+                outString += ('{')
                 for line in objectives:
-                    outfile.write(f'"{line}",')
-                outfile.write('},')
+                    outString += (f'"{line}",')
+                outString += ('},')
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "triggerEnd")): #trigger = 9
-                outfile.write("{\""+quest.triggerEnd[0]+"\",{")
+                outString += ("{\""+quest.triggerEnd[0]+"\",{")
                 for zone in quest.triggerEnd[1].cByZone:
                     if zone not in validZoneList:
                         continue
-                    outfile.write("["+str(zone)+"]={")
+                    outString += ("["+str(zone)+"]={")
                     for c in quest.triggerEnd[1].cByZone[zone]:
-                        outfile.write("{"+str(c[0])+","+str(c[1])+"},")
-                    outfile.write("},")
-                outfile.write("}},")
+                        outString += ("{"+str(c[0])+","+str(c[1])+"},")
+                    outString += ("},")
+                outString += ("}},")
             else:
-                outfile.write("nil,")
-            outfile.write("{") #objectives = 10
+                outString += ("nil,")
+            outString += ("{") #objectives = 10
             if (hasattr(quest, "ReqCreatureId")): #npc = objectives1
-                outfile.write("{")
+                outString += ("{")
                 for npc in quest.ReqCreatureId:
-                    outfile.write("{"+str(npc[0]))
+                    outString += ("{"+str(npc[0]))
                     if npc[1] and (npc[1] != ''):
-                        outfile.write(",\""+npc[1]+"\"},")
+                        outString += (",\""+npc[1]+"\"},")
                     else:
-                        outfile.write(",nil},")
-                outfile.write("},")
+                        outString += (",nil},")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "ReqGOId")): #obj = objectives2
-                outfile.write("{")
+                outString += ("{")
                 for obj in quest.ReqGOId:
-                    outfile.write("{"+str(abs(obj[0]))+",\""+str(obj[1])+"\"},")
-                outfile.write("},")
+                    outString += ("{"+str(obj[0]))
+                    if obj[1] and (obj[1] != ''):
+                        outString += (",\""+obj[1]+"\"},")
+                    else:
+                        outString += (",nil},")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "ReqItemId")): #itm = objectives3
-                outfile.write("{")
+                outString += ("{")
                 if (hasattr(quest, "ReqItemId")):
                     for itm in quest.ReqItemId:
-                        outfile.write("{"+str(itm)+",nil},")
-                outfile.write("},")
+                        outString += ("{"+str(itm)+",nil},")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "RepObjectiveFaction")): #rep = objectives4
-                outfile.write("{"+str(quest.RepObjectiveFaction)+","+str(quest.RepObjectiveValue)+"},")
+                outString += ("{"+str(quest.RepObjectiveFaction)+","+str(quest.RepObjectiveValue)+"},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "killCreditData")): #multi-creatureID = objectives5
-                outfile.write("{")
+                outString += ("{")
                 for collection in quest.killCreditData:
-                    outfile.write("{{")
+                    outString += ("{{")
                     for mobId in collection[0]:
-                        outfile.write(str(mobId)+",")
-                    outfile.write(str(collection[1][0])) # write baseID into spawns, because some baseIDs do have actual spawns
-                    outfile.write("},")
-                    outfile.write(str(collection[1][0])+",")
+                        outString += (str(mobId)+",")
+                    outString += (str(collection[1][0])) # write baseID into spawns, because some baseIDs do have actual spawns
+                    outString += ("},")
+                    outString += (str(collection[1][0])+",")
                     if len(collection[1][1]) > 0:
-                        outfile.write("\""+collection[1][1]+"\"")
-                    outfile.write("},")
-                outfile.write("},")
-            outfile.write("},") #objectives = 10
+                        outString += ("\""+collection[1][1]+"\"")
+                    outString += ("},")
+                outString += ("},")
+            outString += ("},") #objectives = 10
             if (hasattr(quest, "SrcItemId")): #SrcItemId = 11
-                outfile.write(str(quest.SrcItemId)+",")
+                outString += (str(quest.SrcItemId)+",")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "PreQuestGroup")): # 12
-                outfile.write("{")
+                outString += ("{")
                 for questId in quest.PreQuestGroup:
-                    outfile.write(str(questId)+",")
-                outfile.write("},")
+                    outString += (str(questId)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "PreQuestSingle")): # 13
-                outfile.write("{")
+                outString += ("{")
                 for questId in quest.PreQuestSingle:
-                    outfile.write(str(questId)+",")
-                outfile.write("},")
+                    outString += (str(questId)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "ChildQuests")): # 14
-                outfile.write("{")
+                outString += ("{")
                 for questId in quest.ChildQuests:
-                    outfile.write(str(questId)+",")
-                outfile.write("},")
+                    outString += (str(questId)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "InGroupWith")): # 15
-                outfile.write("{")
+                outString += ("{")
                 for questId in quest.InGroupWith:
-                    outfile.write(str(questId)+",")
-                outfile.write("},")
+                    outString += (str(questId)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "ExclusiveTo")): # 16
-                outfile.write("{")
+                outString += ("{")
                 for questId in quest.ExclusiveTo:
-                    outfile.write(str(questId)+",")
-                outfile.write("},")
+                    outString += (str(questId)+",")
+                outString += ("},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "ZoneOrSort")): #17
-                outfile.write(str(quest.ZoneOrSort)+",")
+                outString += (str(quest.ZoneOrSort)+",")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "RequiredSkill")): #18
-                outfile.write("{"+str(quest.RequiredSkill)+","+str(quest.RequiredSkillValue)+"},")
+                outString += ("{"+str(quest.RequiredSkill)+","+str(quest.RequiredSkillValue)+"},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "RequiredMinRepFaction")): #19
-                outfile.write("{"+str(quest.RequiredMinRepFaction)+","+str(quest.RequiredMinRepValue)+"},")
+                outString += ("{"+str(quest.RequiredMinRepFaction)+","+str(quest.RequiredMinRepValue)+"},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, "RequiredMaxRepFaction")): #20
-                outfile.write("{"+str(quest.RequiredMaxRepFaction)+","+str(quest.RequiredMaxRepValue)+"},")
+                outString += ("{"+str(quest.RequiredMaxRepFaction)+","+str(quest.RequiredMaxRepValue)+"},")
             else:
-                outfile.write("nil,")
+                outString += ("nil,")
             if (hasattr(quest, 'ReqSourceId')): #21
-                outfile.write('{')
+                outString += ('{')
                 done = []
                 for itm in quest.ReqSourceId:
                     if itm in done:
                         continue
-                    outfile.write(f'{itm},')
+                    outString += (f'{itm},')
                     done.append(itm)
-                outfile.write('},')
+                outString += ('},')
             else:
-                outfile.write('nil,')
+                outString += ('nil,')
             if (hasattr(quest, 'NextQuestInChain')): #22
-                outfile.write(f'{quest.NextQuestInChain},')
+                outString += (f'{quest.NextQuestInChain},')
             else:
-                outfile.write('nil,')
+                outString += ('nil,')
             if (hasattr(quest, 'QuestFlags')): # 23
-                outfile.write(f'{quest.QuestFlags},')
+                outString += (f'{quest.QuestFlags},')
             else:
-                outfile.write('nil,')
+                outString += ('nil,')
             if (hasattr(quest, 'SpecialFlags')): # 24
-                outfile.write(f'{quest.SpecialFlags},')
+                outString += (f'{quest.SpecialFlags},')
             else:
-                outfile.write('nil,')
+                outString += ('nil,')
             if (hasattr(quest, 'ParentQuest')): # 25
-                outfile.write(f'{quest.ParentQuest},')
+                outString += (f'{quest.ParentQuest},')
             else:
-                outfile.write('nil,')
+                outString += ('nil,')
 
             if hasattr(quest, 'RepReward') and len(quest.RepReward) > 0: #26
-                outfile.write('{')
+                outString += ('{')
                 for factionId in sorted(quest.RepReward):
-                    outfile.write("{" + str(factionId) + ","+ str(quest.RepReward[factionId])+"},")
-                outfile.write('},')
+                    outString += ("{" + str(factionId) + ","+ str(quest.RepReward[factionId])+"},")
+                outString += ('},')
             else:
-                outfile.write('nil,')
-            outfile.write("},\n")
-        outfile.write("}]]\n")
-        outfile.close();
+                outString += ('nil,')
+            outString += ("},\n")
+        outString += ("}]]\n")
+
+        #Remove trailing comma/data
+        for i in range(1, 10): #That degree really pays off!
+            outString = outString.replace('nil,}', '}')
+        outString = outString.replace(",}", "}")
+        outString = outString.replace(",nil}", "}")
+        outString = outString.replace("{}", "nil")
+
+        outfile.write(outString)
+        outfile.close()
 
     def pfQuestFile(self, file='quests.lua', locale='enGB'):
         outfile = open(file, 'w')
