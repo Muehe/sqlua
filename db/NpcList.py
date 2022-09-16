@@ -310,14 +310,7 @@ QuestieDB.npcData = [[return {
                 outString += ("nil,")
             outString += ("},\n")
         outString += ("}]]\n")
-        
-        #Remove trailing comma/data
-        for i in range(1, 10): #That degree really pays off!
-            outString = outString.replace('nil,}', '}')
-        outString = outString.replace(",}", "}")
-        outString = outString.replace(",nil}", "}")
-        outString = outString.replace("{}", "nil")
 
-        outfile.write(outString)
+        outfile.write(removeTrailingData(outString))
         outfile.close()
         #print(f"Skipped waypoint IDs ({len(skippedWaypoints)}):", skippedWaypoints)

@@ -21,3 +21,12 @@ def escapeQuotes(inp):
         return inp
     name = inp.replace("'", "\\'").lstrip().rstrip()
     return name
+
+def removeTrailingData(inp):
+    #Remove trailing comma/data
+    for i in range(1, 10): #That degree really pays off!
+        inp = inp.replace('nil,}', '}')
+    inp = inp.replace(",}", "}")
+    inp = inp.replace(",nil}", "}")
+    inp = inp.replace("{}", "nil")
+    return inp
