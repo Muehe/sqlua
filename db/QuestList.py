@@ -205,32 +205,34 @@ class QuestList():
             # role 0=start, 1=end
             cursor.execute("SELECT actor, entry, quest, role FROM quest_relations")
             for a in cursor.fetchall():
+                entry = a[1]
+                quest = a[2]
                 if a[0] == 0:
                     if a[3] == 0:
-                        if a[1] in creature_questrelation:
-                            creature_questrelation[a[1]].append(a[2])
+                        if quest in creature_questrelation:
+                            creature_questrelation[quest].append((entry, quest))
                         else:
-                            creature_questrelation[a[1]] = []
-                            creature_questrelation[a[1]].append(a[2])
-                    else:
-                        if a[1] in creature_involvedrelation:
-                            creature_involvedrelation[a[1]].append(a[2])
+                            creature_questrelation[quest] = []
+                            creature_questrelation[quest].append((entry, quest))
+                    elif a[3] == 1:
+                        if quest in creature_involvedrelation:
+                            creature_involvedrelation[quest].append((entry, quest))
                         else:
-                            creature_involvedrelation[a[1]] = []
-                            creature_involvedrelation[a[1]].append(a[2])
+                            creature_involvedrelation[quest] = []
+                            creature_involvedrelation[quest].append((entry, quest))
                 elif a[0] == 1:
                     if a[3] == 0:
-                        if a[1] in gameobject_questrelation:
-                            gameobject_questrelation[a[1]].append(a[2])
+                        if quest in gameobject_questrelation:
+                            gameobject_questrelation[quest].append((entry, quest))
                         else:
-                            gameobject_questrelation[a[1]] = []
-                            gameobject_questrelation[a[1]].append(a[2])
+                            gameobject_questrelation[quest] = []
+                            gameobject_questrelation[quest].append((entry, quest))
                     elif a[3] == 1:
-                        if a[1] in gameobject_involvedrelation:
-                            gameobject_involvedrelation[a[1]].append(a[2])
+                        if quest in gameobject_involvedrelation:
+                            gameobject_involvedrelation[quest].append((entry, quest))
                         else:
-                            gameobject_involvedrelation[a[1]] = []
-                            gameobject_involvedrelation[a[1]].append(a[2])
+                            gameobject_involvedrelation[quest] = []
+                            gameobject_involvedrelation[quest].append((entry, quest))
         else:
             print("  SELECT creature_involvedrelation")
             cursor.execute("SELECT id, quest FROM creature_involvedrelation")
