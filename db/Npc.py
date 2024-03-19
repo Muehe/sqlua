@@ -82,6 +82,7 @@ def getFactionTemplate(fac):
 factionTemplateClassic = getFactionTemplate('data/classic/FactionTemplate.dbc.CSV')
 factionTemplateTBC = getFactionTemplate('data/tbc/FactionTemplate.dbc.CSV')
 factionTemplateWotLK = getFactionTemplate('data/wotlk/FactionTemplate.dbc.CSV')
+factionTemplateCata = getFactionTemplate('data/cata/FactionTemplate.dbc.CSV')
 
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
@@ -103,6 +104,11 @@ class Npc():
             movementZones = movementZonesWotLK
             movementTemplateZones = movementTemplateZonesWotLK
             factionTemplate = factionTemplateWotLK
+        elif version == 'cata':
+            zones = zonesWotLK # TODO: Add cata version
+            movementZones = movementZonesWotLK # TODO: Add cata version
+            movementTemplateZones = movementTemplateZonesWotLK # TODO: Add cata version
+            factionTemplate = factionTemplateCata
         self.id = npc[0]
         self.debug = debug
         self.name = escapeQuotes(npc[1])
