@@ -144,7 +144,10 @@ class NpcList():
                     npc_end[a[0]].append(a)
 
         print("  SELECT creature_movement")
-        cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
+        if self.version == 'cata':
+            cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
+        else:
+            cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
         npc_mov = {}
         for a in cursor.fetchall():
             if(a[1] in npc_mov):
