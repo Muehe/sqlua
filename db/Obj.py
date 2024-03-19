@@ -27,6 +27,8 @@ class Obj():
             objectZones = objectZonesTBC
         elif version == 'wotlk':
             objectZones = objectZonesWotLK
+        elif version == 'cata':
+            objectZones = objectZonesWotLK # TODO: cata version
         self.id = obj[0]
         self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]
