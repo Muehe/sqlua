@@ -68,7 +68,11 @@ class ItemList():
         ret = {}
 
         print("  SELECT item_template")
-        dictCursor.execute("SELECT entry AS id, name, Flags, startquest, FoodType, ItemLevel, RequiredLevel, ammo_type, class, subclass FROM item_template")
+        if self.version == "cata":
+            # TODO: Fix ammo_type even though we don't need it?
+            dictCursor.execute("SELECT entry AS id, name, Flags, startquest, FoodType, ItemLevel, RequiredLevel, 0 as ammo_type, class, subclass FROM item_template")
+        else:
+            dictCursor.execute("SELECT entry AS id, name, Flags, startquest, FoodType, ItemLevel, RequiredLevel, ammo_type, class, subclass FROM item_template")
         ret['item_template'] = dictCursor.fetchall()
 
         print("  SELECT creature_loot_template")
