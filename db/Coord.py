@@ -15,6 +15,8 @@ class Coord():
             mapBorders = mapBordersTBC
         elif version == 'wotlk':
             mapBorders = mapBordersWotLK
+        elif version == 'cata':
+            mapBorders = mapBordersWotLK # TODO: cata version
         for mapSet in mapBorders:
             zone = int(mapSet[0])
             if (not (zoneId == False)) and (zone != zoneId):
