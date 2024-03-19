@@ -63,8 +63,8 @@ class ObjList():
             obj_tpl.append(a)
 
         if self.version == 'cata':
-            print(" SELECT gameobject JOINED pool_gameobject")
-            cursor.execute("SELECT id, map, position_x, position_y, guid FROM gameobject WHERE guid IN (SELECT guid FROM pool_gameobject)")
+            print(" SELECT gameobject")
+            cursor.execute("SELECT id, map, position_x, position_y, guid FROM gameobject")
             obj = {}
             for a in cursor.fetchall():
                 if a[0] not in obj:
