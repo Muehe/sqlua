@@ -69,8 +69,8 @@ class NpcList():
             npc_tpl.append(a)
 
         if self.version == 'cata':
-            print('  SELECT creature JOINED pool_creature')
-            cursor.execute('SELECT id, map, position_x, position_y, guid FROM creature WHERE guid IN (SELECT guid FROM pool_creature)')
+            print('  SELECT creature')
+            cursor.execute('SELECT id, map, position_x, position_y, guid FROM creature')
             npc = {}
             for a in cursor.fetchall():
                 if a[0] not in npc:
