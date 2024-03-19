@@ -68,30 +68,39 @@ class NpcList():
         for a in cursor.fetchall():
             npc_tpl.append(a)
 
-        print('  SELECT creature_spawn_entry')
-        cursor.execute('SELECT * FROM creature_spawn_entry')
-        npc_spawn_entry = {}
-        for guid, entry in cursor.fetchall():
-            if guid not in npc_spawn_entry:
-                npc_spawn_entry[guid] = []
-            npc_spawn_entry[guid].append(entry)
+        if self.version == 'cata':
+            print('  SELECT creature JOINED pool_creature')
+            cursor.execute('SELECT id, map, position_x, position_y, guid FROM creature WHERE guid IN (SELECT guid FROM pool_creature)')
+            npc = {}
+            for a in cursor.fetchall():
+                if a[0] not in npc:
+                    npc[a[0]] = []
+                npc[a[0]].append(a)
+        else:
+            print('  SELECT creature_spawn_entry')
+            cursor.execute('SELECT * FROM creature_spawn_entry')
+            npc_spawn_entry = {}
+            for guid, entry in cursor.fetchall():
+                if guid not in npc_spawn_entry:
+                    npc_spawn_entry[guid] = []
+                npc_spawn_entry[guid].append(entry)
 
-        print("  SELECT creature")
-        cursor.execute("SELECT id, map, position_x, position_y, guid FROM creature")
-        npc = {}
-        for a in cursor.fetchall():
-            if (a[0] == 0):
-                if a[4] in npc_spawn_entry:
-                    for entry in npc_spawn_entry[a[4]]:
-                        if entry not in npc:
-                            npc[entry] = []
-                        npc[entry].append(a)
-                #else:
-                    #print(f'Missing entry for GUID {a[4]}')
-                continue
-            elif(a[0] not in npc):
-                npc[a[0]] = []
-            npc[a[0]].append(a)
+            print("  SELECT creature")
+            cursor.execute("SELECT id, map, position_x, position_y, guid FROM creature")
+            npc = {}
+            for a in cursor.fetchall():
+                if (a[0] == 0):
+                    if a[4] in npc_spawn_entry:
+                        for entry in npc_spawn_entry[a[4]]:
+                            if entry not in npc:
+                                npc[entry] = []
+                            npc[entry].append(a)
+                    #else:
+                        #print(f'Missing entry for GUID {a[4]}')
+                    continue
+                elif(a[0] not in npc):
+                    npc[a[0]] = []
+                npc[a[0]].append(a)
 
         print("  SELECT creature_questrelation")
         cursor.execute("SELECT * FROM creature_questrelation")
