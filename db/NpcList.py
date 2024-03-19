@@ -157,7 +157,10 @@ class NpcList():
                 npc_mov[a[1]].append(a)
 
         print("  SELECT creature_movement_template")
-        cursor.execute("SELECT point, entry, PositionX, PositionY, PathId FROM creature_movement_template")
+        if self.version == 'cata':
+            cursor.execute("SELECT point, entry, position_x, position_y, wpguid FROM creature_movement_template")
+        else:
+            cursor.execute("SELECT point, entry, PositionX, PositionY, PathId FROM creature_movement_template")
         npc_mov_tpl = {}
         for a in cursor.fetchall():
             if(a[1] in npc_mov_tpl):
