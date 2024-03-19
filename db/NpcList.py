@@ -59,7 +59,11 @@ class NpcList():
         print("Selecting NPC related MySQL tables...")
 
         print("  SELECT creature_template")
-        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
+        if self.version == 'cata':
+            # FactionAlliance and FactionHorde seem to contain the same data
+            cursor.execute("SELECT Entry, Name, MinLevel, MaxLevel, MinLevelHealth, MaxLevelHealth, `Rank`, FactionAlliance, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
+        else:
+            cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
         npc_tpl = []
         for a in cursor.fetchall():
             npc_tpl.append(a)
