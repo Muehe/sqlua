@@ -102,25 +102,46 @@ class NpcList():
                     npc[a[0]] = []
                 npc[a[0]].append(a)
 
-        print("  SELECT creature_questrelation")
-        cursor.execute("SELECT * FROM creature_questrelation")
-        npc_start = {}
-        for a in cursor.fetchall():
-            if(a[0] in npc_start):
-                npc_start[a[0]].append(a)
-            else:
-                npc_start[a[0]] = []
-                npc_start[a[0]].append(a)
+        if self.version == 'cata':
+            print("  SELECT quest_relation")
+            npc_start = {}
+            npc_end = {}
+            # actor 0=creature, 1=gameobject
+            # entry=creature_template.entry or gameobject_template.entry
+            # quest=quest_template.entry
+            # role 0=start, 1=end
+            cursor.execute("SELECT entry, quest, role FROM quest_relations WHERE actor=0")
+            for a in cursor.fetchall():
+                entry = a[0]
+                quest = a[1]
+                if a[2] == 0:
+                    if quest not in npc_start:
+                        npc_start[quest] = []
+                    npc_start[quest].append((entry, quest))
+                elif a[2] == 1:
+                    if quest not in npc_end:
+                        npc_end[quest] = []
+                    npc_end[quest].append((entry, quest))
+        else:
+            print("  SELECT creature_questrelation")
+            cursor.execute("SELECT * FROM creature_questrelation")
+            npc_start = {}
+            for a in cursor.fetchall():
+                if(a[0] in npc_start):
+                    npc_start[a[0]].append(a)
+                else:
+                    npc_start[a[0]] = []
+                    npc_start[a[0]].append(a)
 
-        print("  SELECT creature_involvedrelation")
-        cursor.execute("SELECT * FROM creature_involvedrelation")
-        npc_end = {}
-        for a in cursor.fetchall():
-            if(a[0] in npc_end):
-                npc_end[a[0]].append(a)
-            else:
-                npc_end[a[0]] = []
-                npc_end[a[0]].append(a)
+            print("  SELECT creature_involvedrelation")
+            cursor.execute("SELECT * FROM creature_involvedrelation")
+            npc_end = {}
+            for a in cursor.fetchall():
+                if(a[0] in npc_end):
+                    npc_end[a[0]].append(a)
+                else:
+                    npc_end[a[0]] = []
+                    npc_end[a[0]].append(a)
 
         print("  SELECT creature_movement")
         cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
