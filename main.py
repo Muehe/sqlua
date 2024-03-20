@@ -14,7 +14,7 @@ import time
 version = config.version
 debug = config.debug
 
-if version not in ['classic', 'tbc', 'wotlk']:
+if version not in ['classic', 'tbc', 'wotlk', 'cata']:
     print(f'Unknown version {version}')
     sys.exit(1)
 

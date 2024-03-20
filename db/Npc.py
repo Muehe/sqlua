@@ -17,6 +17,7 @@ def getCreatureZones(file):
 zonesClassic = getCreatureZones('data/classic/creature_preExtract.csvzone_and_area.csv')
 zonesTBC = getCreatureZones('data/tbc/creature_preExtract.csvzone_and_area.csv')
 zonesWotLK = getCreatureZones('data/wotlk/creature_preExtract.csvzone_and_area.csv')
+zonesCata = getCreatureZones('data/cata/creature_preExtract.csvzone_and_area.csv')
 
 def getCreatureWaypoints(file):
     infile = open(file, "r")
@@ -64,6 +65,9 @@ movementTemplateZonesTBC = getCreatureTemplateWaypoints('data/tbc/creature_movem
 movementZonesWotLK = getCreatureWaypoints('data/wotlk/creature_movement_preExtract.csvzone_and_area.csv')
 movementTemplateZonesWotLK = getCreatureTemplateWaypoints('data/wotlk/creature_movement_template_preExtract.csvzone_and_area.csv')
 
+movementZonesCata = getCreatureWaypoints('data/cata/creature_movement_preExtract.csvzone_and_area.csv')
+movementTemplateZonesCata = getCreatureTemplateWaypoints('data/cata/creature_movement_template_preExtract.csvzone_and_area.csv')
+
 def getFactionTemplate(fac):
     content = ""
     with open(fac, "r") as infile:
@@ -105,9 +109,9 @@ class Npc():
             movementTemplateZones = movementTemplateZonesWotLK
             factionTemplate = factionTemplateWotLK
         elif version == 'cata':
-            zones = zonesWotLK # TODO: Add cata version
-            movementZones = movementZonesWotLK # TODO: Add cata version
-            movementTemplateZones = movementTemplateZonesWotLK # TODO: Add cata version
+            zones = zonesCata
+            movementZones = movementZonesCata
+            movementTemplateZones = movementTemplateZonesCata
             factionTemplate = factionTemplateCata
         self.id = npc[0]
         self.debug = debug
