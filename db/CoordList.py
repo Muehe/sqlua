@@ -7,13 +7,13 @@ class CoordList():
         self.cByZone = {}
         self.debug = debug
         for coord in coordTable:
-            if len(coord) > 3:
-                self.addCoord(coord[0], coord[1], coord[2], version, coord[3])
+            if len(coord) > 4:
+                self.addCoord(coord[0], coord[1], coord[2], version, coord[3], coord[4])
             else:
-                self.addCoord(coord[0], coord[1], coord[2], version)
+                self.addCoord(coord[0], coord[1], coord[2], version, False, 0)
 
-    def addCoord(self, map, x, y, version, zone=False):
-        newCoord = Coord(map, x, y,version, zone, debug=self.debug)
+    def addCoord(self, map, x, y, version, zone, phaseMask):
+        newCoord = Coord(map, x, y,version, zone, phaseMask, debug=self.debug)
         if not newCoord.noZone:
             self.cList.append(newCoord)
             for zone in newCoord.zoneList:

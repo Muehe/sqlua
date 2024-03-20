@@ -70,7 +70,7 @@ class NpcList():
 
         if self.version == 'cata':
             print('  SELECT creature')
-            cursor.execute('SELECT id, map, position_x, position_y, guid FROM creature')
+            cursor.execute('SELECT id, map, position_x, position_y, guid, phaseMask FROM creature')
             npc = {}
             for a in cursor.fetchall():
                 if a[0] not in npc:
@@ -255,7 +255,10 @@ QuestieDB.npcData = [[return {
                         zoneId = zone
                     outString += ("["+str(zone)+"]={")
                     for coords in npc.spawns.cByZone[zone]:
-                        outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
+                        if len(coords) == 3:
+                            outString += ("{"+str(coords[0])+","+str(coords[1])+","+str(coords[2])+"},")
+                        else:
+                            outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
                     outString += ("},")
                 outString += ("},")
             else:

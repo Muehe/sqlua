@@ -139,13 +139,13 @@ class Npc():
             if self.id in dicts['npc']:
                 rawSpawns = dicts['npc'][self.id]
                 for spawn in rawSpawns:
-                    # id, map, position_x, position_y, guid
+                    # id, map, position_x, position_y, guid, phaseMask
                     if (spawn[0] == self.id) or (spawn[0] == 0):
                         # get spawns
                         if spawn[4] in zones:
-                            spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
+                            spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]], spawn[5]))
                         else:
-                            spawns.append((spawn[1], spawn[2], spawn[3]))
+                            spawns.append((spawn[1], spawn[2], spawn[3], False, spawn[5]))
                         # get waypoints
                         npcMovement = None
                         if spawn[4] in dicts['npc_movement']:
