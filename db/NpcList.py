@@ -60,8 +60,8 @@ class NpcList():
 
         print("  SELECT creature_template")
         if self.version == 'cata':
-            # FactionAlliance and FactionHorde seem to contain the same data
-            cursor.execute("SELECT Entry, Name, MinLevel, MaxLevel, MinLevelHealth, MaxLevelHealth, `Rank`, FactionAlliance, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
+            # TODO: Add missing columns
+            cursor.execute("SELECT entry, name, 0 as MinLevel, 0 as MaxLevel, 0 as MinLevelHealth, 0 as MaxLevelHealth, 0 as `Rank`, faction, subname, npcflag, KillCredit1, KillCredit2 FROM creature_template WHERE entry != 211770")
         else:
             cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
         npc_tpl = []
@@ -70,7 +70,7 @@ class NpcList():
 
         if self.version == 'cata':
             print('  SELECT creature')
-            cursor.execute('SELECT id, map, position_x, position_y, guid, phaseMask FROM creature')
+            cursor.execute('SELECT id, map, position_x, position_y, guid, PhaseId FROM creature WHERE PhaseId <= 670')
             npc = {}
             for a in cursor.fetchall():
                 if a[0] not in npc:
@@ -103,25 +103,25 @@ class NpcList():
                 npc[a[0]].append(a)
 
         if self.version == 'cata':
-            print("  SELECT quest_relation")
+            print("  SELECT creature_queststarter")
             npc_start = {}
-            npc_end = {}
-            # actor 0=creature, 1=gameobject
-            # entry=creature_template.entry or gameobject_template.entry
-            # quest=quest_template.entry
-            # role 0=start, 1=end
-            cursor.execute("SELECT entry, quest, role FROM quest_relations WHERE actor=0")
+            cursor.execute("SELECT id, quest FROM creature_queststarter")
             for a in cursor.fetchall():
                 entry = a[0]
                 quest = a[1]
-                if a[2] == 0:
-                    if quest not in npc_start:
-                        npc_start[quest] = []
-                    npc_start[quest].append((entry, quest))
-                elif a[2] == 1:
-                    if quest not in npc_end:
-                        npc_end[quest] = []
-                    npc_end[quest].append((entry, quest))
+                if quest not in npc_start:
+                    npc_start[quest] = []
+                npc_start[quest].append((entry, quest))
+
+            print("  SELECT creature_questender")
+            npc_end = {}
+            cursor.execute("SELECT id, quest FROM creature_questender")
+            for a in cursor.fetchall():
+                entry = a[0]
+                quest = a[1]
+                if quest not in npc_end:
+                    npc_end[quest] = []
+                npc_end[quest].append((entry, quest))
         else:
             print("  SELECT creature_questrelation")
             cursor.execute("SELECT * FROM creature_questrelation")
@@ -143,38 +143,38 @@ class NpcList():
                     npc_end[a[0]] = []
                     npc_end[a[0]].append(a)
 
-        print("  SELECT creature_movement")
-        if self.version == 'cata':
-            cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
-        else:
-            cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
+        # print("  SELECT creature_movement")
+        # if self.version == 'cata':
+        #     cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
+        # else:
+        #     cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
         npc_mov = {}
-        for a in cursor.fetchall():
-            if(a[1] in npc_mov):
-                npc_mov[a[1]].append(a)
-            else:
-                npc_mov[a[1]] = []
-                npc_mov[a[1]].append(a)
-
-        print("  SELECT creature_movement_template")
-        if self.version == 'cata':
-            cursor.execute("SELECT point, entry, position_x, position_y, wpguid FROM creature_movement_template")
-        else:
-            cursor.execute("SELECT point, entry, PositionX, PositionY, PathId FROM creature_movement_template")
+        # for a in cursor.fetchall():
+        #     if(a[1] in npc_mov):
+        #         npc_mov[a[1]].append(a)
+        #     else:
+        #         npc_mov[a[1]] = []
+        #         npc_mov[a[1]].append(a)
+        #
+        # print("  SELECT creature_movement_template")
+        # if self.version == 'cata':
+        #     cursor.execute("SELECT point, entry, position_x, position_y, wpguid FROM creature_movement_template")
+        # else:
+        #     cursor.execute("SELECT point, entry, PositionX, PositionY, PathId FROM creature_movement_template")
         npc_mov_tpl = {}
-        for a in cursor.fetchall():
-            if(a[1] in npc_mov_tpl):
-                npc_mov_tpl[a[1]].append(a)
-            else:
-                npc_mov_tpl[a[1]] = []
-                npc_mov_tpl[a[1]].append(a)
-
-        print("  SELECT locales_creature")
-        count = dictCursor.execute("SELECT * FROM locales_creature")
+        # for a in cursor.fetchall():
+        #     if(a[1] in npc_mov_tpl):
+        #         npc_mov_tpl[a[1]].append(a)
+        #     else:
+        #         npc_mov_tpl[a[1]] = []
+        #         npc_mov_tpl[a[1]].append(a)
+        #
+        # print("  SELECT locales_creature")
+        # count = dictCursor.execute("SELECT * FROM locales_creature")
         loc_npc = {}
-        for _ in range(0, count):
-            q = dictCursor.fetchone()
-            loc_npc[q['entry']] = q
+        # for _ in range(0, count):
+        #     q = dictCursor.fetchone()
+        #     loc_npc[q['entry']] = q
 
         print("Done.")
         return {'npc_template':npc_tpl,
@@ -220,6 +220,9 @@ QuestieDB.npcData = [[return {
         skippedWaypoints = []
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
+            if not npc.name:
+                # 211770 has no name
+                continue
             foundTag = False
             for tag in excludeTags:
                 if tag in npc.name:

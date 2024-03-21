@@ -32,6 +32,7 @@ def recache():
 
 def main(recache):
     """Extracts and prints quest related data"""
+    # TODO: Add args to extract and print only specific files
     quests, npcs, objects, items = getClassInstances(recache)
     print("Printing files...")
     quests.printQuestFile(f'output/{version}/{version}QuestDB.lua')
