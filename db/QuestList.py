@@ -73,7 +73,7 @@ class QuestList:
             quest = self.qList[questId]
             if quest in excluded:
                 continue
-            if hasattr(quest, "ExclusiveGroup"):
+            if hasattr(quest, "ExclusiveGroup") and quest.ExclusiveGroup is not None:
                 group = self.allQuests(ExclusiveGroup = quest.ExclusiveGroup)
                 for q in group:
                     if q in excluded:
@@ -96,7 +96,7 @@ class QuestList:
             quest = self.qList[questId]
             if quest in excluded:
                 continue
-            if hasattr(quest, "PrevQuestId"):
+            if hasattr(quest, "PrevQuestId") and quest.PrevQuestId is not None:
                 if quest.PrevQuestId > 0:
                     # this should be the proper way to do it according to wiki, but due to the core handeling it differently the following fragment is deactivated
                     # left here in case I want to debug the core/db later
@@ -111,7 +111,7 @@ class QuestList:
                 else: # quest.PrevQuestId < 0
                     self.qList[abs(quest.PrevQuestId)].addChild(questId)
                     self.qList[questId].setParent(abs(quest.PrevQuestId))
-            if hasattr(quest, "NextQuestId"):
+            if hasattr(quest, "NextQuestId") and quest.NextQuestId is not None:
                 if quest.NextQuestId > 0:
                     postQuest = self.qList[quest.NextQuestId]
                     if hasattr(quest, "InGroupWith"):
