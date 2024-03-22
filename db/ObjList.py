@@ -7,23 +7,26 @@ import pickle
 
 class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, version, extractSpawns=True, recache=False):
+    def __init__(self, version):
         self.version = version
-        if (not os.path.isfile(f'data/{version}/objects.pkl') or recache):
+
+    def run(self, cursor, dictCursor, extractSpawns=True, recache=False):
+        if (not os.path.isfile(f'data/{self.version}/objects.pkl') or recache):
             print('Caching objects...')
-            self.cacheObjects(cursor, dictCursor, extractSpawns)
+            dicts = self.getObjTables(cursor, dictCursor)
+            self.cacheObjects(dicts, extractSpawns)
         else:
             try:
-                with open(f'data/{version}/objects.pkl', 'rb') as f:
+                with open(f'data/{self.version}/objects.pkl', 'rb') as f:
                     self.objectList = pickle.load(f)
                 print('Using cached objects.')
             except:
                 print('ERROR: Something went wrong while loading cached objects. Re-caching.')
-                self.cacheObjects(cursor, dictCursor, extractSpawns)
+                dicts = self.getObjTables(cursor, dictCursor)
+                self.cacheObjects(dicts, extractSpawns)
 
-    def cacheObjects(self, cursor, dictCursor, extractSpawns=True):
+    def cacheObjects(self, dicts, extractSpawns=True):
         self.objectList = {}
-        dicts = self.getObjTables(cursor, dictCursor)
         count = len(dicts['object_template'])
         print(f'Caching {count} objects...')
         for obj in dicts['object_template']:
