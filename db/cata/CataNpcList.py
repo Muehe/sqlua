@@ -11,7 +11,7 @@ class CataNpcList(NpcList):
         super().__init__(version, debug)
 
     def run(self, cursor, dictCursor, recache=False, extractSpawns=True):
-        if (not os.path.isfile(f'data/cata/npcs.pkl') or recache):
+        if not os.path.isfile(f'data/cata/npcs.pkl') or recache:
             print('Caching NPCs...')
             dicts = self.getNpcTables(cursor, dictCursor)
             self.cacheNpcs(dicts, extractSpawns)
@@ -30,7 +30,8 @@ class CataNpcList(NpcList):
 
         print("  SELECT creature_template")
         # FactionAlliance and FactionHorde seem to contain the same data
-        cursor.execute("SELECT Entry, Name, MinLevel, MaxLevel, MinLevelHealth, MaxLevelHealth, `Rank`, FactionAlliance, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
+        cursor.execute(
+            "SELECT Entry, Name, MinLevel, MaxLevel, MinLevelHealth, MaxLevelHealth, `Rank`, FactionAlliance, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
         npc_tpl = []
         for a in cursor.fetchall():
             npc_tpl.append(a)
@@ -91,11 +92,12 @@ class CataNpcList(NpcList):
             loc_npc[q['entry']] = q
 
         print("Done.")
-        return {'npc_template': npc_tpl,
-                'npc': npc,
-                'npc_start': npc_start,
-                'npc_end': npc_end,
-                'npc_movement': npc_mov,
-                'npc_movement_template': npc_mov_tpl,
-                'locales_npc': loc_npc,
-                }
+        return {
+            'npc_template': npc_tpl,
+            'npc': npc,
+            'npc_start': npc_start,
+            'npc_end': npc_end,
+            'npc_movement': npc_mov,
+            'npc_movement_template': npc_mov_tpl,
+            'locales_npc': loc_npc,
+        }

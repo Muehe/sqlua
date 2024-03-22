@@ -9,7 +9,7 @@ class CataItemList(ItemList):
         super().__init__(version)
 
     def run(self, dictCursor, locale="enGB", recache=False):
-        if (not os.path.isfile(f'data/cata/items.pkl') or recache):
+        if not os.path.isfile(f'data/cata/items.pkl') or recache:
             print('Caching items...')
             tables = self.__getItemTables(dictCursor)
             self.cacheItems(tables, locale)

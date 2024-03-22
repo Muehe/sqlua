@@ -9,7 +9,7 @@ class CataObjList(ObjList):
         super().__init__(version)
 
     def run(self, cursor, extractSpawns=True, recache=False):
-        if (not os.path.isfile(f'data/cata/objects.pkl') or recache):
+        if not os.path.isfile(f'data/cata/objects.pkl') or recache:
             print('Caching objects...')
             dicts = self.getObjTables(cursor)
             self.cacheObjects(dicts, extractSpawns)
@@ -63,15 +63,17 @@ class CataObjList(ObjList):
         cursor.execute("SELECT * FROM locales_gameobject")
         loc_obj = {}
         for a in cursor.fetchall():
-            if(a[0] in loc_obj):
+            if (a[0] in loc_obj):
                 loc_obj[a[0]].append(a)
             else:
                 loc_obj[a[0]] = []
                 loc_obj[a[0]].append(a)
 
         print("Done.")
-        return {'object_template':obj_tpl,
-                'object':obj,
-                'object_start':obj_start,
-                'object_end':obj_end,
-                'locales_object':loc_obj}
+        return {
+            'object_template': obj_tpl,
+            'object': obj,
+            'object_start': obj_start,
+            'object_end': obj_end,
+            'locales_object': loc_obj
+        }

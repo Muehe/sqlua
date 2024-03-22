@@ -27,7 +27,8 @@ class CataQuestList(QuestList):
     def __getQuestTables(self, cursor, dictCursor):
         print("Selecting quest related MySQL tables...")
         print("  SELECT quest_template")
-        cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5 FROM quest_template")
+        cursor.execute(
+            "SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5 FROM quest_template")
         quest_template = []
         for a in cursor.fetchall():
             quest_template.append(a)
@@ -112,12 +113,14 @@ class CataQuestList(QuestList):
             q = dictCursor.fetchone()
             loc_quests[q['entry']] = q
         print("Done.")
-        return {'quest_template': quest_template,
-                'creature_killcredit': creature_killcredit,
-                'creature_involvedrelation': creature_involvedrelation,
-                'gameobject_involvedrelation': gameobject_involvedrelation,
-                'creature_questrelation': creature_questrelation,
-                'gameobject_questrelation': gameobject_questrelation,
-                'item_questrelation': item_questrelation,
-                'areatrigger_involvedrelation': areatrigger_involvedrelation,
-                'locales_quest': loc_quests}
+        return {
+            'quest_template': quest_template,
+            'creature_killcredit': creature_killcredit,
+            'creature_involvedrelation': creature_involvedrelation,
+            'gameobject_involvedrelation': gameobject_involvedrelation,
+            'creature_questrelation': creature_questrelation,
+            'gameobject_questrelation': gameobject_questrelation,
+            'item_questrelation': item_questrelation,
+            'areatrigger_involvedrelation': areatrigger_involvedrelation,
+            'locales_quest': loc_quests
+        }
