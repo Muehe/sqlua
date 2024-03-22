@@ -92,6 +92,8 @@ if __name__ == "__main__":
                 reCache = True
             elif arg in ['classic', 'tbc', 'wotlk', 'cata']:
                 version = arg
+            elif arg in ['mangos', 'trinity']:
+                db_flavor = arg
             else:
                 print(f'Unknown argument "{arg}"')
     print(f'Using version {version}')
