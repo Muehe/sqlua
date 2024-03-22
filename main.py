@@ -26,14 +26,14 @@ def getClassInstances(recache=False):
     if version == 'cata':
         quests = CataQuestList(version)
         quests.run(cursor, dictCursor, recache)
-        npcs = CataNpcList(version, debug=debug)
+        npcs = CataNpcList(version, debug)
         npcs.run(cursor, dictCursor, recache)
         obj = CataObjList(version)
         obj.run(cursor, dictCursor, recache=recache)
     else:
         quests = QuestList(version)
         quests.run(cursor, dictCursor, recache)
-        npcs = NpcList(version, debug=debug)
+        npcs = NpcList(version, debug)
         npcs.run(cursor, dictCursor, recache)
         obj = ObjList(version)
         obj.run(cursor, dictCursor, recache=recache)
