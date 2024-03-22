@@ -67,7 +67,7 @@ def read_trinity_quest_list(cursor, dictCursor):
         qt.RewardFactionValue4,  # 60
         qt.RewardFactionValue5  # 61
         
-        FROM quest_template as qt INNER JOIN quest_template_addon as qta ON qt.ID = qta.ID
+        FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
     """)
 
     quest_template = []
