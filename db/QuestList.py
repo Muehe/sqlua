@@ -6,9 +6,9 @@ import os.path
 import pickle
 
 
-class QuestList():
+class QuestList:
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, version, recache=False):
+    def __init__(self, version):
         self.version = version
         self.raceIDs = {
             'NONE': 0,
@@ -33,22 +33,25 @@ class QuestList():
             self.raceIDs['ALLIANCE'] = 1101
             self.raceIDs['HORDE'] = 690
             self.raceIDs['ALL'] = 1791
-        if (not os.path.isfile(f'data/{version}/quests.pkl') or recache):
+
+    def run(self, cursor, dictCursor, recache=False):
+        if (not os.path.isfile(f'data/{self.version}/quests.pkl') or recache):
             print('Caching quests...')
-            self.cacheQuests(cursor, dictCursor)
+            dicts = self.__getQuestTables(cursor, dictCursor)
+            self.cacheQuests(cursor, dictCursor, dicts)
         else:
             try:
-                with open(f'data/{version}/quests.pkl', 'rb') as f:
+                with open(f'data/{self.version}/quests.pkl', 'rb') as f:
                     self.qList = pickle.load(f)
                 print('Using cached quests.')
             except:
                 print('ERROR: Something went wrong while loading cached quests. Re-caching.')
-                self.cacheQuests(cursor, dictCursor)
+                dicts = self.__getQuestTables(cursor, dictCursor)
+                self.cacheQuests(cursor, dictCursor, dicts)
 
-    def cacheQuests(self, cursor, dictCursor):
+    def cacheQuests(self, cursor, dictCursor, dicts):
         self.qList = {}
         self.dictCursor = dictCursor
-        dicts = self.__getQuestTables(cursor, dictCursor)
         # TODO: Use proper CSV reader
         infile = open(f'data/{self.version}/AreaTrigger.dbc.CSV', 'r')
         a = infile.read()

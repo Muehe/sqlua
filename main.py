@@ -23,9 +23,11 @@ if version not in ['classic', 'tbc', 'wotlk', 'cata']:
 def getClassInstances(recache=False):
     """Get new instances of the list classes"""
     if version == 'cata':
-        quests = CataQuestList(cursor, dictCursor, version, recache=recache)
+        quests = CataQuestList(version)
+        quests.run(cursor, dictCursor, recache)
     else:
-        quests = QuestList(cursor, dictCursor, version, recache=recache)
+        quests = QuestList(version)
+        quests.run(cursor, dictCursor, recache)
     npcs = NpcList(cursor, dictCursor, version, recache=recache, debug=debug)
     obj = ObjList(cursor, dictCursor, version, recache=recache)
     items = ItemList(dictCursor, version, recache=recache)
