@@ -9,6 +9,7 @@ class NpcList():
     def __init__(self, version, debug=False):
         self.version = version
         self.debug = debug
+        self.nList = {}
 
     def run(self, cursor, dictCursor, recache=False, extractSpawns=True):
         if (not os.path.isfile(f'data/{self.version}/npcs.pkl') or recache):
@@ -26,7 +27,6 @@ class NpcList():
                 self.cacheNpcs(dicts, extractSpawns)
 
     def cacheNpcs(self, dicts, extractSpawns=True):
-        self.nList = {}
         count = len(dicts['npc_template'])
         print(f'Caching {count} NPCs...')
         for npc in dicts['npc_template']:

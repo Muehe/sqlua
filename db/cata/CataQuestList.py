@@ -13,7 +13,7 @@ class CataQuestList(QuestList):
         if not os.path.isfile(f'data/cata/quests.pkl') or recache:
             print('Caching quests...')
             dicts = self.__getQuestTables(cursor, dictCursor)
-            self.cacheQuests(cursor, dictCursor, dicts)
+            self.cacheQuests(dicts)
         else:
             try:
                 with open(f'data/cata/quests.pkl', 'rb') as f:
@@ -22,7 +22,7 @@ class CataQuestList(QuestList):
             except:
                 print('ERROR: Something went wrong while loading cached quests. Re-caching.')
                 dicts = self.__getQuestTables(cursor, dictCursor)
-                self.cacheQuests(cursor, dictCursor, dicts)
+                self.cacheQuests(dicts)
 
     def __getQuestTables(self, cursor, dictCursor):
         print("Selecting quest related MySQL tables...")

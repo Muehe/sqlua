@@ -9,11 +9,12 @@ class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
     def __init__(self, version):
         self.version = version
+        self.objectList = {}
 
-    def run(self, cursor, dictCursor, extractSpawns=True, recache=False):
+    def run(self, cursor, extractSpawns=True, recache=False):
         if (not os.path.isfile(f'data/{self.version}/objects.pkl') or recache):
             print('Caching objects...')
-            dicts = self.getObjTables(cursor, dictCursor)
+            dicts = self.getObjTables(cursor)
             self.cacheObjects(dicts, extractSpawns)
         else:
             try:
@@ -22,11 +23,10 @@ class ObjList():
                 print('Using cached objects.')
             except:
                 print('ERROR: Something went wrong while loading cached objects. Re-caching.')
-                dicts = self.getObjTables(cursor, dictCursor)
+                dicts = self.getObjTables(cursor)
                 self.cacheObjects(dicts, extractSpawns)
 
     def cacheObjects(self, dicts, extractSpawns=True):
-        self.objectList = {}
         count = len(dicts['object_template'])
         print(f'Caching {count} objects...')
         for obj in dicts['object_template']:
@@ -57,7 +57,7 @@ class ObjList():
     def __iterObj(self, **kwargs):
         return (self.objectList[obj] for obj in self.objectList if self.objectList[obj].match(**kwargs))
 
-    def getObjTables(self, cursor, dictCursor):
+    def getObjTables(self, cursor):
         print("Selecting object related MySQL tables...")
         print("  SELECT gameobject_template")
         cursor.execute("SELECT entry, name, type, faction, data1 FROM gameobject_template")

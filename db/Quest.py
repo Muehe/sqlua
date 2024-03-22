@@ -2,7 +2,7 @@ from db.CoordList import *
 from db.Utilities import *
 
 class Quest():
-    def __init__(self, quest, dicts, areaTrigger, cursor, version, translations=False):
+    def __init__(self, quest, dicts, areaTrigger, version, translations=False):
         self.version = version
         self.id = quest[0]
         self.MinLevel = quest[1]

@@ -10,6 +10,7 @@ class QuestList:
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
     def __init__(self, version):
         self.version = version
+        self.qList = {}
         self.raceIDs = {
             'NONE': 0,
             'HUMAN': 1,
@@ -38,7 +39,7 @@ class QuestList:
         if not os.path.isfile(f'data/{self.version}/quests.pkl') or recache:
             print('Caching quests...')
             dicts = self.__getQuestTables(cursor, dictCursor)
-            self.cacheQuests(cursor, dictCursor, dicts)
+            self.cacheQuests(dicts)
         else:
             try:
                 with open(f'data/{self.version}/quests.pkl', 'rb') as f:
@@ -47,11 +48,9 @@ class QuestList:
             except:
                 print('ERROR: Something went wrong while loading cached quests. Re-caching.')
                 dicts = self.__getQuestTables(cursor, dictCursor)
-                self.cacheQuests(cursor, dictCursor, dicts)
+                self.cacheQuests(dicts)
 
-    def cacheQuests(self, cursor, dictCursor, dicts):
-        self.qList = {}
-        self.dictCursor = dictCursor
+    def cacheQuests(self, dicts):
         # TODO: Use proper CSV reader
         infile = open(f'data/{self.version}/AreaTrigger.dbc.CSV', 'r')
         a = infile.read()
@@ -63,7 +62,7 @@ class QuestList:
         count = len(dicts['quest_template'])
         print(f'Caching {count} quests...')
         for quest in dicts['quest_template']:
-            self.__addQuest(quest, dicts, areaTrigger, cursor)
+            self.__addQuest(quest, dicts, areaTrigger)
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
@@ -149,9 +148,9 @@ class QuestList:
                 bits.insert(0, -x)
         return bits
 
-    def __addQuest(self, quest, tables, areaTrigger, cursor):
+    def __addQuest(self, quest, tables, areaTrigger):
         """only used by constructor"""
-        newQuest = Quest(quest, tables, areaTrigger, cursor, self.version)
+        newQuest = Quest(quest, tables, areaTrigger, self.version)
         self.qList[newQuest.id] = newQuest
 
     def findQuest(self, **kwargs):

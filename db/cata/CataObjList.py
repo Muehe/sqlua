@@ -8,10 +8,10 @@ class CataObjList(ObjList):
     def __init__(self, version):
         super().__init__(version)
 
-    def run(self, cursor, dictCursor, extractSpawns=True, recache=False):
+    def run(self, cursor, extractSpawns=True, recache=False):
         if (not os.path.isfile(f'data/cata/objects.pkl') or recache):
             print('Caching objects...')
-            dicts = self.getObjTables(cursor, dictCursor)
+            dicts = self.getObjTables(cursor)
             self.cacheObjects(dicts, extractSpawns)
         else:
             try:
@@ -20,10 +20,10 @@ class CataObjList(ObjList):
                 print('Using cached objects.')
             except:
                 print('ERROR: Something went wrong while loading cached objects. Re-caching.')
-                dicts = self.getObjTables(cursor, dictCursor)
+                dicts = self.getObjTables(cursor)
                 self.cacheObjects(dicts, extractSpawns)
 
-    def getObjTables(self, cursor, dictCursor):
+    def getObjTables(self, cursor):
         print("Selecting object related MySQL tables...")
         print("  SELECT gameobject_template")
         cursor.execute("SELECT entry, name, type, faction, data1 FROM gameobject_template")
