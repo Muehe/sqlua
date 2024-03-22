@@ -1,4 +1,5 @@
-from db.QuestList import *
+from db.QuestList import QuestList
+from db.cata.QuestList import QuestList as CataQuestList
 from db.NpcList import *
 from db.ObjList import *
 from db.CoordList import *
@@ -21,7 +22,10 @@ if version not in ['classic', 'tbc', 'wotlk', 'cata']:
 
 def getClassInstances(recache=False):
     """Get new instances of the list classes"""
-    quests = QuestList(cursor, dictCursor, version, recache=recache)
+    if version == 'cata':
+        quests = CataQuestList(cursor, dictCursor, version, recache=recache)
+    else:
+        quests = QuestList(cursor, dictCursor, version, recache=recache)
     npcs = NpcList(cursor, dictCursor, version, recache=recache, debug=debug)
     obj = ObjList(cursor, dictCursor, version, recache=recache)
     items = ItemList(dictCursor, version, recache=recache)
