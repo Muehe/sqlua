@@ -10,7 +10,7 @@ class CataQuestList(QuestList):
         super().__init__(version)
 
     def run(self, cursor, dictCursor, recache=False):
-        if (not os.path.isfile(f'data/cata/quests.pkl') or recache):
+        if not os.path.isfile(f'data/cata/quests.pkl') or recache:
             print('Caching quests...')
             dicts = self.__getQuestTables(cursor, dictCursor)
             self.cacheQuests(cursor, dictCursor, dicts)
@@ -25,7 +25,6 @@ class CataQuestList(QuestList):
                 self.cacheQuests(cursor, dictCursor, dicts)
 
     def __getQuestTables(self, cursor, dictCursor):
-        """only used by constructor"""
         print("Selecting quest related MySQL tables...")
         print("  SELECT quest_template")
         cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5 FROM quest_template")
