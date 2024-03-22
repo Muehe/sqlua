@@ -2,7 +2,73 @@
 def read_mangos_quest_list(cursor, dictCursor):
     print("Selecting quest related MySQL tables...")
     print("  SELECT quest_template")
-    cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5 FROM quest_template")
+    cursor.execute("""
+        SELECT
+        entry,  # 0
+        MinLevel,  # 1
+        QuestLevel,  # 2
+        Type,  # 3
+        RequiredClasses,  # 4
+        RequiredRaces,  # 5
+        RequiredSkill,  # 6
+        RequiredSkillValue,  # 7
+        RepObjectiveFaction,  # 8
+        RepObjectiveValue,  # 9
+        RequiredMinRepFaction,  # 10
+        RequiredMinRepValue,  # 11
+        RequiredMaxRepFaction,  # 12
+        RequiredMaxRepValue,  # 13
+        QuestFlags,  # 14
+        PrevQuestId,  # 15
+        NextQuestId,  # 16
+        NextQuestInChain,  # 17
+        ExclusiveGroup,  # 18
+        Title,  # 19
+        Objectives,  # 20
+        ReqItemId1,  # 21
+        ReqItemId2,  # 22
+        ReqItemId3,  # 23
+        ReqItemId4,  # 24
+        ReqSourceId1,  # 25
+        ReqSourceId2,  # 26
+        ReqSourceId3,  # 27
+        ReqSourceId4,  # 28
+        ReqCreatureOrGOId1,  # 29
+        ReqCreatureOrGOId2,  # 30
+        ReqCreatureOrGOId3,  # 31
+        ReqCreatureOrGOId4,  # 32
+        ReqSpellCast1,  # 33
+        ReqSpellCast2,  # 34
+        ReqSpellCast3,  # 35
+        ReqSpellCast4,  # 36
+        PointMapId,  # 37
+        PointX,  # 38
+        PointY,  # 39
+        StartScript,  # 40
+        CompleteScript,  # 41
+        SrcItemId,  # 42
+        ZoneOrSort,  # 43
+        Method,  # 44
+        ObjectiveText1,  # 45
+        ObjectiveText2,  # 46
+        ObjectiveText3,  # 47
+        ObjectiveText4,  # 48
+        EndText,  # 49
+        Details,  # 50
+        SpecialFlags,  # 51
+        RewRepFaction1,  # 52
+        RewRepFaction2,  # 53
+        RewRepFaction3,  # 54
+        RewRepFaction4,  # 55
+        RewRepFaction5,  # 56
+        RewRepValue1,  # 57
+        RewRepValue2,  # 58
+        RewRepValue3,  # 59
+        RewRepValue4,  # 60
+        RewRepValue5  # 61
+    
+        FROM quest_template
+    """)
     quest_template = []
     for a in cursor.fetchall():
         quest_template.append(a)
