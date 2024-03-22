@@ -1,4 +1,5 @@
 from db.QuestList import QuestList
+from db.cata.CataItemList import CataItemList
 from db.cata.CataNpcList import CataNpcList
 from db.cata.CataObjList import CataObjList
 from db.cata.CataQuestList import CataQuestList
@@ -30,6 +31,8 @@ def getClassInstances(recache=False):
         npcs.run(cursor, dictCursor, recache)
         obj = CataObjList(version)
         obj.run(cursor, dictCursor, recache=recache)
+        items = CataItemList(version)
+        items.run(dictCursor, recache=recache)
     else:
         quests = QuestList(version)
         quests.run(cursor, dictCursor, recache)
@@ -37,7 +40,8 @@ def getClassInstances(recache=False):
         npcs.run(cursor, dictCursor, recache)
         obj = ObjList(version)
         obj.run(cursor, dictCursor, recache=recache)
-    items = ItemList(dictCursor, version, recache=recache)
+        items = ItemList(version)
+        items.run(dictCursor, recache=recache)
     return quests, npcs, obj, items
 
 def recache():
