@@ -1,8 +1,8 @@
 from db.QuestList import QuestList
+from db.cata.CataNpcList import CataNpcList
 from db.cata.CataQuestList import CataQuestList
 from db.NpcList import *
 from db.ObjList import *
-from db.CoordList import *
 from db.ItemList import *
 from preExtract.CoordPreExtract import printCoordFiles
 
@@ -25,10 +25,11 @@ def getClassInstances(recache=False):
     if version == 'cata':
         quests = CataQuestList(version)
         quests.run(cursor, dictCursor, recache)
+        npcs = CataNpcList(cursor, dictCursor, version, recache=recache, debug=debug)
     else:
         quests = QuestList(version)
         quests.run(cursor, dictCursor, recache)
-    npcs = NpcList(cursor, dictCursor, version, recache=recache, debug=debug)
+        npcs = NpcList(cursor, dictCursor, version, recache=recache, debug=debug)
     obj = ObjList(cursor, dictCursor, version, recache=recache)
     items = ItemList(dictCursor, version, recache=recache)
     return quests, npcs, obj, items
