@@ -15,6 +15,7 @@ import config
 import time
 
 version = config.version
+db_flavor = config.db_flavor
 debug = config.debug
 
 if version not in ['classic', 'tbc', 'wotlk', 'cata']:

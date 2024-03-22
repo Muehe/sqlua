@@ -1,6 +1,8 @@
 # Which database to use, may also be passed as argument to the main script
 # Accepts 'classic', 'tbc', 'wotlk' or 'cata'
 version = 'classic'
+# Database flavor. Either 'mangos' or 'trinity' (for cata only)
+db_flavor = 'mangos'
 # Toggle debug messages
 debug = False
 # MySQL information
