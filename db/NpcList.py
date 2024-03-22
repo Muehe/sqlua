@@ -13,8 +13,8 @@ class NpcList():
 
     def run(self, cursor, dictCursor, recache=False, extractSpawns=True):
         if (not os.path.isfile(f'data/{self.version}/npcs.pkl') or recache):
-            print('Caching NPCs...')
             dicts = self.getNpcTables(cursor, dictCursor)
+            print('Caching NPCs...')
             self.cacheNpcs(dicts, extractSpawns)
         else:
             try:

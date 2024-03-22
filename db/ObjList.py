@@ -13,8 +13,8 @@ class ObjList():
 
     def run(self, cursor, extractSpawns=True, recache=False):
         if (not os.path.isfile(f'data/{self.version}/objects.pkl') or recache):
-            print('Caching objects...')
             dicts = self.getObjTables(cursor)
+            print('Caching objects...')
             self.cacheObjects(dicts, extractSpawns)
         else:
             try:

@@ -37,8 +37,8 @@ class QuestList:
 
     def run(self, cursor, dictCursor, db_flavor, recache=False):
         if not os.path.isfile(f'data/{self.version}/quests.pkl') or recache:
-            print('Caching quests...')
             dicts = self.__getQuestTables(cursor, dictCursor)
+            print('Caching quests...')
             self.cacheQuests(dicts)
         else:
             try:

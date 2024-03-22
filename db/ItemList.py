@@ -10,8 +10,8 @@ class ItemList():
 
     def run(self, dictCursor, locale = "enGB", recache=False):
         if (not os.path.isfile(f'data/{self.version}/items.pkl') or recache):
-            print('Caching items...')
             tables = self.__getItemTables(dictCursor)
+            print('Caching items...')
             self.cacheItems(tables, locale)
         else:
             try:

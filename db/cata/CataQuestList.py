@@ -13,8 +13,8 @@ class CataQuestList(QuestList):
 
     def run(self, cursor, dictCursor, db_flavor, recache=False):
         if not os.path.isfile(f'data/cata/quests.pkl') or recache:
-            print('Caching quests...')
             dicts = read_mangos_quest_list(cursor, dictCursor)
+            print('Caching quests...')
             self.cacheQuests(dicts)
         else:
             try:
