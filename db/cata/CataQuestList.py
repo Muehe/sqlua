@@ -4,6 +4,7 @@ import os.path
 import pickle
 
 from db.cata.readMangosQuestList import read_mangos_quest_list
+from db.cata.readTrinityQuestList import read_trinity_quest_list
 
 
 class CataQuestList(QuestList):
@@ -13,7 +14,7 @@ class CataQuestList(QuestList):
 
     def run(self, cursor, dictCursor, db_flavor, recache=False):
         if not os.path.isfile(f'data/cata/quests.pkl') or recache:
-            dicts = read_mangos_quest_list(cursor, dictCursor)
+            dicts = load_quests(cursor, dictCursor, db_flavor)
             print('Caching quests...')
             self.cacheQuests(dicts)
         else:
@@ -23,5 +24,11 @@ class CataQuestList(QuestList):
                 print('Using cached quests.')
             except:
                 print('ERROR: Something went wrong while loading cached quests. Re-caching.')
-                dicts = read_mangos_quest_list(cursor, dictCursor)
+                dicts = load_quests(cursor, dictCursor, db_flavor)
                 self.cacheQuests(dicts)
+
+def load_quests(cursor, dictCursor, db_flavor):
+    if db_flavor == 'trinity':
+        return read_trinity_quest_list(cursor, dictCursor)
+    else:
+        return read_mangos_quest_list(cursor, dictCursor)
