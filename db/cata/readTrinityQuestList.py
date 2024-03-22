@@ -93,7 +93,7 @@ def read_trinity_quest_list(cursor, dictCursor):
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
-        if not entry in creature_quest_starter:
+        if not quest in creature_quest_starter:
             creature_quest_starter[quest] = []
         creature_quest_starter[quest].append((entry, quest))
 
@@ -103,7 +103,7 @@ def read_trinity_quest_list(cursor, dictCursor):
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
-        if not entry in creature_quest_ender:
+        if not quest in creature_quest_ender:
             creature_quest_ender[quest] = []
         creature_quest_ender[quest].append((entry, quest))
 
@@ -113,7 +113,7 @@ def read_trinity_quest_list(cursor, dictCursor):
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
-        if not entry in gameobject_quest_starter:
+        if not quest in gameobject_quest_starter:
             gameobject_quest_starter[quest] = []
         gameobject_quest_starter[quest].append((entry, quest))
 
@@ -123,7 +123,7 @@ def read_trinity_quest_list(cursor, dictCursor):
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
-        if not entry in gameobject_quest_ender:
+        if not quest in gameobject_quest_ender:
             gameobject_quest_ender[quest] = []
         gameobject_quest_ender[quest].append((entry, quest))
 
