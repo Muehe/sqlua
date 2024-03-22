@@ -1,5 +1,5 @@
 from db.QuestList import QuestList
-from db.cata.QuestList import QuestList as CataQuestList
+from db.cata.CataQuestList import CataQuestList
 from db.NpcList import *
 from db.ObjList import *
 from db.CoordList import *

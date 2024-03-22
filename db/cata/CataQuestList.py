@@ -6,7 +6,7 @@ import os.path
 import pickle
 
 
-class QuestList():
+class CataQuestList():
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
 
     def __init__(self, cursor, dictCursor, version, recache=False):
