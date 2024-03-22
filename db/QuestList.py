@@ -35,7 +35,7 @@ class QuestList:
             self.raceIDs['HORDE'] = 690
             self.raceIDs['ALL'] = 1791
 
-    def run(self, cursor, dictCursor, recache=False):
+    def run(self, cursor, dictCursor, db_flavor, recache=False):
         if not os.path.isfile(f'data/{self.version}/quests.pkl') or recache:
             print('Caching quests...')
             dicts = self.__getQuestTables(cursor, dictCursor)

@@ -11,7 +11,7 @@ class CataQuestList(QuestList):
     def __init__(self, version):
         super().__init__(version)
 
-    def run(self, cursor, dictCursor, recache=False):
+    def run(self, cursor, dictCursor, db_flavor, recache=False):
         if not os.path.isfile(f'data/cata/quests.pkl') or recache:
             print('Caching quests...')
             dicts = read_mangos_quest_list(cursor, dictCursor)

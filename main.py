@@ -27,7 +27,7 @@ def getClassInstances(recache=False):
     """Get new instances of the list classes"""
     if version == 'cata':
         quests = CataQuestList(version)
-        quests.run(cursor, dictCursor, recache)
+        quests.run(cursor, dictCursor, db_flavor, recache)
         npcs = CataNpcList(version, debug)
         npcs.run(cursor, dictCursor, recache)
         obj = CataObjList(version)
@@ -36,7 +36,7 @@ def getClassInstances(recache=False):
         items.run(dictCursor, recache=recache)
     else:
         quests = QuestList(version)
-        quests.run(cursor, dictCursor, recache)
+        quests.run(cursor, dictCursor, db_flavor, recache)
         npcs = NpcList(version, debug)
         npcs.run(cursor, dictCursor, recache)
         obj = ObjList(version)
