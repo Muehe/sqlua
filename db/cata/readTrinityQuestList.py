@@ -74,6 +74,9 @@ def read_trinity_quest_list(cursor, dictCursor):
     for a in cursor.fetchall():
         quest_template.append(a)
 
+    #TODO: Find Quest level information
+    #TODO: Read Objectives from `quest_objectives` table
+
     print("  SELECT creature_template")
     cursor.execute("SELECT entry, KillCredit1, KillCredit2 FROM creature_template WHERE KillCredit1 != 0 OR KillCredit2 != 0")
     creature_killcredit = {}
@@ -148,7 +151,7 @@ def read_trinity_quest_list(cursor, dictCursor):
             areatrigger_involvedrelation[a[1]] = []
             areatrigger_involvedrelation[a[1]].append(a)
 
-    # TODO: Do this later
+    # TODO: Do this later `quest_template_locale`
     # print("  SELECT locales_quest")
     # count = dictCursor.execute("SELECT * FROM locales_quest")
     loc_quests = {}
