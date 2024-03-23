@@ -70,12 +70,52 @@ def read_trinity_quest_list(cursor, dictCursor):
         FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
     """)
 
-    quest_template = []
+    quest_template_cache = {}
     for a in cursor.fetchall():
-        quest_template.append(a)
+        quest_template_cache[a[0]] = a
 
     #TODO: Find Quest level information
-    #TODO: Read Objectives from `quest_objectives` table
+    quest_template = []
+
+    print("  SELECT quest_objectives")
+    # Type: 0 = creature, 1 = item, 2 = object, 3 = creature, 4 = currency, 5 = spell, 6 = reputation (positive), 7 = reputation (negative), 8 = money, 9 = killPlayer, 10 = areatrigger/event
+    cursor.execute("SELECT QuestID, Type, `Order`, ObjectID, Amount FROM quest_objectives")
+    for a in cursor.fetchall():
+        entry = list(quest_template_cache[a[0]])
+        q_type = a[1]
+        q_order = a[2]
+        target = a[3]
+        if q_type == 0 or q_type == 2 or q_type == 3:  # creature and object
+            if q_order == 0:
+                entry[29] = target
+            elif q_order == 1:
+                entry[30] = target
+            elif q_order == 2:
+                entry[31] = target
+            elif q_order == 3:
+                entry[32] = target
+        if q_type == 1:  # item
+            if q_order == 0:
+                entry[21] = target
+            elif q_order == 1:
+                entry[22] = target
+            elif q_order == 2:
+                entry[23] = target
+            elif q_order == 3:
+                entry[24] = target
+        if q_type == 5:  # spell
+            if q_order == 0:
+                entry[33] = target
+            elif q_order == 1:
+                entry[34] = target
+            elif q_order == 2:
+                entry[35] = target
+            elif q_order == 3:
+                entry[36] = target
+        if q_type == 6 or q_type == 7:  # reputation
+            entry[8] = target
+            entry[9] = a[4]
+        quest_template.append(entry)
 
     print("  SELECT creature_template")
     cursor.execute("SELECT entry, KillCredit1, KillCredit2 FROM creature_template WHERE KillCredit1 != 0 OR KillCredit2 != 0")
