@@ -260,8 +260,9 @@ class Quest():
         if (triggers == []):
             del self.triggerEnd
         else:
-            text = ""
-            if quest[49] == '':
+            if quest[62]:  # AreaDescription
+                text = quest[62]
+            elif quest[49] == '':
                 text = self.Objectives
             else:
                 text = escapeDoubleQuotes(quest[49])
