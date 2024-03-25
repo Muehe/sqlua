@@ -127,7 +127,7 @@ def read_trinity_quest_list(cursor, dictCursor):
                     entry[35] = target
                 elif q_order == 3:
                     entry[36] = target
-            if q_type == 6 or q_type == 7:  # reputation
+            if (q_type == 6 or q_type == 7) and q_order == 0:  # reputation (only take the first one)
                 entry[8] = target
                 entry[9] = o[4]
             quest_template.append(entry)
