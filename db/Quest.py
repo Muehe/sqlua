@@ -10,12 +10,15 @@ class Quest():
         self.Type = quest[3]
         self.RequiredRaces = quest[5]
         # Fix TBC+ masks in Classic data, change quests available to all races to 0 (no requirements)
-        if version == 'classic':
+        if version == 'cata':
+            if quest[5] == 2099199:
+                self.RequiredRaces = 0
+        elif version == 'classic':
             if quest[5] == 690:
                 self.RequiredRaces = 178
-            if quest[5] == 1101:
+            elif quest[5] == 1101:
                 self.RequiredRaces = 77
-            if quest[5] == 255:
+            elif quest[5] == 255:
                 self.RequiredRaces = 0
         else:
             if quest[5] == 1791:
