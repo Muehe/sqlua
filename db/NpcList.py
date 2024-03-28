@@ -31,7 +31,7 @@ class NpcList():
         print(f'Caching {count} NPCs...')
         for npc in dicts['npc_template']:
             self.addNpc(npc, dicts, extractSpawns)
-            if ((count % 100) == 0):
+            if (count % 1000) == 0:
                 print(str(count)+"...")
             count -= 1
         with open(f'data/{self.version}/npcs.pkl', 'wb') as f:
