@@ -71,6 +71,8 @@ def read_trinity_quest_list(cursor, dictCursor):
         FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
     """)
 
+    # TODO: Use BreadcrumbForQuestId to mark quests as breadcrumb
+
     quest_template_cache = {}
     for a in cursor.fetchall():
         quest_template_cache[a[0]] = a
