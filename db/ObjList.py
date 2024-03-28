@@ -11,7 +11,7 @@ class ObjList():
         self.version = version
         self.objectList = {}
 
-    def run(self, cursor, extractSpawns=True, recache=False):
+    def run(self, cursor, db_flavor, extractSpawns=True, recache=False):
         if (not os.path.isfile(f'data/{self.version}/objects.pkl') or recache):
             dicts = self.getObjTables(cursor)
             print('Caching objects...')
