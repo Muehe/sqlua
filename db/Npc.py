@@ -139,7 +139,7 @@ class Npc():
             if self.id in dicts['npc']:
                 rawSpawns = dicts['npc'][self.id]
                 for spawn in rawSpawns:
-                    # id, map, position_x, position_y, guid, phaseMask
+                    # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
                         # get spawns
                         if spawn[4] in zones:

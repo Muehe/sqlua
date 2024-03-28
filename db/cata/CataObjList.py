@@ -4,6 +4,7 @@ import os.path
 import pickle
 
 from db.cata.readMangosObjList import read_mangos_obj_list
+from db.cata.readTrinityObjList import read_trinity_obj_list
 
 
 class CataObjList(ObjList):
@@ -28,6 +29,6 @@ class CataObjList(ObjList):
 
 def load_objects(cursor, db_flavor):
     if db_flavor == 'trinity':
-        pass  # TODO: Implement trinity object list
+        return read_trinity_obj_list(cursor)
     else:
         return read_mangos_obj_list(cursor)

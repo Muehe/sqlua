@@ -196,7 +196,10 @@ QuestieDB.objectData = [[return {
                         zoneId = zone
                     outString += ("["+str(zone)+"]={")
                     for coords in obj.spawns.cByZone[zone]:
-                        outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
+                        if len(coords) == 3:
+                            outString += ("{"+str(coords[0])+","+str(coords[1])+","+str(coords[2])+"},")
+                        else:
+                            outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
                     outString += ("},")
                 outString += ("},")
             else:

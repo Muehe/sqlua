@@ -12,8 +12,8 @@ class CoordList():
             else:
                 self.addCoord(coord[0], coord[1], coord[2], version, False, 0)
 
-    def addCoord(self, map, x, y, version, zone, phaseMask):
-        newCoord = Coord(map, x, y,version, zone, phaseMask, debug=self.debug)
+    def addCoord(self, map, x, y, version, zone, phase_id):
+        newCoord = Coord(map, x, y, version, zone, phase_id, debug=self.debug)
         if not newCoord.noZone:
             self.cList.append(newCoord)
             for zone in newCoord.zoneList:
