@@ -7,8 +7,6 @@ from db.cata.readTrinityNpcList import read_trinity_npc_list
 
 
 class CataNpcList(NpcList):
-    """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-
     def __init__(self, version, debug=False):
         super().__init__(version, debug)
 
