@@ -2,7 +2,7 @@ from db.CoordList import *
 from db.Utilities import *
 
 class Quest():
-    def __init__(self, quest, dicts, areaTrigger, cursor, version, translations=False):
+    def __init__(self, quest, dicts, areaTrigger, version, translations=False):
         self.version = version
         self.id = quest[0]
         self.MinLevel = quest[1]
@@ -10,12 +10,15 @@ class Quest():
         self.Type = quest[3]
         self.RequiredRaces = quest[5]
         # Fix TBC+ masks in Classic data, change quests available to all races to 0 (no requirements)
-        if version == 'classic':
+        if version == 'cata':
+            if quest[5] == 2099199:
+                self.RequiredRaces = 0
+        elif version == 'classic':
             if quest[5] == 690:
                 self.RequiredRaces = 178
-            if quest[5] == 1101:
+            elif quest[5] == 1101:
                 self.RequiredRaces = 77
-            if quest[5] == 255:
+            elif quest[5] == 255:
                 self.RequiredRaces = 0
         else:
             if quest[5] == 1791:
@@ -260,8 +263,9 @@ class Quest():
         if (triggers == []):
             del self.triggerEnd
         else:
-            text = ""
-            if quest[49] == '':
+            if quest[62]:  # AreaDescription
+                text = quest[62]
+            elif quest[49] == '':
                 text = self.Objectives
             else:
                 text = escapeDoubleQuotes(quest[49])

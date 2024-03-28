@@ -6,25 +6,27 @@ import pickle
 
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, version, extractSpawns=True, recache=False, debug=False):
+    def __init__(self, version, debug=False):
         self.version = version
         self.debug = debug
-        if (not os.path.isfile(f'data/{version}/npcs.pkl') or recache):
+        self.nList = {}
+
+    def run(self, cursor, dictCursor, recache=False, extractSpawns=True):
+        if (not os.path.isfile(f'data/{self.version}/npcs.pkl') or recache):
+            dicts = self.getNpcTables(cursor, dictCursor)
             print('Caching NPCs...')
-            self.cacheNpcs(cursor, dictCursor, extractSpawns)
+            self.cacheNpcs(dicts, extractSpawns)
         else:
             try:
-                with open(f'data/{version}/npcs.pkl', 'rb') as f:
+                with open(f'data/{self.version}/npcs.pkl', 'rb') as f:
                     self.nList = pickle.load(f)
                 print('Using cached NPCs.')
             except:
                 print('ERROR: Something went wrong while loading cached NPCs. Re-caching.')
-                self.cacheNpcs(cursor, dictCursor, extractSpawns)
+                dicts = self.getNpcTables(cursor, dictCursor)
+                self.cacheNpcs(dicts, extractSpawns)
 
-
-    def cacheNpcs(self, cursor, dictCursor, extractSpawns=True):
-        self.nList = {}
-        dicts = self.getNpcTables(cursor, dictCursor)
+    def cacheNpcs(self, dicts, extractSpawns=True):
         count = len(dicts['npc_template'])
         print(f'Caching {count} NPCs...')
         for npc in dicts['npc_template']:
@@ -59,122 +61,82 @@ class NpcList():
         print("Selecting NPC related MySQL tables...")
 
         print("  SELECT creature_template")
-        if self.version == 'cata':
-            # TODO: Add missing columns
-            cursor.execute("SELECT entry, name, 0 as MinLevel, 0 as MaxLevel, 0 as MinLevelHealth, 0 as MaxLevelHealth, 0 as `Rank`, faction, subname, npcflag, KillCredit1, KillCredit2 FROM creature_template WHERE entry != 211770")
-        else:
-            cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
+        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
         npc_tpl = []
         for a in cursor.fetchall():
             npc_tpl.append(a)
 
-        if self.version == 'cata':
-            print('  SELECT creature')
-            cursor.execute('SELECT id, map, position_x, position_y, guid, PhaseId FROM creature WHERE PhaseId <= 670')
-            npc = {}
-            for a in cursor.fetchall():
-                if a[0] not in npc:
-                    npc[a[0]] = []
-                npc[a[0]].append(a)
-        else:
-            print('  SELECT creature_spawn_entry')
-            cursor.execute('SELECT * FROM creature_spawn_entry')
-            npc_spawn_entry = {}
-            for guid, entry in cursor.fetchall():
-                if guid not in npc_spawn_entry:
-                    npc_spawn_entry[guid] = []
-                npc_spawn_entry[guid].append(entry)
+        print('  SELECT creature_spawn_entry')
+        cursor.execute('SELECT * FROM creature_spawn_entry')
+        npc_spawn_entry = {}
+        for guid, entry in cursor.fetchall():
+            if guid not in npc_spawn_entry:
+                npc_spawn_entry[guid] = []
+            npc_spawn_entry[guid].append(entry)
 
-            print("  SELECT creature")
-            cursor.execute("SELECT id, map, position_x, position_y, guid FROM creature")
-            npc = {}
-            for a in cursor.fetchall():
-                if (a[0] == 0):
-                    if a[4] in npc_spawn_entry:
-                        for entry in npc_spawn_entry[a[4]]:
-                            if entry not in npc:
-                                npc[entry] = []
-                            npc[entry].append(a)
-                    #else:
-                        #print(f'Missing entry for GUID {a[4]}')
-                    continue
-                elif(a[0] not in npc):
-                    npc[a[0]] = []
-                npc[a[0]].append(a)
+        print("  SELECT creature")
+        cursor.execute("SELECT id, map, position_x, position_y, guid FROM creature")
+        npc = {}
+        for a in cursor.fetchall():
+            if (a[0] == 0):
+                if a[4] in npc_spawn_entry:
+                    for entry in npc_spawn_entry[a[4]]:
+                        if entry not in npc:
+                            npc[entry] = []
+                        npc[entry].append(a)
+                #else:
+                    #print(f'Missing entry for GUID {a[4]}')
+                continue
+            elif(a[0] not in npc):
+                npc[a[0]] = []
+            npc[a[0]].append(a)
 
-        if self.version == 'cata':
-            print("  SELECT creature_queststarter")
-            npc_start = {}
-            cursor.execute("SELECT id, quest FROM creature_queststarter")
-            for a in cursor.fetchall():
-                entry = a[0]
-                quest = a[1]
-                if quest not in npc_start:
-                    npc_start[quest] = []
-                npc_start[quest].append((entry, quest))
+        print("  SELECT creature_questrelation")
+        cursor.execute("SELECT * FROM creature_questrelation")
+        npc_start = {}
+        for a in cursor.fetchall():
+            if(a[0] in npc_start):
+                npc_start[a[0]].append(a)
+            else:
+                npc_start[a[0]] = []
+                npc_start[a[0]].append(a)
 
-            print("  SELECT creature_questender")
-            npc_end = {}
-            cursor.execute("SELECT id, quest FROM creature_questender")
-            for a in cursor.fetchall():
-                entry = a[0]
-                quest = a[1]
-                if quest not in npc_end:
-                    npc_end[quest] = []
-                npc_end[quest].append((entry, quest))
-        else:
-            print("  SELECT creature_questrelation")
-            cursor.execute("SELECT * FROM creature_questrelation")
-            npc_start = {}
-            for a in cursor.fetchall():
-                if(a[0] in npc_start):
-                    npc_start[a[0]].append(a)
-                else:
-                    npc_start[a[0]] = []
-                    npc_start[a[0]].append(a)
+        print("  SELECT creature_involvedrelation")
+        cursor.execute("SELECT * FROM creature_involvedrelation")
+        npc_end = {}
+        for a in cursor.fetchall():
+            if(a[0] in npc_end):
+                npc_end[a[0]].append(a)
+            else:
+                npc_end[a[0]] = []
+                npc_end[a[0]].append(a)
 
-            print("  SELECT creature_involvedrelation")
-            cursor.execute("SELECT * FROM creature_involvedrelation")
-            npc_end = {}
-            for a in cursor.fetchall():
-                if(a[0] in npc_end):
-                    npc_end[a[0]].append(a)
-                else:
-                    npc_end[a[0]] = []
-                    npc_end[a[0]].append(a)
-
-        # print("  SELECT creature_movement")
-        # if self.version == 'cata':
-        #     cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
-        # else:
-        #     cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
+        print("  SELECT creature_movement")
+        cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
         npc_mov = {}
-        # for a in cursor.fetchall():
-        #     if(a[1] in npc_mov):
-        #         npc_mov[a[1]].append(a)
-        #     else:
-        #         npc_mov[a[1]] = []
-        #         npc_mov[a[1]].append(a)
-        #
-        # print("  SELECT creature_movement_template")
-        # if self.version == 'cata':
-        #     cursor.execute("SELECT point, entry, position_x, position_y, wpguid FROM creature_movement_template")
-        # else:
-        #     cursor.execute("SELECT point, entry, PositionX, PositionY, PathId FROM creature_movement_template")
+        for a in cursor.fetchall():
+            if(a[1] in npc_mov):
+                npc_mov[a[1]].append(a)
+            else:
+                npc_mov[a[1]] = []
+                npc_mov[a[1]].append(a)
+
+        print("  SELECT creature_movement_template")
+        cursor.execute("SELECT point, entry, PositionX, PositionY, PathId FROM creature_movement_template")
         npc_mov_tpl = {}
-        # for a in cursor.fetchall():
-        #     if(a[1] in npc_mov_tpl):
-        #         npc_mov_tpl[a[1]].append(a)
-        #     else:
-        #         npc_mov_tpl[a[1]] = []
-        #         npc_mov_tpl[a[1]].append(a)
-        #
-        # print("  SELECT locales_creature")
-        # count = dictCursor.execute("SELECT * FROM locales_creature")
+        for a in cursor.fetchall():
+            if(a[1] in npc_mov_tpl):
+                npc_mov_tpl[a[1]].append(a)
+            else:
+                npc_mov_tpl[a[1]] = []
+                npc_mov_tpl[a[1]].append(a)
+
+        print("  SELECT locales_creature")
+        count = dictCursor.execute("SELECT * FROM locales_creature")
         loc_npc = {}
-        # for _ in range(0, count):
-        #     q = dictCursor.fetchone()
-        #     loc_npc[q['entry']] = q
+        for _ in range(0, count):
+            q = dictCursor.fetchone()
+            loc_npc[q['entry']] = q
 
         print("Done.")
         return {'npc_template':npc_tpl,

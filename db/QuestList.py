@@ -6,10 +6,11 @@ import os.path
 import pickle
 
 
-class QuestList():
+class QuestList:
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, version, recache=False):
+    def __init__(self, version):
         self.version = version
+        self.qList = {}
         self.raceIDs = {
             'NONE': 0,
             'HUMAN': 1,
@@ -33,22 +34,23 @@ class QuestList():
             self.raceIDs['ALLIANCE'] = 1101
             self.raceIDs['HORDE'] = 690
             self.raceIDs['ALL'] = 1791
-        if (not os.path.isfile(f'data/{version}/quests.pkl') or recache):
+
+    def run(self, cursor, dictCursor, db_flavor, recache=False):
+        if not os.path.isfile(f'data/{self.version}/quests.pkl') or recache:
+            dicts = self.__getQuestTables(cursor, dictCursor)
             print('Caching quests...')
-            self.cacheQuests(cursor, dictCursor)
+            self.cacheQuests(dicts)
         else:
             try:
-                with open(f'data/{version}/quests.pkl', 'rb') as f:
+                with open(f'data/{self.version}/quests.pkl', 'rb') as f:
                     self.qList = pickle.load(f)
                 print('Using cached quests.')
             except:
                 print('ERROR: Something went wrong while loading cached quests. Re-caching.')
-                self.cacheQuests(cursor, dictCursor)
+                dicts = self.__getQuestTables(cursor, dictCursor)
+                self.cacheQuests(dicts)
 
-    def cacheQuests(self, cursor, dictCursor):
-        self.qList = {}
-        self.dictCursor = dictCursor
-        dicts = self.__getQuestTables(cursor, dictCursor)
+    def cacheQuests(self, dicts):
         # TODO: Use proper CSV reader
         infile = open(f'data/{self.version}/AreaTrigger.dbc.CSV', 'r')
         a = infile.read()
@@ -60,7 +62,7 @@ class QuestList():
         count = len(dicts['quest_template'])
         print(f'Caching {count} quests...')
         for quest in dicts['quest_template']:
-            self.__addQuest(quest, dicts, areaTrigger, cursor)
+            self.__addQuest(quest, dicts, areaTrigger)
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
@@ -71,7 +73,7 @@ class QuestList():
             quest = self.qList[questId]
             if quest in excluded:
                 continue
-            if hasattr(quest, "ExclusiveGroup"):
+            if hasattr(quest, "ExclusiveGroup") and quest.ExclusiveGroup is not None:
                 group = self.allQuests(ExclusiveGroup = quest.ExclusiveGroup)
                 for q in group:
                     if q in excluded:
@@ -94,7 +96,7 @@ class QuestList():
             quest = self.qList[questId]
             if quest in excluded:
                 continue
-            if hasattr(quest, "PrevQuestId"):
+            if hasattr(quest, "PrevQuestId") and quest.PrevQuestId is not None:
                 if quest.PrevQuestId > 0:
                     # this should be the proper way to do it according to wiki, but due to the core handeling it differently the following fragment is deactivated
                     # left here in case I want to debug the core/db later
@@ -109,7 +111,7 @@ class QuestList():
                 else: # quest.PrevQuestId < 0
                     self.qList[abs(quest.PrevQuestId)].addChild(questId)
                     self.qList[questId].setParent(abs(quest.PrevQuestId))
-            if hasattr(quest, "NextQuestId"):
+            if hasattr(quest, "NextQuestId") and quest.NextQuestId is not None:
                 if quest.NextQuestId > 0:
                     postQuest = self.qList[quest.NextQuestId]
                     if hasattr(quest, "InGroupWith"):
@@ -146,9 +148,9 @@ class QuestList():
                 bits.insert(0, -x)
         return bits
 
-    def __addQuest(self, quest, tables, areaTrigger, cursor):
+    def __addQuest(self, quest, tables, areaTrigger):
         """only used by constructor"""
-        newQuest = Quest(quest, tables, areaTrigger, cursor, self.version)
+        newQuest = Quest(quest, tables, areaTrigger, self.version)
         self.qList[newQuest.id] = newQuest
 
     def findQuest(self, **kwargs):
@@ -194,86 +196,45 @@ class QuestList():
                     creature_killcredit[a[2]] = []
                 creature_killcredit[a[2]].append(a[0])
 
-        if self.version == "cata":
-            print("  SELECT quest_relation")
-            creature_involvedrelation = {}  # Creature quest end
-            creature_questrelation = {}  # Creature quest start
-            gameobject_involvedrelation = {}  # Object quest end
-            gameobject_questrelation = {}  # Object quest start
-            # actor 0=creature, 1=gameobject
-            # entry=creature_template.entry or gameobject_template.entry
-            # quest=quest_template.entry
-            # role 0=start, 1=end
-            cursor.execute("SELECT actor, entry, quest, role FROM quest_relations")
-            for a in cursor.fetchall():
-                entry = a[1]
-                quest = a[2]
-                if a[0] == 0:
-                    if a[3] == 0:
-                        if quest in creature_questrelation:
-                            creature_questrelation[quest].append((entry, quest))
-                        else:
-                            creature_questrelation[quest] = []
-                            creature_questrelation[quest].append((entry, quest))
-                    elif a[3] == 1:
-                        if quest in creature_involvedrelation:
-                            creature_involvedrelation[quest].append((entry, quest))
-                        else:
-                            creature_involvedrelation[quest] = []
-                            creature_involvedrelation[quest].append((entry, quest))
-                elif a[0] == 1:
-                    if a[3] == 0:
-                        if quest in gameobject_questrelation:
-                            gameobject_questrelation[quest].append((entry, quest))
-                        else:
-                            gameobject_questrelation[quest] = []
-                            gameobject_questrelation[quest].append((entry, quest))
-                    elif a[3] == 1:
-                        if quest in gameobject_involvedrelation:
-                            gameobject_involvedrelation[quest].append((entry, quest))
-                        else:
-                            gameobject_involvedrelation[quest] = []
-                            gameobject_involvedrelation[quest].append((entry, quest))
-        else:
-            print("  SELECT creature_involvedrelation")
-            cursor.execute("SELECT id, quest FROM creature_involvedrelation")
-            creature_involvedrelation = {}
-            for a in cursor.fetchall():
-                if(a[1] in creature_involvedrelation):
-                    creature_involvedrelation[a[1]].append(a)
-                else:
-                    creature_involvedrelation[a[1]] = []
-                    creature_involvedrelation[a[1]].append(a)
+        print("  SELECT creature_involvedrelation")
+        cursor.execute("SELECT id, quest FROM creature_involvedrelation")
+        creature_involvedrelation = {}
+        for a in cursor.fetchall():
+            if(a[1] in creature_involvedrelation):
+                creature_involvedrelation[a[1]].append(a)
+            else:
+                creature_involvedrelation[a[1]] = []
+                creature_involvedrelation[a[1]].append(a)
 
-            print("  SELECT gameobject_involvedrelation")
-            cursor.execute("SELECT id, quest FROM gameobject_involvedrelation")
-            gameobject_involvedrelation = {}
-            for a in cursor.fetchall():
-                if(a[1] in gameobject_involvedrelation):
-                    gameobject_involvedrelation[a[1]].append(a)
-                else:
-                    gameobject_involvedrelation[a[1]] = []
-                    gameobject_involvedrelation[a[1]].append(a)
+        print("  SELECT gameobject_involvedrelation")
+        cursor.execute("SELECT id, quest FROM gameobject_involvedrelation")
+        gameobject_involvedrelation = {}
+        for a in cursor.fetchall():
+            if(a[1] in gameobject_involvedrelation):
+                gameobject_involvedrelation[a[1]].append(a)
+            else:
+                gameobject_involvedrelation[a[1]] = []
+                gameobject_involvedrelation[a[1]].append(a)
 
-            print("  SELECT creature_questrelation")
-            cursor.execute("SELECT id, quest FROM creature_questrelation")
-            creature_questrelation = {}
-            for a in cursor.fetchall():
-                if(a[1] in creature_questrelation):
-                    creature_questrelation[a[1]].append(a)
-                else:
-                    creature_questrelation[a[1]] = []
-                    creature_questrelation[a[1]].append(a)
+        print("  SELECT creature_questrelation")
+        cursor.execute("SELECT id, quest FROM creature_questrelation")
+        creature_questrelation = {}
+        for a in cursor.fetchall():
+            if(a[1] in creature_questrelation):
+                creature_questrelation[a[1]].append(a)
+            else:
+                creature_questrelation[a[1]] = []
+                creature_questrelation[a[1]].append(a)
 
-            print("  SELECT gameobject_questrelation")
-            cursor.execute("SELECT id, quest FROM gameobject_questrelation")
-            gameobject_questrelation = {}
-            for a in cursor.fetchall():
-                if(a[1] in gameobject_questrelation):
-                    gameobject_questrelation[a[1]].append(a)
-                else:
-                    gameobject_questrelation[a[1]] = []
-                    gameobject_questrelation[a[1]].append(a)
+        print("  SELECT gameobject_questrelation")
+        cursor.execute("SELECT id, quest FROM gameobject_questrelation")
+        gameobject_questrelation = {}
+        for a in cursor.fetchall():
+            if(a[1] in gameobject_questrelation):
+                gameobject_questrelation[a[1]].append(a)
+            else:
+                gameobject_questrelation[a[1]] = []
+                gameobject_questrelation[a[1]].append(a)
                 
         print("  SELECT item_template")
         cursor.execute("SELECT entry, startquest FROM item_template")
@@ -430,21 +391,21 @@ QuestieDB.questData = [[return {
                 title = escapeDoubleQuotes(quest.locales_Title[localesMap[locale]])
             outString += ("\""+title+"\",") #name = 1
             outString += ("{") #starts = 2
-            if (hasattr(quest, "creatureStart")):
+            if hasattr(quest, "creatureStart") and quest.creatureStart is not None:
                 outString += ("{") #npc = starts1
                 for npc in quest.creatureStart:
                     outString += (str(npc)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "goStart")):
+            if hasattr(quest, "goStart") and quest.goStart is not None:
                 outString += ("{") #obj = starts2
                 for obj in quest.goStart:
                     outString += (str(obj)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "itemStart")):
+            if hasattr(quest, "itemStart") and quest.itemStart is not None:
                 outString += ("{") #itm = starts3
                 for itm in quest.itemStart:
                     outString += (str(itm)+",")
@@ -453,14 +414,14 @@ QuestieDB.questData = [[return {
                 outString += ("nil,")
             outString += ("},")
             outString += ("{") #ends = 3
-            if (hasattr(quest, "creatureEnd")): #npc = ends1
+            if hasattr(quest, "creatureEnd") and quest.creatureEnd is not None: #npc = ends1
                 outString += ("{")
                 for npc in quest.creatureEnd:
                     outString += (str(npc)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "goEnd")): #obj = ends2
+            if hasattr(quest, "goEnd") and quest.goEnd is not None: #obj = ends2
                 outString += ("{")
                 for obj in quest.goEnd:
                     outString += (str(obj)+",")
@@ -471,11 +432,11 @@ QuestieDB.questData = [[return {
             outString += (str(quest.MinLevel)+",") #minLevel = 4
             outString += (str(quest.QuestLevel)+",") #level = 5
             outString += (f'{quest.RequiredRaces},') #RequiredRaces = 6
-            if (hasattr(quest, "RequiredClasses")): #RequiredClasses = 7
+            if hasattr(quest, "RequiredClasses") and quest.RequiredClasses is not None: #RequiredClasses = 7
                 outString += (f"{quest.RequiredClasses},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, 'Objectives')): #objectives = 8
+            if hasattr(quest, 'Objectives') and quest.Objectives is not None: #objectives = 8
                 objectives = quest.Objectives.split('\\n')
                 if locale != 'enGB' and quest.locales_Title[localesMap[locale]] != None:
                     objectives = quest.locales_Title[localesMap[locale]].split('\\n')
@@ -485,7 +446,7 @@ QuestieDB.questData = [[return {
                 outString += ('},')
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "triggerEnd")): #trigger = 9
+            if hasattr(quest, "triggerEnd") and quest.triggerEnd is not None: #trigger = 9
                 outString += ("{\""+quest.triggerEnd[0]+"\",{")
                 for zone in quest.triggerEnd[1].cByZone:
                     if zone not in validZoneList:
@@ -498,7 +459,7 @@ QuestieDB.questData = [[return {
             else:
                 outString += ("nil,")
             outString += ("{") #objectives = 10
-            if (hasattr(quest, "ReqCreatureId")): #npc = objectives1
+            if hasattr(quest, "ReqCreatureId") and quest.ReqCreatureId is not None: #npc = objectives1
                 outString += ("{")
                 for npc in quest.ReqCreatureId:
                     outString += ("{"+str(npc[0]))
@@ -509,7 +470,7 @@ QuestieDB.questData = [[return {
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "ReqGOId")): #obj = objectives2
+            if hasattr(quest, "ReqGOId") and quest.ReqGOId is not None: #obj = objectives2
                 outString += ("{")
                 for obj in quest.ReqGOId:
                     outString += ("{"+str(obj[0]))
@@ -520,7 +481,7 @@ QuestieDB.questData = [[return {
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "ReqItemId")): #itm = objectives3
+            if hasattr(quest, "ReqItemId") and quest.ReqItemId is not None: #itm = objectives3
                 outString += ("{")
                 if (hasattr(quest, "ReqItemId")):
                     for itm in quest.ReqItemId:
@@ -528,7 +489,7 @@ QuestieDB.questData = [[return {
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "RepObjectiveFaction")): #rep = objectives4
+            if hasattr(quest, "RepObjectiveFaction") and quest.RepObjectiveFaction is not None: #rep = objectives4
                 outString += ("{"+str(quest.RepObjectiveFaction)+","+str(quest.RepObjectiveValue)+"},")
             else:
                 outString += ("nil,")
@@ -546,62 +507,62 @@ QuestieDB.questData = [[return {
                     outString += ("},")
                 outString += ("},")
             outString += ("},") #objectives = 10
-            if (hasattr(quest, "SrcItemId")): #SrcItemId = 11
+            if hasattr(quest, "SrcItemId") and quest.SrcItemId is not None: #SrcItemId = 11
                 outString += (str(quest.SrcItemId)+",")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "PreQuestGroup")): # 12
+            if hasattr(quest, "PreQuestGroup") and quest.PreQuestGroup is not None: # 12
                 outString += ("{")
                 for questId in quest.PreQuestGroup:
                     outString += (str(questId)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "PreQuestSingle")): # 13
+            if hasattr(quest, "PreQuestSingle") and quest.PreQuestSingle is not None: # 13
                 outString += ("{")
                 for questId in quest.PreQuestSingle:
                     outString += (str(questId)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "ChildQuests")): # 14
+            if hasattr(quest, "ChildQuests") and quest.ChildQuests is not None: # 14
                 outString += ("{")
                 for questId in quest.ChildQuests:
                     outString += (str(questId)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "InGroupWith")): # 15
+            if hasattr(quest, "InGroupWith") and quest.InGroupWith is not None: # 15
                 outString += ("{")
                 for questId in quest.InGroupWith:
                     outString += (str(questId)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "ExclusiveTo")): # 16
+            if hasattr(quest, "ExclusiveTo") and quest.ExclusiveTo is not None: # 16
                 outString += ("{")
                 for questId in quest.ExclusiveTo:
                     outString += (str(questId)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "ZoneOrSort")): #17
+            if hasattr(quest, "ZoneOrSort") and quest.ZoneOrSort is not None: #17
                 outString += (str(quest.ZoneOrSort)+",")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "RequiredSkill")): #18
+            if hasattr(quest, "RequiredSkill") and quest.RequiredSkill is not None: #18
                 outString += ("{"+str(quest.RequiredSkill)+","+str(quest.RequiredSkillValue)+"},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "RequiredMinRepFaction")): #19
+            if hasattr(quest, "RequiredMinRepFaction") and quest.RequiredMinRepFaction is not None: #19
                 outString += ("{"+str(quest.RequiredMinRepFaction)+","+str(quest.RequiredMinRepValue)+"},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, "RequiredMaxRepFaction")): #20
+            if hasattr(quest, "RequiredMaxRepFaction") and quest.RequiredMaxRepFaction is not None: #20
                 outString += ("{"+str(quest.RequiredMaxRepFaction)+","+str(quest.RequiredMaxRepValue)+"},")
             else:
                 outString += ("nil,")
-            if (hasattr(quest, 'ReqSourceId')): #21
+            if hasattr(quest, 'ReqSourceId') and quest.ReqSourceId is not None: #21
                 outString += ('{')
                 done = []
                 for itm in quest.ReqSourceId:
@@ -612,19 +573,19 @@ QuestieDB.questData = [[return {
                 outString += ('},')
             else:
                 outString += ('nil,')
-            if (hasattr(quest, 'NextQuestInChain')): #22
+            if hasattr(quest, 'NextQuestInChain') and quest.NextQuestInChain is not None: #22
                 outString += (f'{quest.NextQuestInChain},')
             else:
                 outString += ('nil,')
-            if (hasattr(quest, 'QuestFlags')): # 23
+            if hasattr(quest, 'QuestFlags') and quest.QuestFlags is not None: # 23
                 outString += (f'{quest.QuestFlags},')
             else:
                 outString += ('nil,')
-            if (hasattr(quest, 'SpecialFlags')): # 24
+            if hasattr(quest, 'SpecialFlags') and quest.SpecialFlags is not None: # 24
                 outString += (f'{quest.SpecialFlags},')
             else:
                 outString += ('nil,')
-            if (hasattr(quest, 'ParentQuest')): # 25
+            if hasattr(quest, 'ParentQuest') and quest.ParentQuest is not None: # 25
                 outString += (f'{quest.ParentQuest},')
             else:
                 outString += ('nil,')

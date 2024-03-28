@@ -7,23 +7,26 @@ import pickle
 
 class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, cursor, dictCursor, version, extractSpawns=True, recache=False):
+    def __init__(self, version):
         self.version = version
-        if (not os.path.isfile(f'data/{version}/objects.pkl') or recache):
+        self.objectList = {}
+
+    def run(self, cursor, extractSpawns=True, recache=False):
+        if (not os.path.isfile(f'data/{self.version}/objects.pkl') or recache):
+            dicts = self.getObjTables(cursor)
             print('Caching objects...')
-            self.cacheObjects(cursor, dictCursor, extractSpawns)
+            self.cacheObjects(dicts, extractSpawns)
         else:
             try:
-                with open(f'data/{version}/objects.pkl', 'rb') as f:
+                with open(f'data/{self.version}/objects.pkl', 'rb') as f:
                     self.objectList = pickle.load(f)
                 print('Using cached objects.')
             except:
                 print('ERROR: Something went wrong while loading cached objects. Re-caching.')
-                self.cacheObjects(cursor, dictCursor, extractSpawns)
+                dicts = self.getObjTables(cursor)
+                self.cacheObjects(dicts, extractSpawns)
 
-    def cacheObjects(self, cursor, dictCursor, extractSpawns=True):
-        self.objectList = {}
-        dicts = self.getObjTables(cursor, dictCursor)
+    def cacheObjects(self, dicts, extractSpawns=True):
         count = len(dicts['object_template'])
         print(f'Caching {count} objects...')
         for obj in dicts['object_template']:
@@ -54,7 +57,7 @@ class ObjList():
     def __iterObj(self, **kwargs):
         return (self.objectList[obj] for obj in self.objectList if self.objectList[obj].match(**kwargs))
 
-    def getObjTables(self, cursor, dictCursor):
+    def getObjTables(self, cursor):
         print("Selecting object related MySQL tables...")
         print("  SELECT gameobject_template")
         cursor.execute("SELECT entry, name, type, faction, data1 FROM gameobject_template")
@@ -62,80 +65,50 @@ class ObjList():
         for a in cursor.fetchall():
             obj_tpl.append(a)
 
-        if self.version == 'cata':
-            print(" SELECT gameobject")
-            cursor.execute("SELECT id, map, position_x, position_y, guid FROM gameobject")
-            obj = {}
-            for a in cursor.fetchall():
-                if a[0] not in obj:
-                    obj[a[0]] = []
-                obj[a[0]].append(a)
-        else:
-            print('  SELECT gameobject_spawn_entry')
-            cursor.execute('SELECT * FROM gameobject_spawn_entry')
-            obj_spawn_entry = {}
-            for guid, entry in cursor.fetchall():
-                if guid not in obj_spawn_entry:
-                    obj_spawn_entry[guid] = []
-                obj_spawn_entry[guid].append(entry)
+        print('  SELECT gameobject_spawn_entry')
+        cursor.execute('SELECT * FROM gameobject_spawn_entry')
+        obj_spawn_entry = {}
+        for guid, entry in cursor.fetchall():
+            if guid not in obj_spawn_entry:
+                obj_spawn_entry[guid] = []
+            obj_spawn_entry[guid].append(entry)
 
-            print("  SELECT gameobject")
-            cursor.execute("SELECT id, map, position_x, position_y, guid FROM gameobject")
-            obj = {}
-            for a in cursor.fetchall():
-                if (a[0] == 0):
-                    if a[4] in obj_spawn_entry:
-                        for entry in obj_spawn_entry[a[4]]:
-                            if entry not in obj:
-                                obj[entry] = []
-                            obj[entry].append(a)
-                    #else:
-                        #print(f'Missing entry for GUID {a[4]}')
-                    continue
-                elif(a[0] not in obj):
-                    obj[a[0]] = []
-                obj[a[0]].append(a)
+        print("  SELECT gameobject")
+        cursor.execute("SELECT id, map, position_x, position_y, guid FROM gameobject")
+        obj = {}
+        for a in cursor.fetchall():
+            if (a[0] == 0):
+                if a[4] in obj_spawn_entry:
+                    for entry in obj_spawn_entry[a[4]]:
+                        if entry not in obj:
+                            obj[entry] = []
+                        obj[entry].append(a)
+                #else:
+                    #print(f'Missing entry for GUID {a[4]}')
+                continue
+            elif(a[0] not in obj):
+                obj[a[0]] = []
+            obj[a[0]].append(a)
 
-        if self.version == "cata":
-            print("  SELECT quest_relation")
-            obj_start = {}
-            obj_end = {}
-            # actor 0=creature, 1=gameobject
-            # entry=creature_template.entry or gameobject_template.entry
-            # quest=quest_template.entry
-            # role 0=start, 1=end
-            cursor.execute("SELECT entry, quest, role FROM quest_relations WHERE actor=1")
-            for a in cursor.fetchall():
-                entry = a[0]
-                quest = a[1]
-                if a[2] == 0:
-                    if quest not in obj_start:
-                        obj_start[quest] = []
-                    obj_start[quest].append((entry, quest))
-                elif a[2] == 1:
-                    if quest not in obj_end:
-                        obj_end[quest] = []
-                    obj_end[quest].append((entry, quest))
-        else:
-            print("  SELECT gameobject_questrelation")
-            cursor.execute("SELECT * FROM gameobject_questrelation")
-            obj_start = {}
-            for a in cursor.fetchall():
-                if(a[0] in obj_start):
-                    obj_start[a[0]].append(a)
-                else:
-                    obj_start[a[0]] = []
-                    obj_start[a[0]].append(a)
+        print("  SELECT gameobject_questrelation")
+        cursor.execute("SELECT * FROM gameobject_questrelation")
+        obj_start = {}
+        for a in cursor.fetchall():
+            if(a[0] in obj_start):
+                obj_start[a[0]].append(a)
+            else:
+                obj_start[a[0]] = []
+                obj_start[a[0]].append(a)
 
-            print("  SELECT gameobject_involvedrelation")
-            cursor.execute("SELECT * FROM gameobject_involvedrelation")
-            obj_end = {}
-            for a in cursor.fetchall():
-                if(a[0] in obj_end):
-                    obj_end[a[0]].append(a)
-                else:
-                    obj_end[a[0]] = []
-                    obj_end[a[0]].append(a)
+        print("  SELECT gameobject_involvedrelation")
+        cursor.execute("SELECT * FROM gameobject_involvedrelation")
+        obj_end = {}
+        for a in cursor.fetchall():
+            if(a[0] in obj_end):
+                obj_end[a[0]].append(a)
+            else:
+                obj_end[a[0]] = []
+                obj_end[a[0]].append(a)
 
         print("  SELECT locales_gameobject")
         cursor.execute("SELECT * FROM locales_gameobject")

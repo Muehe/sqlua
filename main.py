@@ -1,7 +1,10 @@
-from db.QuestList import *
+from db.QuestList import QuestList
+from db.cata.CataItemList import CataItemList
+from db.cata.CataNpcList import CataNpcList
+from db.cata.CataObjList import CataObjList
+from db.cata.CataQuestList import CataQuestList
 from db.NpcList import *
 from db.ObjList import *
-from db.CoordList import *
 from db.ItemList import *
 from preExtract.CoordPreExtract import printCoordFiles
 
@@ -12,6 +15,7 @@ import config
 import time
 
 version = config.version
+db_flavor = config.db_flavor
 debug = config.debug
 
 if version not in ['classic', 'tbc', 'wotlk', 'cata']:
@@ -21,10 +25,24 @@ if version not in ['classic', 'tbc', 'wotlk', 'cata']:
 
 def getClassInstances(recache=False):
     """Get new instances of the list classes"""
-    quests = QuestList(cursor, dictCursor, version, recache=recache)
-    npcs = NpcList(cursor, dictCursor, version, recache=recache, debug=debug)
-    obj = ObjList(cursor, dictCursor, version, recache=recache)
-    items = ItemList(dictCursor, version, recache=recache)
+    if version == 'cata':
+        quests = CataQuestList(version)
+        quests.run(cursor, dictCursor, db_flavor, recache)
+        npcs = CataNpcList(version, debug)
+        npcs.run(cursor, dictCursor, recache)
+        obj = CataObjList(version)
+        obj.run(cursor, recache=recache)
+        items = CataItemList(version)
+        items.run(dictCursor, recache=recache)
+    else:
+        quests = QuestList(version)
+        quests.run(cursor, dictCursor, db_flavor, recache)
+        npcs = NpcList(version, debug)
+        npcs.run(cursor, dictCursor, recache)
+        obj = ObjList(version)
+        obj.run(cursor, recache=recache)
+        items = ItemList(version)
+        items.run(dictCursor, recache=recache)
     return quests, npcs, obj, items
 
 def recache():
@@ -75,6 +93,8 @@ if __name__ == "__main__":
                 reCache = True
             elif arg in ['classic', 'tbc', 'wotlk', 'cata']:
                 version = arg
+            elif arg in ['mangos', 'trinity']:
+                db_flavor = arg
             else:
                 print(f'Unknown argument "{arg}"')
     print(f'Using version {version}')
