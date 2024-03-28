@@ -11,7 +11,7 @@ class NpcList():
         self.debug = debug
         self.nList = {}
 
-    def run(self, cursor, dictCursor, recache=False, extractSpawns=True):
+    def run(self, cursor, dictCursor, db_flavor, recache=False, extractSpawns=True):
         if (not os.path.isfile(f'data/{self.version}/npcs.pkl') or recache):
             dicts = self.getNpcTables(cursor, dictCursor)
             print('Caching NPCs...')

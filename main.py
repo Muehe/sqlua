@@ -29,7 +29,7 @@ def getClassInstances(recache=False):
         quests = CataQuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
         npcs = CataNpcList(version, debug)
-        npcs.run(cursor, dictCursor, recache)
+        npcs.run(cursor, dictCursor, db_flavor, recache)
         obj = CataObjList(version)
         obj.run(cursor, recache=recache)
         items = CataItemList(version)
