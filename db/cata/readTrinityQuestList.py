@@ -77,7 +77,6 @@ def read_trinity_quest_list(cursor, dictCursor):
     for a in cursor.fetchall():
         quest_template_cache[a[0]] = a
 
-    #TODO: Find Quest level information
     quest_template = []
 
     print("  SELECT quest_objectives")
