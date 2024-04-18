@@ -156,7 +156,7 @@ QuestieDB.objectData = [[return {
             elif obj.type == 23: #Meeting Stone
                 meetingStones.append(objId)
 
-            if obj.type not in [2, 3, 5, 8, 10, 19, 23, 25, 32, 34]:
+            if obj.type not in [2, 3, 5, 8, 10, 19, 22, 23, 25, 32, 34]:
                 continue
             #if not hasattr(obj, 'spawns'):
             #    continue
