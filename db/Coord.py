@@ -29,8 +29,10 @@ class Coord():
             if (mapId == mId) and (x < x1) and (x > x2) and (y < y1) and (y > y2):
                 xCoord = round(abs((x-x1)/(x2-x1)*100), 2)
                 yCoord = round(abs((y-y1)/(y2-y1)*100), 2)
-                self.zoneList[zone] = (yCoord, xCoord)
-                self.pointList.append((zone, yCoord, xCoord))
+                # TODO remove hacky hack
+                if len(self.pointList) != 1:
+                    self.zoneList[zone] = (yCoord, xCoord)
+                    self.pointList.append((zone, yCoord, xCoord))
 
         for instance in instanceIds:
             zoneID = int(instance[0])
