@@ -15,7 +15,7 @@ def getAreaTriggers(version):
     b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),?\n", a)
     areaTrigger = []
     for x in b:
-        areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5]), float(x[6]), float(x[7]), float(x[8]), float(x[9])))
+        areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])))
     print(f'Found {len(areaTrigger)} area triggers in {fi}')
     return areaTrigger
 
