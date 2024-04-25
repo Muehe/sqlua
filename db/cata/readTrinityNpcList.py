@@ -3,6 +3,7 @@ def read_trinity_npc_list(cursor, dictCursor):
 
     print("  SELECT creature_template")
     # FactionAlliance and FactionHorde seem to contain the same data
+    # TODO: Rank is coming from Classification
     cursor.execute("SELECT entry, name, 0 as MinLevel, 0 as MaxLevel, 0 as MinLevelHealth, 0 as MaxLevelHealth, 0 as `Rank`, faction, subname, npcflag, KillCredit1, KillCredit2 FROM creature_template WHERE entry != 211770")
     npc_tpl = []
     for a in cursor.fetchall():
