@@ -25,6 +25,7 @@ if version not in ['classic', 'tbc', 'wotlk', 'cata']:
 
 def getClassInstances(recache=False):
     """Get new instances of the list classes"""
+    print("Reading data from {0} database...".format(db_flavor))
     if version == 'cata':
         quests = CataQuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
