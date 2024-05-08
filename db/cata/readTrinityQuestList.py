@@ -71,11 +71,12 @@ def read_trinity_quest_list(cursor, dictCursor):
         FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
     """)
 
+    # TODO: Use BreadcrumbForQuestId to mark quests as breadcrumb
+
     quest_template_cache = {}
     for a in cursor.fetchall():
         quest_template_cache[a[0]] = a
 
-    #TODO: Find Quest level information
     quest_template = []
 
     print("  SELECT quest_objectives")
@@ -100,7 +101,7 @@ def read_trinity_quest_list(cursor, dictCursor):
             q_type = o[1]
             q_order = o[2]
             target = o[3]
-            if q_type == 0 or q_type == 2 or q_type == 3:  # creature and object
+            if q_type == 0 or q_type == 3:  # creature
                 if q_order == 0:
                     entry[29] = target
                 elif q_order == 1:
@@ -109,6 +110,15 @@ def read_trinity_quest_list(cursor, dictCursor):
                     entry[31] = target
                 elif q_order == 3:
                     entry[32] = target
+            if q_type == 2:  # object
+                if q_order == 0:
+                    entry[29] = -target
+                elif q_order == 1:
+                    entry[30] = -target
+                elif q_order == 2:
+                    entry[31] = -target
+                elif q_order == 3:
+                    entry[32] = -target
             if q_type == 1:  # item
                 if q_order == 0:
                     entry[21] = target

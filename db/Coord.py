@@ -3,7 +3,7 @@ from db.CoordData import *
 class Coord():
     """This class takes a (x,y) point from the continent maps and creates a dictionary of all possible zone (x,y) coordinates.
        If the map/zone belongs to an instance a dummy is added."""
-    def __init__(self, mapId, x, y, version, zoneId=False, debug=False):
+    def __init__(self, mapId, x, y, version, zoneId, phase_id, debug=False):
         self.pointList = []
         self.zoneList = {}
         self.isInstance = False
@@ -31,8 +31,12 @@ class Coord():
                 yCoord = round(abs((y-y1)/(y2-y1)*100), 2)
                 # TODO remove hacky hack
                 if len(self.pointList) != 1:
-                    self.zoneList[zone] = (yCoord, xCoord)
-                    self.pointList.append((zone, yCoord, xCoord))
+                    if 1 < phase_id < 4294967295:
+                        self.zoneList[zone] = (yCoord, xCoord, phase_id)
+                        self.pointList.append((zone, yCoord, xCoord, phase_id))
+                    else:
+                        self.zoneList[zone] = (yCoord, xCoord)
+                        self.pointList.append((zone, yCoord, xCoord))
 
         for instance in instanceIds:
             zoneID = int(instance[0])

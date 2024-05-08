@@ -11,7 +11,7 @@ class ObjList():
         self.version = version
         self.objectList = {}
 
-    def run(self, cursor, extractSpawns=True, recache=False):
+    def run(self, cursor, db_flavor, extractSpawns=True, recache=False):
         if (not os.path.isfile(f'data/{self.version}/objects.pkl') or recache):
             dicts = self.getObjTables(cursor)
             print('Caching objects...')
@@ -156,7 +156,7 @@ QuestieDB.objectData = [[return {
             elif obj.type == 23: #Meeting Stone
                 meetingStones.append(objId)
 
-            if obj.type not in [2, 3, 5, 8, 10, 19, 23, 25, 32, 34]:
+            if obj.type not in [2, 3, 5, 8, 10, 19, 22, 23, 25, 32, 34]:
                 continue
             #if not hasattr(obj, 'spawns'):
             #    continue
@@ -196,7 +196,10 @@ QuestieDB.objectData = [[return {
                         zoneId = zone
                     outString += ("["+str(zone)+"]={")
                     for coords in obj.spawns.cByZone[zone]:
-                        outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
+                        if len(coords) == 3:
+                            outString += ("{"+str(coords[0])+","+str(coords[1])+","+str(coords[2])+"},")
+                        else:
+                            outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
                     outString += ("},")
                 outString += ("},")
             else:
