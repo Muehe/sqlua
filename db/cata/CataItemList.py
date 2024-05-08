@@ -23,7 +23,7 @@ class CataItemList(ItemList):
                 tables = self.__getItemTables(dictCursor)
                 self.cacheItems(tables, locale)
 
-    # Trinity does not have item_template because retail hat the ItemSparse.db2 file
+    # Trinity does not have item_template because retail has the ItemSparse.db2 file
     def __getItemTables(self, dictCursor):
         print("Getting item related MySQL tables...")
 
