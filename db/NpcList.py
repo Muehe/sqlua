@@ -278,22 +278,22 @@ QuestieDB.npcData = [[return {
                     outString += ("nil,")
             else:
                 outString += ("nil,")
-            outString += (str(zoneId)+",") #9
-            if hasattr(npc, "start"): #10
+            outString += (str(zoneId)+",") #9 - zoneID
+            if hasattr(npc, "start"): #10 - questStarts
                 outString += ("{")
                 for quest in npc.start:
                     outString += (str(quest)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if hasattr(npc, "end"): #11
+            if hasattr(npc, "end"): #11 - questEnds
                 outString += ("{")
                 for quest in npc.end:
                     outString += (str(quest)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if hasattr(npc, "faction"): #12
+            if hasattr(npc, "faction"): #12 - factionID
                 outString += (str(npc.faction)+",")
             else:
                 outString += ("nil,")
@@ -303,16 +303,16 @@ QuestieDB.npcData = [[return {
                 friendlyTo += "A"
             if not npc.hostileToH:
                 friendlyTo += "H"
-            if friendlyTo == "": #13
+            if friendlyTo == "": #13 - friendlyToFaction
                 outString += ("nil,")
             else:
                 outString += (f'"{friendlyTo}",')
-            if (hasattr(npc, "subName") and npc.subName != None): #14
+            if (hasattr(npc, "subName") and npc.subName != None): #14 - subName
                 sn = npc.subName.replace('"', '\\"')
                 outString += (f'"{sn}",')
             else:
                 outString += ("nil,")
-            if hasattr(npc, "npcFlags"): #15
+            if hasattr(npc, "npcFlags"): #15 - npcFlags
                 outString += (f'{str(npc.npcFlags)},')
             else:
                 outString += ("nil,")
