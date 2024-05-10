@@ -3,6 +3,7 @@ from db.NpcList import NpcList
 import os.path
 import pickle
 
+from db.cata.readMangosNpcList import read_mangos_npc_list
 from db.cata.readTrinityNpcList import read_trinity_npc_list
 
 
@@ -29,3 +30,5 @@ class CataNpcList(NpcList):
 def load_npcs(cursor, dictCursor, db_flavor):
     if db_flavor == 'trinity':
         return read_trinity_npc_list(cursor, dictCursor)
+    else:
+        return read_mangos_npc_list(cursor, dictCursor)
