@@ -21,9 +21,9 @@ def read_trinity_obj_list(cursor):
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
-        if quest not in obj_start:
-            obj_start[quest] = []
-        obj_start[quest].append((entry, quest))
+        if entry not in obj_start:
+            obj_start[entry] = []
+        obj_start[entry].append((entry, quest))
 
     print("  SELECT gameobject_questender")
     obj_end = {}
@@ -31,9 +31,9 @@ def read_trinity_obj_list(cursor):
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
-        if quest not in obj_end:
-            obj_end[quest] = []
-        obj_end[quest].append((entry, quest))
+        if entry not in obj_end:
+            obj_end[entry] = []
+        obj_end[entry].append((entry, quest))
 
     # print("  SELECT locales_gameobject")
     # cursor.execute("SELECT * FROM locales_gameobject")
