@@ -180,6 +180,12 @@ with open('data/cata/npc_zone_id_data.json', 'r') as f:
     for d in data:
         npcZoneIdMap[int(d['npcId'])] = int(d['zoneId'])
 
+objectZoneIdMap = {}
+with open('data/cata/object_zone_id_data.json', 'r') as f:
+    data = json.load(f)
+    for d in data:
+        objectZoneIdMap[int(d['objectId'])] = int(d['zoneId'])
+
 zoneNames = {}
 for m in mapBordersCata:
     zoneNames[m[0]] = m[1]
