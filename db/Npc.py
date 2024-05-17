@@ -27,7 +27,7 @@ def getCreatureWaypoints(file):
     zoneDict = {}
     for row in reader:
         # Split id#point strings
-        idAndPoint = re.split("\D", row[0])
+        idAndPoint = re.split(r"\D", row[0])
         cid = int(idAndPoint[0])
         point = int(idAndPoint[1])
         if cid not in zoneDict:
@@ -44,7 +44,7 @@ def getCreatureTemplateWaypoints(file):
     zoneDict = {}
     for row in reader:
         # Split id#point strings
-        idAndPoint = re.split("\D", row[0])
+        idAndPoint = re.split(r"\D", row[0])
         cid = int(idAndPoint[0])
         point = int(idAndPoint[1])
         pathId = int(idAndPoint[2])
