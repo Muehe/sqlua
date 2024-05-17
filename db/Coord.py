@@ -30,7 +30,10 @@ class Coord():
                 xCoord = round(abs((x-x1)/(x2-x1)*100), 2)
                 yCoord = round(abs((y-y1)/(y2-y1)*100), 2)
                 # TODO remove hacky hack
-                if len(self.pointList) != 1:
+                if (zoneId == False) and (len(self.pointList) != 1):
+                    self.zoneList[zone] = (yCoord, xCoord)
+                    self.pointList.append((zone, yCoord, xCoord))
+                elif (zoneId != False):
                     self.zoneList[zone] = (yCoord, xCoord)
                     self.pointList.append((zone, yCoord, xCoord))
 
