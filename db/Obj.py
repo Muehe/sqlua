@@ -52,26 +52,6 @@ class Obj():
             self.spawns = CoordList([], version)
         elif extractSpawns:
             self.spawns = CoordList(spawns, version, debug=debug)
-            correct_zone = objectZoneIdMap.get(self.id)
-            if correct_zone and correct_zone in self.spawns.cByZone:
-                cleaned_cList = []
-                for coord in self.spawns.cList:
-                    for point in coord.pointList:
-                        if point[0] == correct_zone:
-                            cleaned_cList.append(coord)
-                            break
-                self.spawns.cList = cleaned_cList
-                self.spawns.cByZone = {correct_zone: self.spawns.cByZone[correct_zone]}
-            elif len(self.spawns.cByZone) > 1:
-                first_zone = sorted(list(self.spawns.cByZone.keys()))[0]
-                cleaned_cList = []
-                for coord in self.spawns.cList:
-                    for point in coord.pointList:
-                        if point[0] == first_zone:
-                            cleaned_cList.append(coord)
-                            break
-                self.spawns.cList = cleaned_cList
-                self.spawns.cByZone = {first_zone: self.spawns.cByZone[first_zone]}
         
         #Start
         self.start = []
