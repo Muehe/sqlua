@@ -41,6 +41,9 @@ class Coord():
             zoneID = int(instance[0])
             mapID = int(instance[2])
             if (mapId == mapID):
+                # TODO: Add this for coords in instances and at the entry
+                # if not zoneID in self.zoneList:
+                #     self.zoneList[zoneID] = (-1, -1)
                 self.zoneList[zoneID] = (-1, -1)
                 self.pointList.append((zoneID, -1, -1))
                 self.isInstance = True

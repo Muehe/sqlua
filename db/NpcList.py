@@ -210,6 +210,7 @@ QuestieDB.npcData = [[return {
             if hasattr(npc, "spawns") and len(npc.spawns.cList) > 0: #7
                 outString += ("{")
                 for zone in npc.spawns.cByZone:
+                    # TODO: Remove this for Cata, as every dungeon and raid has a valid map
                     if not zone in validZoneList:
                         if zoneId == 0:
                             zoneId = zone
