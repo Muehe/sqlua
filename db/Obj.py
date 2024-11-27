@@ -43,9 +43,15 @@ class Obj():
                     # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
                         if spawn[4] in objectZones:
-                            spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]], spawn[5]))
+                            if version == 'cata':
+                                spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]], spawn[5]))
+                            else:
+                                spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]], 0))
                         else:
-                            spawns.append((spawn[1], spawn[2], spawn[3], False, spawn[5]))
+                            if version == 'cata':
+                                spawns.append((spawn[1], spawn[2], spawn[3], False, spawn[5]))
+                            else:
+                                spawns.append((spawn[1], spawn[2], spawn[3], False, 0))
         if (spawns == []):
             Obj.spawnErrors.append(self.id)
             self.noSpawn = True

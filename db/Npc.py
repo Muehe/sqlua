@@ -143,9 +143,15 @@ class Npc():
                     if (spawn[0] == self.id) or (spawn[0] == 0):
                         # get spawns
                         if spawn[4] in zones:
-                            spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]], spawn[5]))
+                            if version == 'cata':
+                                spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]], spawn[5]))
+                            else:
+                                spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]], 0))
                         else:
-                            spawns.append((spawn[1], spawn[2], spawn[3], False, spawn[5]))
+                            if version == 'cata':
+                                spawns.append((spawn[1], spawn[2], spawn[3], False, spawn[5]))
+                            else:
+                                spawns.append((spawn[1], spawn[2], spawn[3], False, 0))
                         # get waypoints
                         npcMovement = None
                         if spawn[4] in dicts['npc_movement']:
@@ -179,7 +185,7 @@ class Npc():
                 for waypoint in dicts['npc_movement_template'][self.id]:
                     # point, entry, position_x, position_y, pathId
                     if (waypoint[1] == self.id) and (len(spawns) > 0):
-                        if (self.id in movementTemplateZones) and (waypoint[0] in movementTemplateZones[self.id][waypoint[4]]):
+                        if (self.id in movementTemplateZones) and (waypoint[4] in movementTemplateZones[self.id]) and (waypoint[0] in movementTemplateZones[self.id][waypoint[4]]):
                             wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3], movementTemplateZones[self.id][waypoint[4]][waypoint[0]])
                         else:
                             wptSort[waypoint[0]] = (spawns[0][0], waypoint[2], waypoint[3])

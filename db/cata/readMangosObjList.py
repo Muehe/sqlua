@@ -7,7 +7,7 @@ def read_mangos_obj_list(cursor):
         obj_tpl.append(a)
 
     print(" SELECT gameobject")
-    cursor.execute("SELECT id, map, position_x, position_y, guid FROM gameobject")
+    cursor.execute("SELECT id, map, position_x, position_y, guid, 0 as PhaseId FROM gameobject")
     obj = {}
     for a in cursor.fetchall():
         if a[0] not in obj:

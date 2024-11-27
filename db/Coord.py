@@ -3,7 +3,7 @@ from db.CoordData import *
 class Coord():
     """This class takes a (x,y) point from the continent maps and creates a dictionary of all possible zone (x,y) coordinates.
        If the map/zone belongs to an instance a dummy is added."""
-    def __init__(self, mapId, x, y, version, zoneId, phase_id, debug=False):
+    def __init__(self, mapId, x, y, version, zoneId=False, phase_id=0, debug=False):
         self.pointList = []
         self.zoneList = {}
         self.isInstance = False

@@ -62,13 +62,17 @@ def main(recache):
     return 0
 
 def getCursors(v):
+    conversions = pymysql.converters.conversions
+    conversions[pymysql.FIELD_TYPE.DECIMAL] = lambda x: float(x)
+    conversions[pymysql.FIELD_TYPE.NEWDECIMAL] = lambda x: float(x)
     connection = pymysql.connect(
         host=config.dbInfo['host'],
         user=config.dbInfo['user'],
         password=config.dbInfo['password'],
         database=config.dbInfo[v],
         port=config.dbInfo["port"],
-        charset='utf8'
+        charset='utf8',
+        conv=conversions
     )
     c = connection.cursor()
     dc = connection.cursor(pymysql.cursors.DictCursor)
