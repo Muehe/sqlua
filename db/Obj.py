@@ -16,6 +16,7 @@ def getObjectZones(file):
 objectZonesClassic = getObjectZones('data/classic/gameobject_preExtract.csvzone_and_area.csv')
 objectZonesTBC = getObjectZones('data/tbc/gameobject_preExtract.csvzone_and_area.csv')
 objectZonesWotLK = getObjectZones('data/wotlk/gameobject_preExtract.csvzone_and_area.csv')
+objectZonesCata = getObjectZones('data/cata/gameobject_preExtract.csvzone_and_area.csv')
 
 class Obj():
     spawnErrors = [] # Holds IDs of objects without spawns entry, name, type, faction, data1
@@ -28,7 +29,7 @@ class Obj():
         elif version == 'wotlk':
             objectZones = objectZonesWotLK
         elif version == 'cata':
-            objectZones = objectZonesWotLK # TODO: cata version
+            objectZones = objectZonesCata
         self.id = obj[0]
         self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]
@@ -39,17 +40,38 @@ class Obj():
             if self.id in dicts['object']:
                 rawSpawn = dicts['object'][self.id]
                 for spawn in rawSpawn:
+                    # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
                         if spawn[4] in objectZones:
-                            spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]]))
+                            spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]], spawn[5]))
                         else:
-                            spawns.append((spawn[1], spawn[2], spawn[3]))
+                            spawns.append((spawn[1], spawn[2], spawn[3], False, spawn[5]))
         if (spawns == []):
             Obj.spawnErrors.append(self.id)
             self.noSpawn = True
             self.spawns = CoordList([], version)
         elif extractSpawns:
             self.spawns = CoordList(spawns, version, debug=debug)
+            correct_zone = objectZoneIdMap.get(self.id)
+            if correct_zone and correct_zone in self.spawns.cByZone:
+                cleaned_cList = []
+                for coord in self.spawns.cList:
+                    for point in coord.pointList:
+                        if point[0] == correct_zone:
+                            cleaned_cList.append(coord)
+                            break
+                self.spawns.cList = cleaned_cList
+                self.spawns.cByZone = {correct_zone: self.spawns.cByZone[correct_zone]}
+            elif len(self.spawns.cByZone) > 1:
+                first_zone = sorted(list(self.spawns.cByZone.keys()))[0]
+                cleaned_cList = []
+                for coord in self.spawns.cList:
+                    for point in coord.pointList:
+                        if point[0] == first_zone:
+                            cleaned_cList.append(coord)
+                            break
+                self.spawns.cList = cleaned_cList
+                self.spawns.cByZone = {first_zone: self.spawns.cByZone[first_zone]}
         
         #Start
         self.start = []

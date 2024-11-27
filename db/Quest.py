@@ -387,6 +387,9 @@ class Quest():
         temp = '$N'.join(split4)
         split5 = temp.split('  ')
         temp = ' '.join(split5)
+        # Remove trailing \n
+        while temp[-2:] == '\\n':
+            temp = temp[:-2]
         return escapeDoubleQuotes(temp)
 
     def addGroup(self, value):

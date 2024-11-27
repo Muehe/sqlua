@@ -25,22 +25,23 @@ if version not in ['classic', 'tbc', 'wotlk', 'cata']:
 
 def getClassInstances(recache=False):
     """Get new instances of the list classes"""
+    print("Reading data from {0} database...".format(db_flavor))
     if version == 'cata':
         quests = CataQuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
         npcs = CataNpcList(version, debug)
-        npcs.run(cursor, dictCursor, recache)
+        npcs.run(cursor, dictCursor, db_flavor, recache)
         obj = CataObjList(version)
-        obj.run(cursor, recache=recache)
+        obj.run(cursor, db_flavor, recache=recache)
         items = CataItemList(version)
         items.run(dictCursor, recache=recache)
     else:
         quests = QuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
         npcs = NpcList(version, debug)
-        npcs.run(cursor, dictCursor, recache)
+        npcs.run(cursor, dictCursor, db_flavor, recache)
         obj = ObjList(version)
-        obj.run(cursor, recache=recache)
+        obj.run(cursor, db_flavor, recache=recache)
         items = ItemList(version)
         items.run(dictCursor, recache=recache)
     return quests, npcs, obj, items
@@ -50,6 +51,7 @@ def recache():
 
 def main(recache):
     """Extracts and prints quest related data"""
+    # TODO: Add args to extract and print only specific files
     quests, npcs, objects, items = getClassInstances(recache)
     print("Printing files...")
     quests.printQuestFile(f'output/{version}/{version}QuestDB.lua')

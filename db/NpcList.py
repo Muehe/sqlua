@@ -11,7 +11,7 @@ class NpcList():
         self.debug = debug
         self.nList = {}
 
-    def run(self, cursor, dictCursor, recache=False, extractSpawns=True):
+    def run(self, cursor, dictCursor, db_flavor, recache=False, extractSpawns=True):
         if (not os.path.isfile(f'data/{self.version}/npcs.pkl') or recache):
             dicts = self.getNpcTables(cursor, dictCursor)
             print('Caching NPCs...')
@@ -31,7 +31,7 @@ class NpcList():
         print(f'Caching {count} NPCs...')
         for npc in dicts['npc_template']:
             self.addNpc(npc, dicts, extractSpawns)
-            if ((count % 100) == 0):
+            if (count % 1000) == 0:
                 print(str(count)+"...")
             count -= 1
         with open(f'data/{self.version}/npcs.pkl', 'wb') as f:
@@ -182,6 +182,9 @@ QuestieDB.npcData = [[return {
         skippedWaypoints = []
         for npcId in sorted(self.nList):
             npc = self.nList[npcId]
+            if not npc.name:
+                # 211770 has no name
+                continue
             foundTag = False
             for tag in excludeTags:
                 if tag in npc.name:
@@ -217,7 +220,10 @@ QuestieDB.npcData = [[return {
                         zoneId = zone
                     outString += ("["+str(zone)+"]={")
                     for coords in npc.spawns.cByZone[zone]:
-                        outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
+                        if len(coords) == 3:
+                            outString += ("{"+str(coords[0])+","+str(coords[1])+","+str(coords[2])+"},")
+                        else:
+                            outString += ("{"+str(coords[0])+","+str(coords[1])+"},")
                     outString += ("},")
                 outString += ("},")
             else:
@@ -272,22 +278,22 @@ QuestieDB.npcData = [[return {
                     outString += ("nil,")
             else:
                 outString += ("nil,")
-            outString += (str(zoneId)+",") #9
-            if hasattr(npc, "start"): #10
+            outString += (str(zoneId)+",") #9 - zoneID
+            if hasattr(npc, "start"): #10 - questStarts
                 outString += ("{")
                 for quest in npc.start:
                     outString += (str(quest)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if hasattr(npc, "end"): #11
+            if hasattr(npc, "end"): #11 - questEnds
                 outString += ("{")
                 for quest in npc.end:
                     outString += (str(quest)+",")
                 outString += ("},")
             else:
                 outString += ("nil,")
-            if hasattr(npc, "faction"): #12
+            if hasattr(npc, "faction"): #12 - factionID
                 outString += (str(npc.faction)+",")
             else:
                 outString += ("nil,")
@@ -297,16 +303,16 @@ QuestieDB.npcData = [[return {
                 friendlyTo += "A"
             if not npc.hostileToH:
                 friendlyTo += "H"
-            if friendlyTo == "": #13
+            if friendlyTo == "": #13 - friendlyToFaction
                 outString += ("nil,")
             else:
                 outString += (f'"{friendlyTo}",')
-            if (hasattr(npc, "subName") and npc.subName != None): #14
+            if (hasattr(npc, "subName") and npc.subName != None): #14 - subName
                 sn = npc.subName.replace('"', '\\"')
                 outString += (f'"{sn}",')
             else:
                 outString += ("nil,")
-            if hasattr(npc, "npcFlags"): #15
+            if hasattr(npc, "npcFlags"): #15 - npcFlags
                 outString += (f'{str(npc.npcFlags)},')
             else:
                 outString += ("nil,")

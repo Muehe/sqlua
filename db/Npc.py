@@ -139,13 +139,13 @@ class Npc():
             if self.id in dicts['npc']:
                 rawSpawns = dicts['npc'][self.id]
                 for spawn in rawSpawns:
-                    # id, map, position_x, position_y, guid
+                    # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
                         # get spawns
                         if spawn[4] in zones:
-                            spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]]))
+                            spawns.append((spawn[1], spawn[2], spawn[3], zones[spawn[4]], spawn[5]))
                         else:
-                            spawns.append((spawn[1], spawn[2], spawn[3]))
+                            spawns.append((spawn[1], spawn[2], spawn[3], False, spawn[5]))
                         # get waypoints
                         npcMovement = None
                         if spawn[4] in dicts['npc_movement']:
@@ -198,6 +198,29 @@ class Npc():
                 self.spawns = CoordList([], version)
             else:
                 self.spawns = CoordList(spawns, version)
+                # use npcZoneIdMap to remove invalid spawn entries
+                correct_zone = npcZoneIdMap.get(self.id)
+                if correct_zone and correct_zone in self.spawns.cByZone:
+                    cleaned_cList = []
+                    for coord in self.spawns.cList:
+                        for point in coord.pointList:
+                            if point[0] == correct_zone:
+                                cleaned_cList.append(coord)
+                                break
+                    self.spawns.cList = cleaned_cList
+                    self.spawns.cByZone = {correct_zone: self.spawns.cByZone[correct_zone]}
+                elif len(self.spawns.cByZone) > 1:
+                    first_zone = sorted(list(self.spawns.cByZone.keys()))[0]
+                    cleaned_cList = []
+                    for coord in self.spawns.cList:
+                        for point in coord.pointList:
+                            if point[0] == first_zone:
+                                cleaned_cList.append(coord)
+                                break
+                    self.spawns.cList = cleaned_cList
+                    self.spawns.cByZone = {first_zone: self.spawns.cByZone[first_zone]}
+
+
             if (waypoints != []):
                 self.waypoints = waypoints
             if(wpError):
