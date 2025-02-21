@@ -33,8 +33,12 @@ def getClassInstances(recache=False):
         npcs.run(cursor, dictCursor, db_flavor, recache)
         obj = CataObjList(version)
         obj.run(cursor, db_flavor, recache=recache)
-        items = CataItemList(version)
-        items.run(dictCursor, recache=recache)
+        if db_flavor != "trinity":
+            items = CataItemList(version)
+            items.run(dictCursor, recache=recache)
+        else:
+            # this will error in main(), but at least it writes the other stuff to file first
+            items = {}
     else:
         quests = QuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
