@@ -26,13 +26,13 @@ def read_mangos_obj_list(cursor):
         entry = a[0]
         quest = a[1]
         if a[2] == 0:
-            if quest not in obj_start:
-                obj_start[quest] = []
-            obj_start[quest].append((entry, quest))
+            if entry not in obj_start:
+                obj_start[entry] = []
+            obj_start[entry].append((entry, quest))
         elif a[2] == 1:
-            if quest not in obj_end:
-                obj_end[quest] = []
-            obj_end[quest].append((entry, quest))
+            if entry not in obj_end:
+                obj_end[entry] = []
+            obj_end[entry].append((entry, quest))
 
     print("  SELECT locales_gameobject")
     cursor.execute("SELECT * FROM locales_gameobject")
