@@ -22,13 +22,13 @@ def read_mangos_npc_list(cursor, dictCursor):
         entry = a[0]
         quest = a[1]
         if a[2] == 0:
-            if quest not in npc_start:
-                npc_start[quest] = []
-            npc_start[quest].append((entry, quest))
+            if entry not in npc_start:
+                npc_start[entry] = []
+            npc_start[entry].append((entry, quest))
         elif a[2] == 1:
-            if quest not in npc_end:
-                npc_end[quest] = []
-            npc_end[quest].append((entry, quest))
+            if entry not in npc_end:
+                npc_end[entry] = []
+            npc_end[entry].append((entry, quest))
 
     # print("  SELECT creature_movement")
     # cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
