@@ -9,6 +9,8 @@ class CoordList():
         for coord in coordTable:
             if len(coord) > 4:
                 self.addCoord(coord[0], coord[1], coord[2], version, coord[3], coord[4])
+            elif len(coord) > 3:
+                self.addCoord(coord[0], coord[1], coord[2], version, coord[3], 0)
             else:
                 self.addCoord(coord[0], coord[1], coord[2], version, False, 0)
 

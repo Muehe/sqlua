@@ -33,8 +33,12 @@ def getClassInstances(recache=False):
         npcs.run(cursor, dictCursor, db_flavor, recache)
         obj = CataObjList(version)
         obj.run(cursor, db_flavor, recache=recache)
-        items = CataItemList(version)
-        items.run(dictCursor, recache=recache)
+        if db_flavor != "trinity":
+            items = CataItemList(version)
+            items.run(dictCursor, recache=recache)
+        else:
+            # this will error in main(), but at least it writes the other stuff to file first
+            items = {}
     else:
         quests = QuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
@@ -62,13 +66,17 @@ def main(recache):
     return 0
 
 def getCursors(v):
+    conversions = pymysql.converters.conversions
+    conversions[pymysql.FIELD_TYPE.DECIMAL] = lambda x: float(x)
+    conversions[pymysql.FIELD_TYPE.NEWDECIMAL] = lambda x: float(x)
     connection = pymysql.connect(
         host=config.dbInfo['host'],
         user=config.dbInfo['user'],
         password=config.dbInfo['password'],
         database=config.dbInfo[v],
         port=config.dbInfo["port"],
-        charset='utf8'
+        charset='utf8',
+        conv=conversions
     )
     c = connection.cursor()
     dc = connection.cursor(pymysql.cursors.DictCursor)

@@ -22,33 +22,32 @@ def read_mangos_npc_list(cursor, dictCursor):
         entry = a[0]
         quest = a[1]
         if a[2] == 0:
-            if quest not in npc_start:
-                npc_start[quest] = []
-            npc_start[quest].append((entry, quest))
+            if entry not in npc_start:
+                npc_start[entry] = []
+            npc_start[entry].append((entry, quest))
         elif a[2] == 1:
-            if quest not in npc_end:
-                npc_end[quest] = []
-            npc_end[quest].append((entry, quest))
+            if entry not in npc_end:
+                npc_end[entry] = []
+            npc_end[entry].append((entry, quest))
 
-    # print("  SELECT creature_movement")
-    # cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
+    print("  SELECT creature_movement")
+    cursor.execute("SELECT point, id, position_x, position_y FROM creature_movement")
     npc_mov = {}
-    # for a in cursor.fetchall():
-    #     if(a[1] in npc_mov):
-    #         npc_mov[a[1]].append(a)
-    #     else:
-    #         npc_mov[a[1]] = []
-    #         npc_mov[a[1]].append(a)
-    #
-    # print("  SELECT creature_movement_template")
-    # cursor.execute("SELECT point, entry, position_x, creature_movement_template.position_y, PathId FROM creature_movement_template")
+    for a in cursor.fetchall():
+        if(a[1] in npc_mov):
+            npc_mov[a[1]].append(a)
+        else:
+            npc_mov[a[1]] = []
+            npc_mov[a[1]].append(a)
+    print("  SELECT creature_movement_template")
+    cursor.execute("SELECT point, entry, position_x, position_y, wpguid FROM creature_movement_template")
     npc_mov_tpl = {}
-    # for a in cursor.fetchall():
-    #     if(a[1] in npc_mov_tpl):
-    #         npc_mov_tpl[a[1]].append(a)
-    #     else:
-    #         npc_mov_tpl[a[1]] = []
-    #         npc_mov_tpl[a[1]].append(a)
+    for a in cursor.fetchall():
+        if(a[1] in npc_mov_tpl):
+            npc_mov_tpl[a[1]].append(a)
+        else:
+            npc_mov_tpl[a[1]] = []
+            npc_mov_tpl[a[1]].append(a)
 
     print("  SELECT locales_creature")
     count = dictCursor.execute("SELECT * FROM locales_creature")
