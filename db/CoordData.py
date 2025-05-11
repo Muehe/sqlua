@@ -8,6 +8,7 @@ DBC functions
 
 """
 
+# TODO: Use proper CSV reader
 def getAreaTriggers(version):
     file_path = f'data/{version}/AreaTrigger.dbc.CSV'
     with open(file_path, 'r') as infile:

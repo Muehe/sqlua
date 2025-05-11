@@ -51,14 +51,7 @@ class QuestList:
                 self.cacheQuests(dicts)
 
     def cacheQuests(self, dicts):
-        # TODO: Use proper CSV reader
-        infile = open(f'data/{self.version}/AreaTrigger.dbc.CSV', 'r')
-        a = infile.read()
-        infile.close()
-        b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),?\n", a)
-        areaTrigger = []
-        for x in b:
-            areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3])))
+        areaTrigger = getAreaTriggers(self.version)
         count = len(dicts['quest_template'])
         print(f'Caching {count} quests...')
         for quest in dicts['quest_template']:
