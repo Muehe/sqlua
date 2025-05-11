@@ -9,15 +9,14 @@ DBC functions
 """
 
 def getAreaTriggers(version):
-    fi = f'data/{version}/AreaTrigger.dbc.CSV'
-    infile = open(fi, 'r')
-    a = infile.read()
-    infile.close()
-    b = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),?\n", a)
+    file_path = f'data/{version}/AreaTrigger.dbc.CSV'
+    with open(file_path, 'r') as infile:
+        file_content = infile.read()
+    rows = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),?\n", file_content)
     areaTrigger = []
-    for x in b:
-        areaTrigger.append((int(x[0]), int(x[1]), float(x[2]), float(x[3]), float(x[4]), float(x[5])))
-    print(f'Found {len(areaTrigger)} area triggers in {fi}')
+    for row in rows:
+        areaTrigger.append((int(row[0]), int(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5])))
+    print(f'Found {len(areaTrigger)} area triggers in {file_path}')
     return areaTrigger
 
 def getMapBorders(version):
