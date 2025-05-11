@@ -1,0 +1,1 @@
+UPDATE quest_template SET NextQuestId = 25127 WHERE Id = 25136;
