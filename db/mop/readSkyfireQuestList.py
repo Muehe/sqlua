@@ -12,8 +12,8 @@ def read_skyfire_quest_list(cursor, dictCursor):
         RequiredRaces,  # 5
         RequiredSkillId,  # 6
         RequiredSkillPoints,  # 7
-        NULL as RepObjectiveFaction,  # 8
-        NULL as RepObjectiveValue,  # 9
+        0 as RepObjectiveFaction,  # 8
+        0 as RepObjectiveValue,  # 9
         RequiredMinRepFaction,  # 10
         RequiredMinRepValue,  # 11
         RequiredMaxRepFaction,  # 12
@@ -25,22 +25,22 @@ def read_skyfire_quest_list(cursor, dictCursor):
         ExclusiveGroup,  # 18
         Title,  # 19
         Objectives,  # 20
-        NULL as ReqItemId1,  # 21
-        NULL as ReqItemId2,  # 22
-        NULL as ReqItemId3,  # 23
-        NULL as ReqItemId4,  # 24
-        NULL as ReqSourceId1,  # 25
-        NULL as ReqSourceId2,  # 26
-        NULL as ReqSourceId3,  # 27
-        NULL as ReqSourceId4,  # 28
-        NULL as ReqCreatureOrGOId1,  # 29
-        NULL as ReqCreatureOrGOId2,  # 30
-        NULL as ReqCreatureOrGOId3,  # 31
-        NULL as ReqCreatureOrGOId4,  # 32
-        NULL as ReqSpellCast1,  # 33
-        NULL as ReqSpellCast2,  # 34
-        NULL as ReqSpellCast3,  # 35
-        NULL as ReqSpellCast4,  # 36
+        0 as ReqItemId1,  # 21
+        0 as ReqItemId2,  # 22
+        0 as ReqItemId3,  # 23
+        0 as ReqItemId4,  # 24
+        0 as ReqSourceId1,  # 25
+        0 as ReqSourceId2,  # 26
+        0 as ReqSourceId3,  # 27
+        0 as ReqSourceId4,  # 28
+        0 as ReqCreatureOrGOId1,  # 29
+        0 as ReqCreatureOrGOId2,  # 30
+        0 as ReqCreatureOrGOId3,  # 31
+        0 as ReqCreatureOrGOId4,  # 32
+        0 as ReqSpellCast1,  # 33
+        0 as ReqSpellCast2,  # 34
+        0 as ReqSpellCast3,  # 35
+        0 as ReqSpellCast4,  # 36
         PointMapId,  # 37
         PointX,  # 38
         PointY,  # 39
@@ -49,10 +49,10 @@ def read_skyfire_quest_list(cursor, dictCursor):
         SourceItemId,  # 42
         ZoneOrSort,  # 43
         Method,  # 44
-        NULL as ObjectiveText1,  # 45
-        NULL as ObjectiveText2,  # 46
-        NULL as ObjectiveText3,  # 47
-        NULL as ObjectiveText4,  # 48
+        '' as ObjectiveText1,  # 45
+        '' as ObjectiveText2,  # 46
+        '' as ObjectiveText3,  # 47
+        '' as ObjectiveText4,  # 48
         EndText,  # 49
         Details,  # 50
         SpecialFlags,  # 51
