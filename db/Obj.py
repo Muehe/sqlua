@@ -30,6 +30,8 @@ class Obj():
             objectZones = objectZonesWotLK
         elif version == 'cata':
             objectZones = objectZonesCata
+        elif version == 'mop':
+            objectZones = objectZonesCata # TODO: Use MoP data
         self.id = obj[0]
         self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]
