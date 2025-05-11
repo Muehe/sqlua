@@ -19,6 +19,13 @@ class CoordList():
         if not newCoord.noZone:
             self.cList.append(newCoord)
             for zone in newCoord.zoneList:
+                # TODO: Add this for coords in instances and at the entry
+                # if newCoord.isInstance:
+                #     if zone in self.cByZone:
+                #         self.cByZone[zone].append((-1, -1))
+                #     else:
+                #         self.cByZone[zone] = [(-1, -1)]
+
                 if zone in self.cByZone:
                     self.cByZone[zone].append(newCoord.zoneList[zone])
                 else:
