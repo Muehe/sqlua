@@ -6,6 +6,7 @@ from db.cata.CataQuestList import CataQuestList
 from db.NpcList import *
 from db.ObjList import *
 from db.ItemList import *
+from db.mop.MopNpcList import MopNpcList
 from db.mop.MopQuestList import MopQuestList
 from preExtract.CoordPreExtract import printCoordFiles
 
@@ -30,6 +31,8 @@ def getClassInstances(recache=False):
     if version == 'mop':
         quests = MopQuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
+        npcs = MopNpcList(version, debug)
+        npcs.run(cursor, dictCursor, db_flavor, recache)
     elif version == 'cata':
         quests = CataQuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)

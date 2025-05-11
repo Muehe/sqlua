@@ -77,6 +77,8 @@ def getFactionTemplate(fac):
     factionList = re.findall("(.*?),.*?,.*?,(.*?),(.*?),(.*?),.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,?\n", content)
     factionDict = {}
     for data in factionList:
+        if data[0] == 'ID':
+            continue
         factionDict[int(data[0])] = (int(data[1]), # ourMask
                                      int(data[2]), # friendlyMask
                                      int(data[3])) # hostileMask
@@ -87,6 +89,7 @@ factionTemplateClassic = getFactionTemplate('data/classic/FactionTemplate.dbc.CS
 factionTemplateTBC = getFactionTemplate('data/tbc/FactionTemplate.dbc.CSV')
 factionTemplateWotLK = getFactionTemplate('data/wotlk/FactionTemplate.dbc.CSV')
 factionTemplateCata = getFactionTemplate('data/cata/FactionTemplate.dbc.CSV')
+factionTemplateMop = getFactionTemplate('data/mop/FactionTemplate.dbc.CSV')
 
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
@@ -113,6 +116,11 @@ class Npc():
             movementZones = movementZonesCata
             movementTemplateZones = movementTemplateZonesCata
             factionTemplate = factionTemplateCata
+        elif version == 'mop': # TODO: Use MoP data
+            zones = zonesCata
+            movementZones = movementZonesCata
+            movementTemplateZones = movementTemplateZonesCata
+            factionTemplate = factionTemplateMop
         self.id = npc[0]
         self.debug = debug
         self.name = escapeQuotes(npc[1])
