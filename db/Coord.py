@@ -17,6 +17,8 @@ class Coord():
             mapBorders = mapBordersWotLK
         elif version == 'cata':
             mapBorders = mapBordersCata
+        elif version == 'mop':
+            mapBorders = mapBordersCata # TODO: Use correct map borders
         for mapSet in mapBorders:
             zone = int(mapSet[0])
             if (not (zoneId == False)) and (zone != zoneId):
