@@ -16,6 +16,8 @@ def getAreaTriggers(version):
     rows = re.findall("(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),(.*?),?\n", file_content)
     areaTrigger = []
     for row in rows:
+        if row[0] == 'ID':
+            continue
         areaTrigger.append((int(row[0]), int(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5])))
     print(f'Found {len(areaTrigger)} area triggers in {file_path}')
     return areaTrigger
