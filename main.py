@@ -6,6 +6,7 @@ from db.cata.CataQuestList import CataQuestList
 from db.NpcList import *
 from db.ObjList import *
 from db.ItemList import *
+from db.mop.MopQuestList import MopQuestList
 from preExtract.CoordPreExtract import printCoordFiles
 
 import sys
@@ -26,7 +27,10 @@ if version not in ['classic', 'tbc', 'wotlk', 'cata']:
 def getClassInstances(recache=False):
     """Get new instances of the list classes"""
     print("Reading data from {0} database...".format(db_flavor))
-    if version == 'cata':
+    if version == 'mop':
+        quests = MopQuestList(version)
+        quests.run(cursor, dictCursor, db_flavor, recache)
+    elif version == 'cata':
         quests = CataQuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
         npcs = CataNpcList(version, debug)
@@ -100,7 +104,7 @@ if __name__ == "__main__":
         for arg in sys.argv[1:]:
             if arg == '-r':
                 reCache = True
-            elif arg in ['classic', 'tbc', 'wotlk', 'cata']:
+            elif arg in ['classic', 'tbc', 'wotlk', 'cata', 'mop']:
                 version = arg
             elif arg in ['mangos', 'trinity']:
                 db_flavor = arg
