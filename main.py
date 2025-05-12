@@ -6,6 +6,7 @@ from db.cata.CataQuestList import CataQuestList
 from db.NpcList import *
 from db.ObjList import *
 from db.ItemList import *
+from db.mop.MopItemList import MopItemList
 from db.mop.MopNpcList import MopNpcList
 from db.mop.MopObjList import MopObjList
 from db.mop.MopQuestList import MopQuestList
@@ -36,6 +37,8 @@ def getClassInstances(recache=False):
         npcs.run(cursor, dictCursor, db_flavor, recache)
         obj = MopObjList(version)
         obj.run(cursor, db_flavor, recache=recache)
+        items = MopItemList(version)
+        items.run(dictCursor, recache=recache)
     elif version == 'cata':
         quests = CataQuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
