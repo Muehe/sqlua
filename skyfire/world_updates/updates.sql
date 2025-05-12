@@ -1,3 +1,7 @@
+# These updates are required after installing the database:
+# SFDB_full_548_24.001_2024_09_04_Release.sql
+# Grab updates from the SkyfireDB repository: https://codeberg.org/ProjectSkyfire/database.git
+
 # quest 25136 has a NextQuestId which is not in the database
 UPDATE quest_template SET NextQuestId = 25127 WHERE Id = 25136;
 
