@@ -32,7 +32,7 @@ class MopItemList(ItemList):
         print("  SELECT item_template")
         # TODO: Fix ammo_type even though we don't need it?
         # TODO: Do we need FoodType in MoP?
-        dictCursor.execute("SELECT entry AS id, name, Flags, startquest, 0 as FoodType, ItemLevel, RequiredLevel, 0 as ammo_type, class, subclass FROM item_template")
+        dictCursor.execute("SELECT entry AS id, name, Flags, startquest, 0 as FoodType, ItemLevel, RequiredLevel, 0 as ammo_type, class, subclass FROM item_template ORDER BY id")
         ret['item_template'] = dictCursor.fetchall()
 
         print("  SELECT creature_loot_template")
