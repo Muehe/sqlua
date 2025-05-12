@@ -6,3 +6,7 @@ UPDATE gameobject_loot_template SET item = ABS(mincountOrRef) WHERE item = 1 AND
 
 # quest 31694 has some debug text in the objectives text and details which we remove
 UPDATE quest_template SET Objectives = '', Details = '' WHERE Id = 31694;
+
+# NPC 62943 has npcflag of -2147483648, which we don't care about
+UPDATE creature_template SET npcflag = 0 WHERE entry = 62943;
+
