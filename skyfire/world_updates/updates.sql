@@ -18,3 +18,9 @@ UPDATE quest_template SET Flags = 128 WHERE Flags = 16777216;
 # for even numbers we set them to 0
 UPDATE quest_template SET Flags = 1 WHERE Flags > 524296 AND MOD(Flags, 2) = 1; # odd
 UPDATE quest_template SET Flags = 0 WHERE Flags > 524296 AND MOD(Flags, 2) = 0; # even
+
+# the requiredRaces field is mixed in pre-cata values and cata values, we streamline them to the cata values
+UPDATE quest_template SET RequiredRaces = 2098253 WHERE RequiredRaces = 77; # All Alliance Classic
+UPDATE quest_template SET RequiredRaces = 946 WHERE RequiredRaces = 178; # All Horde Classic
+UPDATE quest_template SET RequiredRaces = 2098253 WHERE RequiredRaces = 1101; # All Alliance TBC
+UPDATE quest_template SET RequiredRaces = 946 WHERE RequiredRaces = 690; # All Horde TBC
