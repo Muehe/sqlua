@@ -24,3 +24,6 @@ UPDATE quest_template SET RequiredRaces = 2098253 WHERE RequiredRaces = 77; # Al
 UPDATE quest_template SET RequiredRaces = 946 WHERE RequiredRaces = 178; # All Horde Classic
 UPDATE quest_template SET RequiredRaces = 2098253 WHERE RequiredRaces = 1101; # All Alliance TBC
 UPDATE quest_template SET RequiredRaces = 946 WHERE RequiredRaces = 690; # All Horde TBC
+
+# some quests have a MinLevel of -1, which does not make sense, we set them to 0
+UPDATE quest_template SET MinLevel = 0 WHERE MinLevel = -1;
