@@ -10,3 +10,11 @@ UPDATE quest_template SET Objectives = '', Details = '' WHERE Id = 31694;
 # NPC 62943 has npcflag of -2147483648, which we don't care about
 UPDATE creature_template SET npcflag = 0 WHERE entry = 62943;
 
+# some quests have questflags set to 16777216 - we override them with the Cata value 128
+UPDATE quest_template SET Flags = 128 WHERE Flags = 16777216;
+
+# some quests have questflags set to a really high value
+# for odd numbers we set them to 1 to keep the repeatable flag
+# for even numbers we set them to 0
+UPDATE quest_template SET Flags = 1 WHERE Flags > 524296 AND MOD(Flags, 2) = 1; # odd
+UPDATE quest_template SET Flags = 0 WHERE Flags > 524296 AND MOD(Flags, 2) = 0; # even
