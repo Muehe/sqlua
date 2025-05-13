@@ -65,7 +65,7 @@ def main(recache):
     print("Done.")
     return 0
 
-def getCursors(v):
+def getCursors(v, f):
     conversions = pymysql.converters.conversions
     conversions[pymysql.FIELD_TYPE.DECIMAL] = lambda x: float(x)
     conversions[pymysql.FIELD_TYPE.NEWDECIMAL] = lambda x: float(x)
@@ -73,7 +73,7 @@ def getCursors(v):
         host=config.dbInfo['host'],
         user=config.dbInfo['user'],
         password=config.dbInfo['password'],
-        database=config.dbInfo[v],
+        database=config.dbInfo[f][v],
         port=config.dbInfo["port"],
         charset='utf8',
         conv=conversions
@@ -107,9 +107,10 @@ if __name__ == "__main__":
             else:
                 print(f'Unknown argument "{arg}"')
     print(f'Using version {version}')
+    print(f'Using DB flavour {db_flavor}')
     runMain = True
 
-cursor, dictCursor = getCursors(version)
+cursor, dictCursor = getCursors(version, db_flavor)
 
 if runMain:
     start_time = time.time()

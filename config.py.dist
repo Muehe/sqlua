@@ -11,7 +11,13 @@ dbInfo = {
     'user': 'mangos',
     'password': 'mangos',
     'port': 3306,
-    'classic': 'classicmangos',
-    'tbc': 'tbcmangos',
-    'wotlk': 'wotlkmangos',
+    'mangos': {
+        'classic': 'classicmangos',
+        'tbc': 'tbcmangos',
+        'wotlk': 'wotlkmangos',
+        'cata': 'mangos3',
+    },
+    'trinity': {
+        'cata': 'world',
+    },
 }
