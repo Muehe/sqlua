@@ -56,16 +56,17 @@ def read_mangos_quest_list(cursor, dictCursor):
         EndText,  # 49
         Details,  # 50
         SpecialFlags,  # 51
-        RewRepFaction1,  # 52
-        RewRepFaction2,  # 53
-        RewRepFaction3,  # 54
-        RewRepFaction4,  # 55
-        RewRepFaction5,  # 56
-        RewRepValue1,  # 57
-        RewRepValue2,  # 58
-        RewRepValue3,  # 59
-        RewRepValue4,  # 60
-        RewRepValue5  # 61
+        0 as BreadcrumbForQuestId, # 52
+        RewRepFaction1,  # 53
+        RewRepFaction2,  # 54
+        RewRepFaction3,  # 55
+        RewRepFaction4,  # 56
+        RewRepFaction5,  # 57
+        RewRepValue1,  # 58
+        RewRepValue2,  # 59
+        RewRepValue3,  # 60
+        RewRepValue4,  # 61
+        RewRepValue5  # 62
     
         FROM quest_template
     """)

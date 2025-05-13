@@ -30,10 +30,18 @@ class QuestList:
             self.raceIDs['ALLIANCE'] = 77
             self.raceIDs['HORDE'] = 178
             self.raceIDs['ALL'] = 255
+        if version == 'cata':
+            self.raceIDs['ALLIANCE'] = 2098253
+            self.raceIDs['HORDE'] = 946
+            self.raceIDs['ALL'] = 2099199
         else:
             self.raceIDs['ALLIANCE'] = 1101
             self.raceIDs['HORDE'] = 690
             self.raceIDs['ALL'] = 1791
+
+        self.skipList = {
+            8731: {'cata'}
+        }
 
     def run(self, cursor, dictCursor, db_flavor, recache=False):
         if not os.path.isfile(f'data/{self.version}/quests.pkl') or recache:
@@ -62,7 +70,8 @@ class QuestList:
         count = len(dicts['quest_template'])
         print(f'Caching {count} quests...')
         for quest in dicts['quest_template']:
-            self.__addQuest(quest, dicts, areaTrigger)
+            if not (quest[0] in self.skipList and self.version in self.skipList[quest[0]]):
+                self.__addQuest(quest, dicts, areaTrigger)
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
@@ -176,9 +185,9 @@ class QuestList:
         print("Selecting quest related MySQL tables...")
         print("  SELECT quest_template")
         if self.version == "wotlk":
-            cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5, RewRepValueId1, RewRepValueId2, RewRepValueId3, RewRepValueId4, RewRepValueId5 FROM quest_template")
+            cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, BreadCrumbForQuestId, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5, RewRepValueId1, RewRepValueId2, RewRepValueId3, RewRepValueId4, RewRepValueId5 FROM quest_template")
         else: # SrcItemId needed to check for spell_script_target (type and targetEntry) via item_template.spellId
-            cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5 FROM quest_template")
+            cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, BreadCrumbForQuestId, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5 FROM quest_template")
         quest_template = []
         for a in cursor.fetchall():
             quest_template.append(a)
@@ -353,11 +362,11 @@ QuestieDB.questKeys = {
     ['objectivesText'] = 8, -- table: {string,...}, Description of the quest. Auto-complete if nil.
     ['triggerEnd'] = 9, -- table: {text, {[zoneID] = {coordPair,...},...}}
     ['objectives'] = 10, -- table
-        --['creatureObjective'] = 1, -- table {{creature(int), text(string)},...}, If text is nil the default "<Name> slain x/y" is used
-        --['objectObjective'] = 2, -- table {{object(int), text(string)},...}
-        --['itemObjective'] = 3, -- table {{item(int), text(string)},...}
+        --['creatureObjective'] = 1, -- table {{creature(int), text(string), iconFile},...}, If text is nil the default "<Name> slain x/y" is used
+        --['objectObjective'] = 2, -- table {{object(int), text(string), iconFile},...}
+        --['itemObjective'] = 3, -- table {{item(int), text(string), iconFile},...}
         --['reputationObjective'] = 4, -- table: {faction(int), value(int)}
-        --['killCreditObjective'] = 5, -- table: {{{creature(int), ...}, baseCreatureID, baseCreatureText}, ...}
+        --['killCreditObjective'] = 5, -- table: {{{creature(int), ...}, baseCreatureID, baseCreatureText, iconFile}, ...}
     ['sourceItemId'] = 11, -- int, item provided by quest starter
     ['preQuestGroup'] = 12, -- table: {quest(int)}
     ['preQuestSingle'] = 13, -- table: {quest(int)}
@@ -375,6 +384,10 @@ QuestieDB.questKeys = {
     ['parentQuest'] = 25, -- int, the ID of the parent quest that needs to be active for the current one to be available. See also 'childQuests' (field 14)
     ['reputationReward'] = 26, --table: {{faction(int), value(int)},...}, a list of reputation rewarded upon quest completion
     ['extraObjectives'] = 27, -- table: {{spawnlist, iconFile, text, objectiveIndex (optional), {{dbReferenceType, id}, ...} (optional)},...}, a list of hidden special objectives for a quest. Similar to requiredSourceItems
+    ['requiredSpell'] = 28, -- int: quest is only available if character has this spellID
+    ['requiredSpecialization'] = 29, -- int: quest is only available if character meets the spec requirements. Use QuestieProfessions.specializationKeys for having a spec, or QuestieProfessions.professionKeys to indicate having the profession with no spec. See QuestieProfessions.lua for more info.
+    ['requiredMaxLevel'] = 30, -- int: quest is only available up to a certain level
+    ['breadcrumbForQuestId'] = 31, -- int: quest ID for the quest this optional breadcrumb quest leads to
 }
 
 QuestieDB.questData = [[return {
@@ -597,6 +610,12 @@ QuestieDB.questData = [[return {
                 outString += ('},')
             else:
                 outString += ('nil,')
+
+            # fields 27-30 are added "dynamically" via corrections, if you have later data you need to print 4 nils
+
+            if hasattr(quest, 'BreadcrumbForQuestId'): #27
+                outString += ('nil,nil,nil,nil,' + str(quest.BreadcrumbForQuestId))
+
             outString += ("},\n")
         outString += ("}]]\n")
 

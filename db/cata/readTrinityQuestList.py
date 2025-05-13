@@ -5,8 +5,8 @@ def read_trinity_quest_list(cursor, dictCursor):
     cursor.execute("""
         SELECT
         qt.ID,  # 0
-        0 as MinLevel,  # 1
-        -1 as QuestLevel,  # 2
+        qt.MinLevel as MinLevel,  # 1
+        qt.QuestLevel as QuestLevel,  # 2
         qt.QuestType,  # 3
         qta.AllowableClasses,  # 4
         qt.AllowableRaces,  # 5
@@ -56,17 +56,18 @@ def read_trinity_quest_list(cursor, dictCursor):
         '' as EndText,  # 49
         qt.QuestDescription,  # 50
         qta.SpecialFlags,  # 51
-        qt.RewardFactionID1,  # 52
-        qt.RewardFactionID2,  # 53
-        qt.RewardFactionID3,  # 54
-        qt.RewardFactionID4,  # 55
-        qt.RewardFactionID5,  # 56
-        qt.RewardFactionValue1,  # 57
-        qt.RewardFactionValue2,  # 58
-        qt.RewardFactionValue3,  # 59
-        qt.RewardFactionValue4,  # 60
-        qt.RewardFactionValue5,  # 61
-        qt.AreaDescription  # 62
+        qta.BreadcrumbForQuestId, # 52
+        qt.RewardFactionID1,  # 53
+        qt.RewardFactionID2,  # 54
+        qt.RewardFactionID3,  # 55
+        qt.RewardFactionID4,  # 56
+        qt.RewardFactionID5,  # 57
+        qt.RewardFactionValue1,  # 58
+        qt.RewardFactionValue2,  # 59
+        qt.RewardFactionValue3,  # 60
+        qt.RewardFactionValue4,  # 61
+        qt.RewardFactionValue5,  # 62
+        qt.AreaDescription  # 63
         
         FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
     """)

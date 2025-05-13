@@ -8,20 +8,18 @@ class Quest():
         self.MinLevel = quest[1]
         self.QuestLevel = quest[2]
         self.Type = quest[3]
-        self.RequiredRaces = quest[5]
+        self.RequiredRaces = quest[5] & 2099199
         # Fix TBC+ masks in Classic data, change quests available to all races to 0 (no requirements)
         if version == 'cata':
-            if quest[5] == 2099199:
+            if self.RequiredRaces == 2099199:
                 self.RequiredRaces = 0
         elif version == 'classic':
-            if quest[5] == 690:
-                self.RequiredRaces = 178
-            elif quest[5] == 1101:
-                self.RequiredRaces = 77
-            elif quest[5] == 255:
+            self.RequiredRaces = self.RequiredRaces & 255
+            if self.RequiredRaces == 255:
                 self.RequiredRaces = 0
-        else:
-            if quest[5] == 1791:
+        else: # tbc + cata
+            self.RequiredRaces = self.RequiredRaces & 1791
+            if self.RequiredRaces == 1791:
                 self.RequiredRaces = 0
         self.Title = escapeDoubleQuotes(quest[19])
         self.locales_Title = {}
@@ -291,25 +289,26 @@ class Quest():
         self.ChildQuests = []
         if (quest[51] != 0):
             self.SpecialFlags = quest[51]
+        if (quest[52] != 0):
+            self.BreadcrumbForQuestId = quest[52]
 
         #Reputation reward
         self.RepReward = self.getRep(quest)
-            
 
     def getRep(self, quest):
         self.RepReward = {}
         if self.version == "wotlk":
             data = [0, 10, 25, 75, 150, 250, 350, 500, 1000, 5]
             for i in range(0, 5):
-                if (quest[52+i] != 0):  #RewRepFaction
-                    if quest[57+i] != 0 and quest[57+i] > 1000: #RewRepValue
-                        self.RepReward[quest[52+i]] = int(quest[57+i]/100)
-                    elif(quest[57+5+i] != 0): #RewRepValueId
-                        self.RepReward[quest[52+i]] = int(data[abs(quest[57+5+i])] * (quest[57+5+i] / abs(quest[57+5+i])))
+                if (quest[53+i] != 0):  #RewRepFaction
+                    if quest[58+i] != 0 and quest[58+i] > 1000: #RewRepValue
+                        self.RepReward[quest[53+i]] = int(quest[58+i]/100)
+                    elif(quest[58+5+i] != 0): #RewRepValueId
+                        self.RepReward[quest[53+i]] = int(data[abs(quest[58+5+i])] * (quest[58+5+i] / abs(quest[58+5+i])))
         else:
             for i in range(0, 5):
-                if (quest[52+i] != 0): #RewRepFaction
-                    self.RepReward[quest[52+i]] = quest[57+i] #RewRepValueId
+                if (quest[53+i] != 0): #RewRepFaction
+                    self.RepReward[quest[53+i]] = quest[58+i] #RewRepValueId
 
         return self.RepReward
 
