@@ -291,6 +291,7 @@ class Quest():
             self.SpecialFlags = quest[51]
         if (quest[52] != 0):
             self.BreadcrumbForQuestId = quest[52]
+        self.Breadcrumbs = []
 
         #Reputation reward
         self.RepReward = self.getRep(quest)
@@ -311,8 +312,6 @@ class Quest():
                     self.RepReward[quest[53+i]] = quest[58+i] #RewRepValueId
 
         return self.RepReward
-
-
 
     def __repr__(self):
         return str(self.id)
@@ -413,3 +412,7 @@ class Quest():
 
     def setParent(self, value):
         self.ParentQuest = value
+
+    def addBreadcrumb(self, value):
+        if value not in self.Breadcrumbs:
+            self.Breadcrumbs.append(value)
