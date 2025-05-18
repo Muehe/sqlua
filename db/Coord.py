@@ -18,7 +18,7 @@ class Coord():
         elif version == 'cata':
             mapBorders = mapBordersCata
         elif version == 'mop':
-            mapBorders = mapBordersCata # TODO: Use correct map borders
+            mapBorders = mapBordersMoP
         for mapSet in mapBorders:
             zone = int(mapSet[0])
             if (not (zoneId == False)) and (zone != zoneId):
