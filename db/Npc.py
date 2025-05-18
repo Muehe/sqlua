@@ -14,6 +14,23 @@ def getCreatureZones(file):
     infile.close()
     return zoneDict
 
+def get_zones_from_spawn(spawn: tuple[any, str, int, float, float], version: str) -> dict[int, int]:
+    zoneDict = {}
+    guid = spawn[4]
+    mapId = spawn[1]
+    pos_x = spawn[2]
+    pos_y = spawn[3]
+
+    coord = Coord(mapId, pos_x, pos_y, version)
+
+    if coord.pointList:
+        # Use the first found zoneID
+        zoneID = coord.pointList[0][0]
+        zoneDict[guid] = zoneID
+    else:
+        zoneDict[guid] = None
+    return zoneDict
+
 zonesClassic = getCreatureZones('data/classic/creature_preExtract.csvzone_and_area.csv')
 zonesTBC = getCreatureZones('data/tbc/creature_preExtract.csvzone_and_area.csv')
 zonesWotLK = getCreatureZones('data/wotlk/creature_preExtract.csvzone_and_area.csv')
@@ -117,7 +134,7 @@ class Npc():
             movementTemplateZones = movementTemplateZonesCata
             factionTemplate = factionTemplateCata
         elif version == 'mop': # TODO: Use MoP data
-            zones = zonesCata
+            # zones = zonesCata # Set further below
             movementZones = movementZonesCata
             movementTemplateZones = movementTemplateZonesCata
             factionTemplate = factionTemplateMop
@@ -149,6 +166,9 @@ class Npc():
                 for spawn in rawSpawns:
                     # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
+                        if version == 'mop':
+                            zones = get_zones_from_spawn(spawn, version)
+
                         # get spawns
                         if spawn[4] in zones:
                             if version == 'cata':
