@@ -34,11 +34,10 @@ def get_retail_like_map_borders(version):
     wma = []
     with open(f'data/{version}/UiMapAssignment.dbc.CSV', 'r') as infile:
         reader = csv.reader(infile)
+        next(reader) # Skip header
         """(UiMin_0,UiMin_1,UiMax_0,UiMax_1,Region_0,Region_1,Region_2,Region_3,Region_4,Region_5,ID,UiMapID,OrderIndex,MapID,AreaID,WMODoodadPlacementID,WMOGroupID)"""
         """Region_0=maxY, Region_1=maxX, Region_3=minY, Region_4=minX"""
         for row in reader:
-            if row[0] == 'UiMin_0':
-                continue
             """(zoneId, zoneName, mapId, minX, maxX, minY, maxY)"""
             wma.append((int(row[14]), "None", int(row[13]), float(row[8]), float(row[5]), float(row[7]), float(row[4])))
     return wma
