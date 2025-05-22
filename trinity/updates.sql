@@ -3,3 +3,6 @@ DELETE FROM `creature` WHERE `id` > 80674;
 DELETE FROM `creature_template` WHERE `entry` > 80674;
 DELETE FROM `creature_queststarter` WHERE `id` > 80674;
 DELETE FROM `creature_questender` WHERE `id` > 80674;
+
+# quest 31694 has some debug text in the objectives text and details which we remove
+UPDATE quest_template SET LogDescription = '', QuestDescription = '' WHERE ID = 31694;
