@@ -24,6 +24,9 @@ class Quest():
             if quest[5] == 1791:
                 self.RequiredRaces = 0
         self.Title = escapeDoubleQuotes(quest[19])
+        if self.Title is None or self.Title == '':
+            print("WARNING: Title is missing for quest ID", self.id)
+            self.Title = ''
         self.locales_Title = {}
         for x in range(1, 9):
             if not translations:
