@@ -1,8 +1,9 @@
 
-def read_trinity_quest_list(cursor, dictCursor):
+def read_trinity_quest_list(cursor, dictCursor, quest_ids=None):
+    quest_ids_for_where_clause = ', '.join(map(str, quest_ids)) if quest_ids else ''
     print("Selecting quest related MySQL tables...")
     print("  SELECT quest_template")
-    cursor.execute("""
+    cursor.execute(f"""
         SELECT
         qt.ID,  # 0
         0 as MinLevel,  # 1
@@ -69,6 +70,7 @@ def read_trinity_quest_list(cursor, dictCursor):
         qt.AreaDescription  # 62
         
         FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
+        {('WHERE qt.ID IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}
     """)
 
     # TODO: Use BreadcrumbForQuestId to mark quests as breadcrumb
@@ -81,7 +83,7 @@ def read_trinity_quest_list(cursor, dictCursor):
 
     print("  SELECT quest_objectives")
     # Type: 0 = creature, 1 = item, 2 = object, 3 = creature, 4 = currency, 5 = spell, 6 = reputation (positive), 7 = reputation (negative), 8 = money, 9 = killPlayer, 10 = areatrigger/event
-    cursor.execute("SELECT QuestID, Type, `Order`, ObjectID, Amount FROM quest_objectives")
+    cursor.execute(f"SELECT QuestID, Type, `Order`, ObjectID, Amount FROM quest_objectives {('WHERE QuestID IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
     
     quest_objectives = {}
     for a in cursor.fetchall():
@@ -157,7 +159,7 @@ def read_trinity_quest_list(cursor, dictCursor):
 
     print("  SELECT creature_queststarter")
     creature_quest_starter = {}
-    cursor.execute("SELECT id, quest FROM creature_queststarter")
+    cursor.execute(f"SELECT id, quest FROM creature_queststarter {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -167,7 +169,7 @@ def read_trinity_quest_list(cursor, dictCursor):
 
     print("  SELECT creature_questender")
     creature_quest_ender = {}
-    cursor.execute("SELECT id, quest FROM creature_questender")
+    cursor.execute(f"SELECT id, quest FROM creature_questender {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -177,7 +179,7 @@ def read_trinity_quest_list(cursor, dictCursor):
 
     print("  SELECT gameobject_queststarter")
     gameobject_quest_starter = {}
-    cursor.execute("SELECT id, quest FROM gameobject_queststarter")
+    cursor.execute(f"SELECT id, quest FROM gameobject_queststarter {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -187,7 +189,7 @@ def read_trinity_quest_list(cursor, dictCursor):
 
     print("  SELECT gameobject_questender")
     gameobject_quest_ender = {}
-    cursor.execute("SELECT id, quest FROM gameobject_questender")
+    cursor.execute(f"SELECT id, quest FROM gameobject_questender {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -207,7 +209,7 @@ def read_trinity_quest_list(cursor, dictCursor):
     #         item_questrelation[a[1]].append(a)
 
     print("  SELECT areatrigger_involvedrelation")
-    cursor.execute("SELECT id, quest FROM areatrigger_involvedrelation")
+    cursor.execute(f"SELECT id, quest FROM areatrigger_involvedrelation {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
     areatrigger_involvedrelation = {}
     for a in cursor.fetchall():
         if a[1] in areatrigger_involvedrelation:

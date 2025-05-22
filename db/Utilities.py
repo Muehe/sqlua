@@ -30,3 +30,9 @@ def removeTrailingData(inp):
     inp = inp.replace(",nil}", "}")
     inp = inp.replace("{}", "nil")
     return inp
+
+# Reads the quest IDs by line from a given file.
+def read_quest_ids(file_path: str) -> list[int]:
+    print("Reading quest IDs from", file_path)
+    with open(file_path, 'r') as file:
+        return [int(line.strip()) for line in file if line.strip().isdigit()]
