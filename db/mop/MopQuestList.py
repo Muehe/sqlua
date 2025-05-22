@@ -30,7 +30,7 @@ class MopQuestList(QuestList):
 
 def load_quests(cursor, dictCursor, db_flavor):
     if db_flavor == 'trinity':
-        quest_ids = read_quest_ids('./data/mop/mopIds.txt')
+        quest_ids = read_quest_ids('./data/mop/mopQuestIds.txt')
         return read_trinity_quest_list(cursor, dictCursor, quest_ids)
     else:
         return read_skyfire_quest_list(cursor, dictCursor)
