@@ -106,6 +106,9 @@ class QuestList:
                     self.qList[questId].setParent(abs(quest.PrevQuestId))
             if hasattr(quest, "NextQuestId") and quest.NextQuestId is not None:
                 if quest.NextQuestId > 0:
+                    if quest.NextQuestId not in self.qList:
+                        print("WARNING: Invalid NextQuestId %d for quest %d" % (quest.NextQuestId, quest.id))
+                        continue
                     postQuest = self.qList[quest.NextQuestId]
                     if hasattr(quest, "InGroupWith"):
                         postQuest.addPreGroup(questId)
