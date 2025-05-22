@@ -147,14 +147,19 @@ class Npc():
         self.maxlevelhealth = npc[5]
         self.rank = npc[6]
         self.faction = npc[7]
-        if (12 & factionTemplate[self.faction][0]) != 0:
+        if self.faction in factionTemplate:
+            if (12 & factionTemplate[self.faction][0]) != 0:
+                self.hostileToA = True
+            else:
+                self.hostileToA = False
+            if (10 & factionTemplate[self.faction][0]) != 0:
+                self.hostileToH = True
+            else:
+                self.hostileToH = False
+        else:
+            print("Faction not found in factionTemplate:", self.faction, "NPC ID:", self.id)
             self.hostileToA = True
-        else:
-            self.hostileToA = False
-        if (10 & factionTemplate[self.faction][0]) != 0:
             self.hostileToH = True
-        else:
-            self.hostileToH = False
         self.subName = npc[8]
         self.npcFlags = npc[9]
         if extractSpawns:
