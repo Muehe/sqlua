@@ -21,7 +21,10 @@ def get_zones_from_spawn(spawn: tuple[any, str, int, float, float], version: str
     pos_x = spawn[2]
     pos_y = spawn[3]
 
-    coord = Coord(mapId, pos_x, pos_y, version, spawn[6])
+    if len(spawn) == 7:
+        coord = Coord(mapId, pos_x, pos_y, version, spawn[6])
+    else:
+        coord = Coord(mapId, pos_x, pos_y, version)
 
     if coord.pointList:
         # Use the first found zoneID
