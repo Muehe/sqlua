@@ -11,7 +11,7 @@ def read_trinity_npc_list(cursor, dictCursor, npc_ids = None):
         npc_tpl.append(a)
 
     print('  SELECT creature')
-    cursor.execute(f"SELECT id, map, position_x, position_y, guid, PhaseId FROM creature {('WHERE id IN (' + npc_ids_for_where_clause + ')') if npc_ids else 'WHERE PhaseId <= 670'}")
+    cursor.execute(f"SELECT id, map, position_x, position_y, guid, PhaseId, zoneId FROM creature {('WHERE id IN (' + npc_ids_for_where_clause + ')') if npc_ids else 'WHERE PhaseId <= 670'}")
     npc = {}
     for a in cursor.fetchall():
         if a[0] not in npc:
