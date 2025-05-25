@@ -3,7 +3,7 @@ from db.NpcList import NpcList
 import os.path
 import pickle
 
-from db.cata.readMangosNpcList import read_mangos_npc_list
+from db.Utilities import read_id_file
 from db.cata.readTrinityNpcList import read_trinity_npc_list
 from db.mop.readSkyfireNpcList import read_skyfire_npc_list
 
@@ -29,4 +29,8 @@ class MopNpcList(NpcList):
 
 
 def load_npcs(cursor, dictCursor, db_flavor):
-    return read_skyfire_npc_list(cursor, dictCursor)
+    if db_flavor == 'trinity':
+        npc_ids = read_id_file('./data/mop/mopNpcIds.txt')
+        return read_trinity_npc_list(cursor, dictCursor, npc_ids)
+    else:
+        return read_skyfire_npc_list(cursor, dictCursor)
