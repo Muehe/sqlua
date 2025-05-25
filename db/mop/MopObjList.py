@@ -3,7 +3,7 @@ from db.ObjList import ObjList
 import os.path
 import pickle
 
-from db.cata.readMangosObjList import read_mangos_obj_list
+from db.Utilities import read_id_file
 from db.cata.readTrinityObjList import read_trinity_obj_list
 from db.mop.readSkyfireObjList import read_skyfire_obj_list
 
@@ -29,4 +29,8 @@ class MopObjList(ObjList):
 
 
 def load_objects(cursor, db_flavor):
-    return read_skyfire_obj_list(cursor)
+    if db_flavor == 'trinity':
+        obj_ids = read_id_file('./data/mop/mopObjectIds.txt')
+        return read_trinity_obj_list(cursor, obj_ids)
+    else:
+        return read_skyfire_obj_list(cursor)

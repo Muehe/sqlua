@@ -1,14 +1,16 @@
-def read_trinity_obj_list(cursor):
+def read_trinity_obj_list(cursor, obj_ids = None):
+    obj_ids_for_where_clause = ', '.join(map(str, obj_ids)) if obj_ids else ''
+
     print("Selecting object related MySQL tables...")
     print("  SELECT gameobject_template")
     # TODO: faction is unused in Questie
-    cursor.execute("SELECT entry, name, type, 0 as faction, data1 FROM gameobject_template")
+    cursor.execute(f"SELECT entry, name, type, 0 as faction, data1 FROM gameobject_template {('WHERE entry IN (' + obj_ids_for_where_clause + ')') if obj_ids else ''}")
     obj_tpl = []
     for a in cursor.fetchall():
         obj_tpl.append(a)
 
     print(" SELECT gameobject")
-    cursor.execute("SELECT id, map, position_x, position_y, guid, PhaseId FROM gameobject WHERE PhaseId <= 670")
+    cursor.execute(f"SELECT id, map, position_x, position_y, guid, PhaseId FROM gameobject {('WHERE id IN (' + obj_ids_for_where_clause + ')') if obj_ids else 'WHERE PhaseId <= 670'}")
     obj = {}
     for a in cursor.fetchall():
         if a[0] not in obj:
@@ -17,7 +19,7 @@ def read_trinity_obj_list(cursor):
 
     print("  SELECT gameobject_queststarter")
     obj_start = {}
-    cursor.execute("SELECT id, quest FROM gameobject_queststarter")
+    cursor.execute(f"SELECT id, quest FROM gameobject_queststarter {('WHERE id IN (' + obj_ids_for_where_clause + ')') if obj_ids else ''}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -27,7 +29,7 @@ def read_trinity_obj_list(cursor):
 
     print("  SELECT gameobject_questender")
     obj_end = {}
-    cursor.execute("SELECT id, quest FROM gameobject_questender")
+    cursor.execute(f"SELECT id, quest FROM gameobject_questender {('WHERE id IN (' + obj_ids_for_where_clause + ')') if obj_ids else ''}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
