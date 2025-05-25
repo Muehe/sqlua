@@ -31,16 +31,44 @@ def getMapBorders(version):
     return wma
 
 def get_retail_like_map_borders(version):
-    wma = []
+    area_table = {}
+    with open(f'data/{version}/AreaTable.dbc.CSV', 'r') as infile:
+        reader = csv.DictReader(infile)
+        for row in reader:
+            area_table[row['ID']] = row
+
+    ui_map = {}
+    with open(f'data/{version}/UiMap.dbc.CSV', 'r') as infile:
+        reader = csv.DictReader(infile)
+        for row in reader:
+            ui_map[row['ID']] = row
+
+    ui_map_assignments = []
     with open(f'data/{version}/UiMapAssignment.dbc.CSV', 'r') as infile:
         reader = csv.reader(infile)
         next(reader) # Skip header
         """(UiMin_0,UiMin_1,UiMax_0,UiMax_1,Region_0,Region_1,Region_2,Region_3,Region_4,Region_5,ID,UiMapID,OrderIndex,MapID,AreaID,WMODoodadPlacementID,WMOGroupID)"""
         """Region_0=maxY, Region_1=maxX, Region_3=minY, Region_4=minX"""
         for row in reader:
+            if row[12] != '0':
+                continue
+            area_id = int(row[14])
+            ui_map_id = row[11]
+            if area_id == 0:
+                # Some entries in UiMapAssignment have AreaID 0, even though there is an areaId in AreaTable.
+                # So we search for it by the zone name.
+                if ui_map_id not in ui_map:
+                    print(f'Warning: UiMapID {ui_map_id} not found in UiMap table for AreaID 0.')
+                    continue
+                name_lang = ui_map[ui_map_id]['Name_lang']
+                for mop_area_id, area in area_table.items():
+                    if area['AreaName_lang'] == name_lang:
+                        area_id = int(mop_area_id)
+                        # no break to get the last value if there are multiple matches
+
             """(zoneId, zoneName, mapId, minX, maxX, minY, maxY)"""
-            wma.append((int(row[14]), "None", int(row[13]), float(row[8]), float(row[5]), float(row[7]), float(row[4])))
-    return wma
+            ui_map_assignments.append((area_id, "None", int(row[13]), float(row[8]), float(row[5]), float(row[7]), float(row[4])))
+    return ui_map_assignments
 
 """
 
