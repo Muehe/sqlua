@@ -22,10 +22,14 @@ UPDATE quest_template SET Flags = 1 WHERE Flags > 524296 AND MOD(Flags, 2) = 1; 
 UPDATE quest_template SET Flags = 0 WHERE Flags > 524296 AND MOD(Flags, 2) = 0; # even
 
 # the requiredRaces field is mixed in pre-cata values and cata values, we streamline them to the cata values
-UPDATE quest_template SET RequiredRaces = 2098253 WHERE RequiredRaces = 77; # All Alliance Classic
-UPDATE quest_template SET RequiredRaces = 946 WHERE RequiredRaces = 178; # All Horde Classic
-UPDATE quest_template SET RequiredRaces = 2098253 WHERE RequiredRaces = 1101; # All Alliance TBC
-UPDATE quest_template SET RequiredRaces = 946 WHERE RequiredRaces = 690; # All Horde TBC
+UPDATE quest_template SET RequiredRaces = 2098253 WHERE RequiredRaces = 77; # All Alliance Classic -> Cata
+UPDATE quest_template SET RequiredRaces = 946 WHERE RequiredRaces = 178; # All Horde Classic -> Cata
+UPDATE quest_template SET RequiredRaces = 2098253 WHERE RequiredRaces = 1101; # All Alliance TBC -> Cata
+UPDATE quest_template SET RequiredRaces = 946 WHERE RequiredRaces = 690; # All Horde TBC -> Cata
+
+ALTER TABLE quest_template MODIFY COLUMN RequiredRaces INT UNSIGNED;
+UPDATE quest_template SET RequiredRaces = 18875469 WHERE RequiredRaces = 2098253; # All Alliance Cata -> MoP
+UPDATE quest_template SET RequiredRaces = 33555378 WHERE RequiredRaces = 946; # All Horde Cata -> MoP
 
 # some quests have a MinLevel of -1, which does not make sense, we set them to 0
 UPDATE quest_template SET MinLevel = 0 WHERE MinLevel = -1;
