@@ -41,7 +41,7 @@ class Coord():
         for instance in instanceIds:
             zoneID = int(instance[0])
             mapID = int(instance[2])
-            if (mapId == mapID):
+            if mapId == mapID or zoneID == zoneId:
                 self.isInstance = True
                 self.instanceId = zoneID
 
