@@ -76,8 +76,8 @@ These IDs are used to determine if a coordinate is on an instance map (that does
 """
 
 
+# Values are taken from AreaTable.dbc - (ID, ZoneName; ContinentID)
 """(zoneId, name, mapId)"""
-# TODO: Check which of these have valid ingame maps in wotlk/cata
 instanceIds = [ (206, 'UtgardeKeep', 574),
                 (209, 'ShadowfangKeep', 33),
                 (491, 'RazorfenKraul', 47),
@@ -197,6 +197,19 @@ instanceIds = [ (206, 'UtgardeKeep', 574),
                 (5844, 'HourofTwilight', 940),
                 # (5861, 'DarkmoonFaireIsland', 974),
                 (5892, 'DragonSoul', 967),
+                (5975, 'TempleoftheJadeSerpent', 870),
+                (6001, 'StormstoutBrewery', 870),
+                (6052, 'ScarletHalls', 1001),
+                (6066, 'Scholomance', 1007),
+                (6125, 'MogushanVaults', 1008),
+                (6173, 'ShadoPanMonastery', 870),
+                (6182, 'MogushanPalace', 994),
+                (6214, 'SiegeofNiuzaoTemple', 1011),
+                (6396, 'GateoftheSettingSunGV', 870),
+                (6435, 'HeartofFear', 870),
+                (6515, 'TerraceofEndlessSpring', 996),
+                (6622, 'ThunderKingRaid', 1098),
+                (6738, 'OrgrimmarRaid', 1136),
               ]
 
 """
