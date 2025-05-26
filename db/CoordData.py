@@ -66,7 +66,7 @@ def get_retail_like_map_borders(version):
                         # no break to get the last value if there are multiple matches
 
             """(zoneId, zoneName, mapId, minX, maxX, minY, maxY)"""
-            ui_map_assignments.append((area_id, "None", int(row['MapID']), float(row['Region_4']), float(row['Region_2']), float(row['Region_3']), float(row['Region_0'])))
+            ui_map_assignments.append((area_id, "None", int(row['MapID']), float(row['Region_4']), float(row['Region_1']), float(row['Region_3']), float(row['Region_0'])))
     return ui_map_assignments
 
 """
