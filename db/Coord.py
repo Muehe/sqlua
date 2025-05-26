@@ -42,9 +42,8 @@ class Coord():
             zoneID = int(instance[0])
             mapID = int(instance[2])
             if (mapId == mapID):
-                self.zoneList[zoneID] = (-1, -1)
-                self.pointList.append((zoneID, -1, -1))
                 self.isInstance = True
+                self.instanceId = zoneID
 
         if len(self.pointList) > 1:
             self.isMulti = True

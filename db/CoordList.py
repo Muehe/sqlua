@@ -23,6 +23,12 @@ class CoordList():
                     self.cByZone[zone].append(newCoord.zoneList[zone])
                 else:
                     self.cByZone[zone] = [newCoord.zoneList[zone]]
+            if newCoord.isInstance:
+                if newCoord.instanceId in self.cByZone:
+                    if (-1, -1) not in self.cByZone[newCoord.instanceId]:
+                        self.cByZone[newCoord.instanceId].append((-1, -1))
+                else:
+                    self.cByZone[newCoord.instanceId] = [(-1, -1)]
 
     def findCoord(self, **kwargs):
         return next(self.__iterCoord(**kwargs))
