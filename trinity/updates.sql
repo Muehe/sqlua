@@ -19,7 +19,7 @@ UPDATE quest_template SET Flags = 0 WHERE Flags > 524296 AND MOD(Flags, 2) = 0; 
 
 # Stormwind
 UPDATE creature SET zoneId = 1519, areaId = 1519 WHERE id IN (
-    60931, 61809, 61837, 62106, 62419, 65048, 65066, 65068, 65051, 68868, 65069, 69334, 70296
+    60931, 61809, 61837, 62106, 62419, 65048, 65066, 65068, 65051, 68868, 65069, 65072, 69334, 70296
 );
 
 # Darnassus
@@ -34,7 +34,7 @@ UPDATE creature SET zoneId = 3487, areaId = 3487 WHERE id IN (
 
 # Orgrimmar
 UPDATE creature SET zoneId = 1637, areaId = 1637 WHERE id IN (
-    62445, 65008, 65058, 65060, 65061, 65063, 65065, 65071, 65072, 65074, 65076, 65078, 66022, 68869, 69333, 70301
+    62445, 65008, 65058, 65060, 65061, 65063, 65065, 65071, 65074, 65076, 65078, 66022, 68869, 69333, 70301
 );
 
 # Northshire (Human starting area)
@@ -116,3 +116,8 @@ UPDATE creature SET zoneId = 5034, areaId = 5034 WHERE id IN (
 UPDATE creature SET zoneId = 4922, areaId = 4922 WHERE id IN (
     62904
 );
+
+# Invalid creature entries
+DELETE FROM creature WHERE id IN (
+    58701, 59304, 59316, 59375, 60908, 65379, 72676, 72973
+    );
