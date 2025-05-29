@@ -37,3 +37,5 @@ UPDATE quest_template SET MinLevel = 0 WHERE MinLevel = -1;
 # Remove NPC 69533 as quest starter for now, as it is missing in the database
 # This NPC is correct though and should be added to the database at some point
 DELETE FROM creature_queststarter WHERE id = 69533;
+
+UPDATE gameobject_template SET type = 2, name = 'An empty bookshelf' WHERE entry = 212526;
