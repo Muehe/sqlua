@@ -126,28 +126,31 @@ class MopItemList(ItemList):
                                     ret["ObjectlootIDsRef"][rLootTable["item"]].append(gameobject["id"])
 
         
-        # print("  SELECT creature_template")
-        # dictCursor.execute("SELECT entry AS id, LootId, VendorTemplateId FROM creature_template") # PickpocketLootId and SkinningLootId might be good...
-        # cTemplate = dictCursor.fetchall()
+        print("  SELECT creature_template")
+        dictCursor.execute("SELECT entry AS id, LootId, 0 as VendorTemplateId FROM creature_template") # PickpocketLootId and SkinningLootId might be good...
+        cTemplate = dictCursor.fetchall()
         # create loot lookup table for NPCs
         ret["nlootIDs"] = {}
         ret["nlootIDsRef"] = {}
-        # for creature in cTemplate:
-        #     if creature["LootId"] in creature_loot_template_lootid:
-        #         for cLootTable in creature_loot_template_lootid[creature["LootId"]]:
-        #             if cLootTable["mincountOrRef"] > 0:
-        #                 if cLootTable["item"] not in ret["nlootIDs"]:
-        #                     ret["nlootIDs"][cLootTable["item"]] = []
-        #                 if creature["id"] not in ret["nlootIDs"][cLootTable["item"]]:
-        #                     ret["nlootIDs"][cLootTable["item"]].append(creature["id"])
-        #             else:
-        #                 refID = abs(cLootTable["mincountOrRef"])
-        #                 for rLootTable in ret['reference_loot_template'][refID]:
-        #                     if rLootTable["mincountOrRef"] > 0:
-        #                         if rLootTable["item"] not in ret["nlootIDsRef"]:
-        #                             ret["nlootIDsRef"][rLootTable["item"]] = []
-        #                         if creature["id"] not in ret["nlootIDsRef"][rLootTable["item"]]:
-        #                             ret["nlootIDsRef"][rLootTable["item"]].append(creature["id"])
+        for creature in cTemplate:
+            if creature["LootId"] in creature_loot_template_lootid:
+                for cLootTable in creature_loot_template_lootid[creature["LootId"]]:
+                    if cLootTable["mincountOrRef"] > 0:
+                        if cLootTable["item"] not in ret["nlootIDs"]:
+                            ret["nlootIDs"][cLootTable["item"]] = []
+                        if creature["id"] not in ret["nlootIDs"][cLootTable["item"]]:
+                            ret["nlootIDs"][cLootTable["item"]].append(creature["id"])
+                    else:
+                        refID = abs(cLootTable["mincountOrRef"])
+                        if refID in ret['reference_loot_template']:
+                            for rLootTable in ret['reference_loot_template'][refID]:
+                                if rLootTable["mincountOrRef"] > 0:
+                                    if rLootTable["item"] not in ret["nlootIDsRef"]:
+                                        ret["nlootIDsRef"][rLootTable["item"]] = []
+                                    if creature["id"] not in ret["nlootIDsRef"][rLootTable["item"]]:
+                                        ret["nlootIDsRef"][rLootTable["item"]].append(creature["id"])
+                        else:
+                            print(f"WARNING: refID {refID} not found in reference_loot_template for createure {creature['id']}")
 
         ret['vendorTempIDs'] = {}
         # for creature in cTemplate:
