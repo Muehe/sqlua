@@ -4,6 +4,15 @@ DELETE FROM `creature_template` WHERE `entry` > 80674;
 DELETE FROM `creature_queststarter` WHERE `id` > 80674;
 DELETE FROM `creature_questender` WHERE `id` > 80674;
 
+# Reduce race requirements to MoP races
+UPDATE `quest_template` SET `AllowableRaces` = 33555378 WHERE `AllowableRaces` = 12261800583900083122; # Horde
+UPDATE `quest_template` SET `AllowableRaces` = 18875469 WHERE `AllowableRaces` = 6130900294268439629; # Alliance
+UPDATE `quest_template` SET `AllowableRaces` = 0 WHERE `AllowableRaces` = 18446744073709551615; # Both
+UPDATE `quest_template` SET `AllowableRaces` = 33554432 WHERE `AllowableRaces` = 31012; # Pandaren Horde
+UPDATE `quest_template` SET `AllowableRaces` = 16777216 WHERE `AllowableRaces` = 16777216; # Pandaren Alliance
+UPDATE `quest_template` SET `AllowableRaces` = 8388608 WHERE `AllowableRaces` = 58720256; # Pandaren Neutral
+UPDATE `quest_template` SET `AllowableRaces` = 8388608 WHERE `AllowableRaces` = 54043195541028864; # Pandaren Neutral
+
 # quest 31694 has some debug text in the objectives text and details which we remove
 UPDATE quest_template SET LogDescription = '', QuestDescription = '' WHERE ID = 31694;
 
@@ -120,4 +129,4 @@ UPDATE creature SET zoneId = 4922, areaId = 4922 WHERE id IN (
 # Invalid creature entries
 DELETE FROM creature WHERE id IN (
     58701, 59304, 59316, 59375, 60908, 65379, 72676, 72973
-    );
+);
