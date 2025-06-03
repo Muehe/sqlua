@@ -37,8 +37,10 @@ def getClassInstances(recache=False):
             items = CataItemList(version)
             items.run(dictCursor, recache=recache)
         else:
-            # this will error in main(), but at least it writes the other stuff to file first
-            items = {}
+            # Trinity has no item DB, use mangos data
+            items = CataItemList(version)
+            c, dc = getCursors(version, 'mangos')
+            items.run(dc, recache=recache)
     else:
         quests = QuestList(version)
         quests.run(cursor, dictCursor, db_flavor, recache)
