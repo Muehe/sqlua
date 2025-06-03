@@ -40,7 +40,7 @@ class QuestList:
             self.raceIDs['ALL'] = 1791
 
         self.skipList = {
-            8731: {'cata'}
+            8731: {'cata'}, # Why the hell did I want to skip this? Some weird data in TrinityDB I think?
         }
 
     def run(self, cursor, dictCursor, db_flavor, recache=False):
@@ -64,6 +64,11 @@ class QuestList:
                 return False
         return True
 
+    def skipQuest(self, qid):
+        if qid in self.skipList and self.version in self.skipList[qid]:
+            return True
+        return False
+
     def cacheQuests(self, dicts):
         # TODO: Use proper CSV reader
         infile = open(f'data/{self.version}/AreaTrigger.dbc.CSV', 'r')
@@ -76,7 +81,7 @@ class QuestList:
         count = len(dicts['quest_template'])
         print(f'Caching {count} quests...')
         for quest in dicts['quest_template']:
-            if not (quest[0] in self.skipList and self.version in self.skipList[quest[0]]):
+            if not self.skipQuest(quest[0]):
                 self.__addQuest(quest, dicts, areaTrigger)
             if ((count % 500) == 0):
                 print(str(count)+"...")
