@@ -131,7 +131,7 @@ class Npc():
         else:
             self.hostileToH = False
         self.subName = npc[8]
-        self.npcFlags = npc[9]
+        self.npcFlags = npc[9] & pow(2, 32) - 1
         if extractSpawns:
             spawns = []
             waypoints = []

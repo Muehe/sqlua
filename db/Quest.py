@@ -46,8 +46,8 @@ class Quest():
         if (quest[12] != 0):
             self.RequiredMaxRepFaction = quest[12]
             self.RequiredMaxRepValue = quest[13]
-        if (quest[14] != 0):
-            self.QuestFlags = quest[14]
+        if (quest[14] & pow(2, 24) - 1 != 0):
+            self.QuestFlags = quest[14] & pow(2, 24) - 1
         if (quest[15] != 0):
             self.PrevQuestId = quest[15]
         if (quest[16] != 0):
@@ -289,7 +289,7 @@ class Quest():
         self.ChildQuests = []
         if (quest[51] != 0):
             self.SpecialFlags = quest[51]
-        if (quest[52] != 0):
+        if (quest[52] != 0 and quest[52] != None):
             self.BreadcrumbForQuestId = quest[52]
         self.Breadcrumbs = []
 
