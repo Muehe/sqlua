@@ -58,6 +58,12 @@ class QuestList:
                 dicts = self.__getQuestTables(cursor, dictCursor)
                 self.cacheQuests(dicts)
 
+    def validQuestName(self, name):
+        for string in ['Deprecated', 'DEPRECATED', 'ZZOLD', 'zzOLD', 'zzold', '(REMOVED)', '<UNUSED>']:
+            if string in name:
+                return False
+        return True
+
     def cacheQuests(self, dicts):
         # TODO: Use proper CSV reader
         infile = open(f'data/{self.version}/AreaTrigger.dbc.CSV', 'r')
@@ -95,7 +101,7 @@ class QuestList:
                     for q in group:
                         if q.id != quest.id:
                             quest.addGroup(q.id)
-            if hasattr(quest, "BreadcrumbForQuestId") and quest.BreadcrumbForQuestId is not None:
+            if hasattr(quest, "BreadcrumbForQuestId") and quest.BreadcrumbForQuestId is not None and quest.BreadcrumbForQuestId in self.qList:
                 self.qList[quest.BreadcrumbForQuestId].addBreadcrumb(quest.id)
         for questId in self.qList:
             quest = self.qList[questId]
@@ -401,6 +407,8 @@ QuestieDB.questData = [[return {
         outString = ""
         for id in sorted(self.qList):
             quest = self.qList[id]
+            if not self.validQuestName(quest.Title):
+                continue
             #if quest in excluded:
             #    continue
             outString += ("["+str(quest.id)+"] = {") #key
