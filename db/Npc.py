@@ -14,6 +14,26 @@ def getCreatureZones(file):
     infile.close()
     return zoneDict
 
+def get_zones_from_spawn(spawn: tuple[any, str, int, float, float], version: str) -> dict[int, int]:
+    zoneDict = {}
+    guid = spawn[4]
+    mapId = spawn[1]
+    pos_x = spawn[2]
+    pos_y = spawn[3]
+
+    if len(spawn) == 7:
+        coord = Coord(mapId, pos_x, pos_y, version, spawn[6])
+    else:
+        coord = Coord(mapId, pos_x, pos_y, version)
+
+    if coord.pointList:
+        # Use the first found zoneID
+        zoneID = coord.pointList[0][0]
+        zoneDict[guid] = zoneID
+    else:
+        zoneDict[guid] = None
+    return zoneDict
+
 zonesClassic = getCreatureZones('data/classic/creature_preExtract.csvzone_and_area.csv')
 zonesTBC = getCreatureZones('data/tbc/creature_preExtract.csvzone_and_area.csv')
 zonesWotLK = getCreatureZones('data/wotlk/creature_preExtract.csvzone_and_area.csv')
@@ -77,6 +97,8 @@ def getFactionTemplate(fac):
     factionList = re.findall("(.*?),.*?,.*?,(.*?),(.*?),(.*?),.*?,.*?,.*?,.*?,.*?,.*?,.*?,.*?,?\n", content)
     factionDict = {}
     for data in factionList:
+        if data[0] == 'ID':
+            continue
         factionDict[int(data[0])] = (int(data[1]), # ourMask
                                      int(data[2]), # friendlyMask
                                      int(data[3])) # hostileMask
@@ -87,6 +109,7 @@ factionTemplateClassic = getFactionTemplate('data/classic/FactionTemplate.dbc.CS
 factionTemplateTBC = getFactionTemplate('data/tbc/FactionTemplate.dbc.CSV')
 factionTemplateWotLK = getFactionTemplate('data/wotlk/FactionTemplate.dbc.CSV')
 factionTemplateCata = getFactionTemplate('data/cata/FactionTemplate.dbc.CSV')
+factionTemplateMop = getFactionTemplate('data/mop/FactionTemplate.dbc.CSV')
 
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
@@ -113,6 +136,11 @@ class Npc():
             movementZones = movementZonesCata
             movementTemplateZones = movementTemplateZonesCata
             factionTemplate = factionTemplateCata
+        elif version == 'mop': # TODO: Use MoP data
+            # zones = zonesCata # Set further below
+            movementZones = movementZonesCata
+            movementTemplateZones = movementTemplateZonesCata
+            factionTemplate = factionTemplateMop
         self.id = npc[0]
         self.debug = debug
         self.name = escapeQuotes(npc[1])
@@ -122,14 +150,19 @@ class Npc():
         self.maxlevelhealth = npc[5]
         self.rank = npc[6]
         self.faction = npc[7]
-        if (12 & factionTemplate[self.faction][0]) != 0:
+        if self.faction in factionTemplate:
+            if (12 & factionTemplate[self.faction][0]) != 0:
+                self.hostileToA = True
+            else:
+                self.hostileToA = False
+            if (10 & factionTemplate[self.faction][0]) != 0:
+                self.hostileToH = True
+            else:
+                self.hostileToH = False
+        else:
+            print("Faction not found in factionTemplate:", self.faction, "NPC ID:", self.id)
             self.hostileToA = True
-        else:
-            self.hostileToA = False
-        if (10 & factionTemplate[self.faction][0]) != 0:
             self.hostileToH = True
-        else:
-            self.hostileToH = False
         self.subName = npc[8]
         self.npcFlags = npc[9] & pow(2, 32) - 1
         if extractSpawns:
@@ -141,6 +174,9 @@ class Npc():
                 for spawn in rawSpawns:
                     # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
+                        if version == 'mop':
+                            zones = get_zones_from_spawn(spawn, version)
+
                         # get spawns
                         if spawn[4] in zones:
                             if version == 'cata':

@@ -307,7 +307,7 @@ QuestieDB.npcData = [[return {
                 outString += ("nil,")
             else:
                 outString += (f'"{friendlyTo}",')
-            if (hasattr(npc, "subName") and npc.subName != None): #14 - subName
+            if hasattr(npc, "subName") and npc.subName is not None and npc.subName != "": #14 - subName
                 sn = npc.subName.replace('"', '\\"')
                 outString += (f'"{sn}",')
             else:

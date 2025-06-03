@@ -13,6 +13,23 @@ def getObjectZones(file):
     infile.close()
     return zoneDict
 
+def get_zones_from_spawn(spawn: tuple[any, str, int, float, float], version: str) -> dict[int, int]:
+    zoneDict = {}
+    guid = spawn[4]
+    mapId = spawn[1]
+    pos_x = spawn[2]
+    pos_y = spawn[3]
+
+    coord = Coord(mapId, pos_x, pos_y, version)
+
+    if coord.pointList:
+        # Use the first found zoneID
+        zoneID = coord.pointList[0][0]
+        zoneDict[guid] = zoneID
+    else:
+        zoneDict[guid] = None
+    return zoneDict
+
 objectZonesClassic = getObjectZones('data/classic/gameobject_preExtract.csvzone_and_area.csv')
 objectZonesTBC = getObjectZones('data/tbc/gameobject_preExtract.csvzone_and_area.csv')
 objectZonesWotLK = getObjectZones('data/wotlk/gameobject_preExtract.csvzone_and_area.csv')
@@ -42,6 +59,9 @@ class Obj():
                 for spawn in rawSpawn:
                     # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
+                        if version == 'mop':
+                            objectZones = get_zones_from_spawn(spawn, version)
+
                         if spawn[4] in objectZones:
                             if version == 'cata':
                                 spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]], spawn[5]))

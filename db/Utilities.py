@@ -11,13 +11,13 @@ localesMap = {
 }
 
 def escapeDoubleQuotes(inp):
-    if inp == None:
+    if inp is None:
         return inp
     name = inp.replace('"', '\\"').lstrip().rstrip()
     return name
 
 def escapeQuotes(inp):
-    if inp == None:
+    if inp is None:
         return inp
     name = inp.replace("'", "\\'").lstrip().rstrip()
     return name
@@ -30,3 +30,9 @@ def removeTrailingData(inp):
     inp = inp.replace(",nil}", "}")
     inp = inp.replace("{}", "nil")
     return inp
+
+# Reads the IDs by line from a given file.
+def read_id_file(file_path: str) -> list[int]:
+    print("Reading IDs from", file_path)
+    with open(file_path, 'r') as file:
+        return [int(line.strip()) for line in file if line.strip().isdigit()]
