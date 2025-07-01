@@ -260,3 +260,44 @@ ammoType = {
     2: 'Arrows',
     3: 'Bullets',
 }
+
+QuestObjectiveType = {
+    0: 'QUEST_OBJECTIVE_MONSTER', # kill
+    1: 'QUEST_OBJECTIVE_ITEM', # collect
+    2: 'QUEST_OBJECTIVE_GAMEOBJECT', # interact object
+    3: 'QUEST_OBJECTIVE_TALKTO', # interact npc
+    4: 'QUEST_OBJECTIVE_CURRENCY',
+    5: 'QUEST_OBJECTIVE_LEARNSPELL',
+    6: 'QUEST_OBJECTIVE_MIN_REPUTATION',
+    7: 'QUEST_OBJECTIVE_MAX_REPUTATION',
+    8: 'QUEST_OBJECTIVE_MONEY',
+    9: 'QUEST_OBJECTIVE_PLAYERKILLS',
+    10: 'QUEST_OBJECTIVE_AREATRIGGER',
+    11: 'QUEST_OBJECTIVE_WINPETBATTLEAGAINSTNPC',
+    12: 'QUEST_OBJECTIVE_DEFEATBATTLEPET',
+    13: 'QUEST_OBJECTIVE_WINPVPPETBATTLES',
+    14: 'QUEST_OBJECTIVE_CRITERIA_TREE',
+    15: 'QUEST_OBJECTIVE_PROGRESS_BAR',
+    16: 'QUEST_OBJECTIVE_HAVE_CURRENCY', # requires the player to have X currency when turning in but does not consume it
+    17: 'QUEST_OBJECTIVE_OBTAIN_CURRENCY', # requires the player to gain X currency after starting the quest but not required to keep it until the end (does not consume)
+    18: 'QUEST_OBJECTIVE_INCREASE_REPUTATION', # requires the player to gain X reputation with a faction
+    19: 'QUEST_OBJECTIVE_AREA_TRIGGER_ENTER',
+    20: 'QUEST_OBJECTIVE_AREA_TRIGGER_EXIT',
+    21: 'QUEST_OBJECTIVE_KILL_WITH_LABEL',
+}
+
+QuestObjectiveTypeKey = {v: k for k, v in QuestObjectiveType.items()}
+
+QuestObjectiveFlags = {
+    0: 'QUEST_OBJECTIVE_FLAG_NONE',
+    1: 'QUEST_OBJECTIVE_FLAG_TRACKED_ON_MINIMAP', # client displays large yellow blob on minimap for creature/gameobject
+    2: 'QUEST_OBJECTIVE_FLAG_SEQUENCED', # client will not see the objective displayed until all previous objectives are completed
+    4: 'QUEST_OBJECTIVE_FLAG_OPTIONAL', # not required to complete the quest
+    8: 'QUEST_OBJECTIVE_FLAG_HIDDEN', # never displayed in quest log
+    16: 'QUEST_OBJECTIVE_FLAG_HIDE_CREDIT_MSG', # skip showing item objective progress
+    32: 'QUEST_OBJECTIVE_FLAG_PRESERVE_QUEST_ITEMS',
+    64: 'QUEST_OBJECTIVE_FLAG_PART_OF_PROGRESS_BAR', # hidden objective used to calculate progress bar percent (quests are limited to a single progress bar objective)
+    128: 'QUEST_OBJECTIVE_FLAG_KILL_PLAYERS_SAME_FACTION',
+    256: 'QUEST_OBJECTIVE_FLAG_NO_SHARE_PROGRESS',
+    521: 'QUEST_OBJECTIVE_FLAG_IGNORE_SOULBOUND_ITEMS',
+}

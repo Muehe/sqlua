@@ -1,6 +1,7 @@
 import flask
+from os.path import isfile
 
-from config import *
+from main import *
 
 from db.NpcList import *
 from db.QuestList import *
@@ -12,10 +13,11 @@ from gui.npcPage import *
 from gui.objectPage import *
 from gui.itemPage import *
 
-npcs = NpcList(None, None, version, recache=False)
-quests = QuestList(None, None, version, recache=False)
-objects = ObjList(None, None, version, recache=False)
-items = ItemList(None, version, recache=False)
+#npcs = NpcList(None, flavor, None, version, recache=False)
+#quests = QuestList(None, flavor, None, version, recache=False)
+#objects = ObjList(None, flavor, None, version, recache=False)
+#items = ItemList(None, flavor, version, recache=False)
+quests, npcs, objects, items = getClassInstances(False)
 
 app = flask.Flask(__name__)
 
@@ -39,3 +41,10 @@ def obj(objectID):
 @app.route('/item/<int:itemID>')
 def item(itemID):
     return itemPage(itemID, items, npcs, objects, quests)
+
+@app.route('/hasmap/<int:mapID>')
+def map(mapID):
+    if isfile(f'static/maps/{mapID}.jpg'):
+        return True
+    else:
+        return False

@@ -114,14 +114,14 @@ html {
     padding: 1em;
 }
 
-.col-1 {width: 12.5%;}
-.col-2 {width: 25%;}
-.col-3 {width: 37.5%;}
-.col-4 {width: 50%;}
-.col-5 {width: 62.5%;}
-.col-6 {width: 75%;}
-.col-7 {width: 87.5%;}
-.col-8 {width: 100%;}
+.col-12-5 {width: 12.5%;}
+.col-25 {width: 25%;}
+.col-37-5 {width: 37.5%;}
+.col-50 {width: 50%;}
+.col-62-5 {width: 62.5%;}
+.col-75 {width: 75%;}
+.col-87-5 {width: 87.5%;}
+.col-100 {width: 100%;}
 
 .header {
     background-color: gold;

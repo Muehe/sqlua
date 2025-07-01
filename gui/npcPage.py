@@ -42,7 +42,7 @@ def npcPage(npcID, npcs, quests):
             if zone not in pinList:
                 pinList[zone] = []
             for coord in npc.spawns.cByZone[zone]:
-                pinList[zone].append(createPinDict('Spawn: '+npc.name, coord[0], coord[1], color='blue', opacity=0.7, imgSrc='glow2', width=2))
+                pinList[zone].append(createPinDict('Spawn: '+npc.name+' ('+str(coord[0])+','+str(coord[1])+')', coord[0], coord[1], color='blue', opacity=0.7, imgSrc='object_tiny', width=1))
         data['pinList'] = pinList
 
     data['zoneNames'] = zoneNames

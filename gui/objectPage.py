@@ -29,7 +29,7 @@ def objectPage(objectID, objects, quests):
             if zone not in pinList:
                 pinList[zone] = []
             for coord in obj.spawns.cByZone[zone]:
-                pinList[zone].append(createPinDict('Spawn: '+obj.name, coord[0], coord[1], color='yellow', opacity=0.7, imgSrc='glow2', width=2))
+                pinList[zone].append(createPinDict('Spawn: '+obj.name+' ('+str(coord[0])+','+str(coord[1])+')', coord[0], coord[1], color='yellow', opacity=0.7, imgSrc='object_tiny', width=1))
         data['pinList'] = pinList
     data['zoneNames'] = zoneNames
 

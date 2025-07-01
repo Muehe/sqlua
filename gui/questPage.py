@@ -1,4 +1,5 @@
 import flask
+from os.path import isfile
 
 from db.CoordData import *
 from gui.utility import *
@@ -39,7 +40,7 @@ def questPage(questID, quests, npcs, objects, items):
                         pinList[zone] = []
                     pinList[zone].append(pin)
             for objId in item.objects:
-                obj = objects.objectList[npcId]
+                obj = objects.objectList[objId]
                 for zone, pin in coordsToPins(obj.spawns, item.name+' dropped by: '+obj.name, imgSrc='loot', width=2):
                     if zone not in pinList:
                         pinList[zone] = []
@@ -58,6 +59,21 @@ def questPage(questID, quests, npcs, objects, items):
                 if zone not in pinList:
                     pinList[zone] = []
                 pinList[zone].append(pin)
+    if hasattr(quest, 'itemStart'):
+        for itemId in quest.itemStart:
+            item = items.itemList[itemId]
+            for npcId in item.npcs:
+                npc = npcs.nList[npcId]
+                for zone, pin in coordsToPins(npc.spawns, item.name+' dropped by NPC "'+npc.name+'" starts this quest', imgSrc='available', width=2):
+                    if zone not in pinList:
+                        pinList[zone] = []
+                    pinList[zone].append(pin)
+            for objId in item.objects:
+                obj = objects.objectList[objId]
+                for zone, pin in coordsToPins(obj.spawns, item.name+' dropped by object "'+obj.name+'" starts this quest', imgSrc='available', width=2):
+                    if zone not in pinList:
+                        pinList[zone] = []
+                    pinList[zone].append(pin)
     if hasattr(quest, 'creatureEnd'):
         for npcId in quest.creatureEnd:
             npc = npcs.nList[npcId]
@@ -72,8 +88,18 @@ def questPage(questID, quests, npcs, objects, items):
                 if zone not in pinList:
                     pinList[zone] = []
                 pinList[zone].append(pin)
+    remove = []
+    for zone in pinList:
+        if not isfile(f'gui/static/maps/{zone}.jpg'):
+            remove.append(zone)
+    for zone in remove:
+        del pinList[zone]
+    
+
     if len(pinList) > 0:
         data['pinList'] = pinList
+    if len(remove) > 0:
+        data['removed'] = remove
     ""
     data['quest'] = quest
     data['zoneNames'] = zoneNames
