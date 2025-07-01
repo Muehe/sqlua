@@ -2,7 +2,7 @@
 # Accepts 'classic', 'tbc', 'wotlk' or 'cata'
 version = 'classic'
 # Database flavor. Either 'mangos' or 'trinity' (for cata only)
-db_flavor = 'mangos'
+flavor = 'mangos'
 # Toggle debug messages
 debug = False
 # MySQL information
@@ -11,13 +11,19 @@ dbInfo = {
     'user': 'mangos',
     'password': 'mangos',
     'port': 3306,
-    'mangos': {
+    'cmangos': {
         'classic': 'classicmangos',
         'tbc': 'tbcmangos',
         'wotlk': 'wotlkmangos',
+    },
+    'mangos': {
         'cata': 'mangos3',
+        'mop': 'mangos4',
     },
     'trinity': {
         'cata': 'world',
+    },
+    'skyfire': {
+        'mop': 'skyfire',
     },
 }

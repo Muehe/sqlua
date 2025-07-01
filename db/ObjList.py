@@ -7,24 +7,31 @@ import pickle
 
 class ObjList():
     """Holds a list of Obj() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, version):
+    def __init__(self, version, flavor, cursor, extractSpawns=True, recache=False):
         self.version = version
+        self.flavor = flavor
         self.objectList = {}
 
-    def run(self, cursor, db_flavor, extractSpawns=True, recache=False):
-        if (not os.path.isfile(f'data/{self.version}/objects.pkl') or recache):
-            dicts = self.getObjTables(cursor)
+        if flavor == 'cmangos':
+            from db.flavor.readCmangosObjList import getObjTables
+        elif flavor == 'mangos':
+            from db.flavor.readMangosObjList import getObjTables
+        elif flavor == 'trinity':
+            from db.flavor.readTrinityObjList import getObjTables
+        elif flavor == 'skyfire':
+            from db.flavor.readSkyfireObjList import getObjTables
+
+        if (not os.path.isfile(f'data/{version}/{flavor}/objects.pkl') or recache):
             print('Caching objects...')
-            self.cacheObjects(dicts, extractSpawns)
+            self.cacheObjects(getObjTables(cursor), extractSpawns)
         else:
             try:
-                with open(f'data/{self.version}/objects.pkl', 'rb') as f:
+                with open(f'data/{version}/{flavor}/objects.pkl', 'rb') as f:
                     self.objectList = pickle.load(f)
                 print('Using cached objects.')
             except:
                 print('ERROR: Something went wrong while loading cached objects. Re-caching.')
-                dicts = self.getObjTables(cursor)
-                self.cacheObjects(dicts, extractSpawns)
+                self.cacheObjects(getObjTables(cursor), extractSpawns)
 
     def cacheObjects(self, dicts, extractSpawns=True):
         count = len(dicts['object_template'])
@@ -34,7 +41,7 @@ class ObjList():
             if ((count % 500) == 0):
                 print(str(count)+"...")
             count -= 1
-        with open(f'data/{self.version}/objects.pkl', 'wb') as f:
+        with open(f'data/{self.version}/{self.flavor}/objects.pkl', 'wb') as f:
             pickle.dump(self.objectList, f, protocol=pickle.HIGHEST_PROTOCOL)
         print("Done caching objects.")
 
@@ -56,76 +63,6 @@ class ObjList():
 
     def __iterObj(self, **kwargs):
         return (self.objectList[obj] for obj in self.objectList if self.objectList[obj].match(**kwargs))
-
-    def getObjTables(self, cursor):
-        print("Selecting object related MySQL tables...")
-        print("  SELECT gameobject_template")
-        cursor.execute("SELECT entry, name, type, faction, data1 FROM gameobject_template")
-        obj_tpl = []
-        for a in cursor.fetchall():
-            obj_tpl.append(a)
-
-        print('  SELECT gameobject_spawn_entry')
-        cursor.execute('SELECT * FROM gameobject_spawn_entry')
-        obj_spawn_entry = {}
-        for guid, entry in cursor.fetchall():
-            if guid not in obj_spawn_entry:
-                obj_spawn_entry[guid] = []
-            obj_spawn_entry[guid].append(entry)
-
-        print("  SELECT gameobject")
-        cursor.execute("SELECT id, map, position_x, position_y, guid FROM gameobject")
-        obj = {}
-        for a in cursor.fetchall():
-            if (a[0] == 0):
-                if a[4] in obj_spawn_entry:
-                    for entry in obj_spawn_entry[a[4]]:
-                        if entry not in obj:
-                            obj[entry] = []
-                        obj[entry].append(a)
-                #else:
-                    #print(f'Missing entry for GUID {a[4]}')
-                continue
-            elif(a[0] not in obj):
-                obj[a[0]] = []
-            obj[a[0]].append(a)
-
-        print("  SELECT gameobject_questrelation")
-        cursor.execute("SELECT * FROM gameobject_questrelation")
-        obj_start = {}
-        for a in cursor.fetchall():
-            if(a[0] in obj_start):
-                obj_start[a[0]].append(a)
-            else:
-                obj_start[a[0]] = []
-                obj_start[a[0]].append(a)
-
-        print("  SELECT gameobject_involvedrelation")
-        cursor.execute("SELECT * FROM gameobject_involvedrelation")
-        obj_end = {}
-        for a in cursor.fetchall():
-            if(a[0] in obj_end):
-                obj_end[a[0]].append(a)
-            else:
-                obj_end[a[0]] = []
-                obj_end[a[0]].append(a)
-
-        print("  SELECT locales_gameobject")
-        cursor.execute("SELECT * FROM locales_gameobject")
-        loc_obj = {}
-        for a in cursor.fetchall():
-            if(a[0] in loc_obj):
-                loc_obj[a[0]].append(a)
-            else:
-                loc_obj[a[0]] = []
-                loc_obj[a[0]].append(a)
-
-        print("Done.")
-        return {'object_template':obj_tpl,
-                'object':obj,
-                'object_start':obj_start,
-                'object_end':obj_end,
-                'locales_object':loc_obj}
 
     def printObjFile(self, file='output/objectDB.lua', locale='enGB'):
         print("  Printing Object file '%s'" % file)

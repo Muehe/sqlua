@@ -8,8 +8,9 @@ import pickle
 
 class QuestList:
     """Holds a list of Quest() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, version):
+    def __init__(self, version, flavor, cursor, dictCursor, recache=False):
         self.version = version
+        self.flavor = flavor
         self.qList = {}
         self.raceIDs = {
             'NONE': 0,
@@ -26,6 +27,7 @@ class QuestList:
             'DRAENEI': 1024,
             'WORGEN': 2097152,
         }
+
         if version == 'classic':
             self.raceIDs['ALLIANCE'] = 77
             self.raceIDs['HORDE'] = 178
@@ -43,20 +45,26 @@ class QuestList:
             8731: {'cata'}, # Why the hell did I want to skip this? Some weird data in TrinityDB I think?
         }
 
-    def run(self, cursor, dictCursor, db_flavor, recache=False):
-        if not os.path.isfile(f'data/{self.version}/quests.pkl') or recache:
-            dicts = self.__getQuestTables(cursor, dictCursor)
+        if flavor == 'cmangos':
+            from db.flavor.readCmangosQuestList import getQuestTables
+        elif flavor == 'mangos':
+            from db.flavor.readMangosQuestList import getQuestTables
+        elif flavor == 'trinity':
+            from db.flavor.readTrinityQuestList import getQuestTables
+        elif flavor == 'skyfire':
+            from db.flavor.readSkyfireQuestList import getQuestTables
+
+        if not os.path.isfile(f'data/{self.version}/{flavor}/quests.pkl') or recache:
             print('Caching quests...')
-            self.cacheQuests(dicts)
+            self.cacheQuests(getQuestTables(cursor, dictCursor, self.version))
         else:
             try:
-                with open(f'data/{self.version}/quests.pkl', 'rb') as f:
+                with open(f'data/{self.version}/{flavor}/quests.pkl', 'rb') as f:
                     self.qList = pickle.load(f)
                 print('Using cached quests.')
             except:
                 print('ERROR: Something went wrong while loading cached quests. Re-caching.')
-                dicts = self.__getQuestTables(cursor, dictCursor)
-                self.cacheQuests(dicts)
+                self.cacheQuests(getQuestTables(cursor, dictCursor))
 
     def validQuestName(self, name):
         for string in ['Deprecated', 'DEPRECATED', 'ZZOLD', 'zzOLD', 'zzold', '(REMOVED)', '<UNUSED>']:
@@ -150,7 +158,7 @@ class QuestList:
                 delattr(quest, "PreQuestGroup")
             if quest.ChildQuests == []:
                 delattr(quest, "ChildQuests")
-        with open(f'data/{self.version}/quests.pkl', 'wb') as f:
+        with open(f'data/{self.version}/{self.flavor}/quests.pkl', 'wb') as f:
             pickle.dump(self.qList, f, protocol=pickle.HIGHEST_PROTOCOL)
         print("Done caching quests.")
 
@@ -190,108 +198,6 @@ class QuestList:
 
     def __iterQuest(self, **kwargs):
         return (self.qList[quest] for quest in self.qList if self.qList[quest].match(**kwargs))
-
-    def __getQuestTables(self, cursor, dictCursor):
-        """only used by constructor"""
-        print("Selecting quest related MySQL tables...")
-        print("  SELECT quest_template")
-        if self.version == "wotlk":
-            cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, BreadCrumbForQuestId, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5, RewRepValueId1, RewRepValueId2, RewRepValueId3, RewRepValueId4, RewRepValueId5 FROM quest_template")
-        else: # SrcItemId needed to check for spell_script_target (type and targetEntry) via item_template.spellId
-            cursor.execute("SELECT entry, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue, RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, QuestFlags, PrevQuestId, NextQuestId, NextQuestInChain, ExclusiveGroup, Title, Objectives, ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4, PointMapId, PointX, PointY, StartScript, CompleteScript, SrcItemId, ZoneOrSort, Method, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, EndText, Details, SpecialFlags, BreadCrumbForQuestId, RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5 FROM quest_template")
-        quest_template = []
-        for a in cursor.fetchall():
-            quest_template.append(a)
-
-        print("  SELECT creature_template")
-        cursor.execute("SELECT entry, KillCredit1, KillCredit2 FROM creature_template WHERE KillCredit1 != 0 OR KillCredit2 != 0")
-        creature_killcredit = {}
-        for a in cursor.fetchall():
-            if a[1] != 0:
-                if not (a[1] in creature_killcredit):
-                    creature_killcredit[a[1]] = []
-                creature_killcredit[a[1]].append(a[0])
-            if a[2] != 0:
-                if not (a[2] in creature_killcredit):
-                    creature_killcredit[a[2]] = []
-                creature_killcredit[a[2]].append(a[0])
-
-        print("  SELECT creature_involvedrelation")
-        cursor.execute("SELECT id, quest FROM creature_involvedrelation")
-        creature_involvedrelation = {}
-        for a in cursor.fetchall():
-            if(a[1] in creature_involvedrelation):
-                creature_involvedrelation[a[1]].append(a)
-            else:
-                creature_involvedrelation[a[1]] = []
-                creature_involvedrelation[a[1]].append(a)
-
-        print("  SELECT gameobject_involvedrelation")
-        cursor.execute("SELECT id, quest FROM gameobject_involvedrelation")
-        gameobject_involvedrelation = {}
-        for a in cursor.fetchall():
-            if(a[1] in gameobject_involvedrelation):
-                gameobject_involvedrelation[a[1]].append(a)
-            else:
-                gameobject_involvedrelation[a[1]] = []
-                gameobject_involvedrelation[a[1]].append(a)
-
-        print("  SELECT creature_questrelation")
-        cursor.execute("SELECT id, quest FROM creature_questrelation")
-        creature_questrelation = {}
-        for a in cursor.fetchall():
-            if(a[1] in creature_questrelation):
-                creature_questrelation[a[1]].append(a)
-            else:
-                creature_questrelation[a[1]] = []
-                creature_questrelation[a[1]].append(a)
-
-        print("  SELECT gameobject_questrelation")
-        cursor.execute("SELECT id, quest FROM gameobject_questrelation")
-        gameobject_questrelation = {}
-        for a in cursor.fetchall():
-            if(a[1] in gameobject_questrelation):
-                gameobject_questrelation[a[1]].append(a)
-            else:
-                gameobject_questrelation[a[1]] = []
-                gameobject_questrelation[a[1]].append(a)
-                
-        print("  SELECT item_template")
-        cursor.execute("SELECT entry, startquest FROM item_template")
-        item_questrelation = {}
-        for a in cursor.fetchall():
-            if(a[1] in item_questrelation):
-                item_questrelation[a[1]].append(a)
-            else:
-                item_questrelation[a[1]] = []
-                item_questrelation[a[1]].append(a)
-
-        print("  SELECT areatrigger_involvedrelation")
-        cursor.execute("SELECT id, quest FROM areatrigger_involvedrelation")
-        areatrigger_involvedrelation = {}
-        for a in cursor.fetchall():
-            if(a[1] in areatrigger_involvedrelation):
-                areatrigger_involvedrelation[a[1]].append(a)
-            else:
-                areatrigger_involvedrelation[a[1]] = []
-                areatrigger_involvedrelation[a[1]].append(a)
-
-        print("  SELECT locales_quest")
-        count = dictCursor.execute("SELECT * FROM locales_quest")
-        loc_quests = {}
-        for _ in range(0, count):
-            q = dictCursor.fetchone()
-            loc_quests[q['entry']] = q
-        print("Done.")
-        return {'quest_template':quest_template,
-                'creature_killcredit': creature_killcredit,
-                'creature_involvedrelation':creature_involvedrelation,
-                'gameobject_involvedrelation':gameobject_involvedrelation,
-                'creature_questrelation':creature_questrelation,
-                'gameobject_questrelation':gameobject_questrelation,
-                'item_questrelation':item_questrelation,
-                'areatrigger_involvedrelation':areatrigger_involvedrelation,
-                'locales_quest':loc_quests}
 
     def checkStartEnd(self):
         """Find quests with missing start or end points.

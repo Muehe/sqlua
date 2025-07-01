@@ -6,25 +6,32 @@ import pickle
 
 class NpcList():
     """Holds a list of Npc() objects. Requires a pymysql cursor to cmangos classicdb."""
-    def __init__(self, version, debug=False):
+    def __init__(self, version, flavor, cursor, dictCursor, recache=False, extractSpawns=True, debug=False):
         self.version = version
+        self.flavor = flavor
         self.debug = debug
         self.nList = {}
 
-    def run(self, cursor, dictCursor, db_flavor, recache=False, extractSpawns=True):
-        if (not os.path.isfile(f'data/{self.version}/npcs.pkl') or recache):
-            dicts = self.getNpcTables(cursor, dictCursor)
+        if flavor == 'cmangos':
+            from db.flavor.readCmangosNpcList import getNpcTables
+        elif flavor == 'mangos':
+            from db.flavor.readMangosNpcList import getNpcTables
+        elif flavor == 'trinity':
+            from db.flavor.readTrinityNpcList import getNpcTables
+        elif flavor == 'skyfire':
+            from db.flavor.readSkyfireNpcList import getNpcTables
+
+        if (not os.path.isfile(f'data/{version}/{flavor}/npcs.pkl') or recache):
             print('Caching NPCs...')
-            self.cacheNpcs(dicts, extractSpawns)
+            self.cacheNpcs(getNpcTables(cursor, dictCursor), extractSpawns)
         else:
             try:
-                with open(f'data/{self.version}/npcs.pkl', 'rb') as f:
+                with open(f'data/{version}/{flavor}/npcs.pkl', 'rb') as f:
                     self.nList = pickle.load(f)
                 print('Using cached NPCs.')
             except:
                 print('ERROR: Something went wrong while loading cached NPCs. Re-caching.')
-                dicts = self.getNpcTables(cursor, dictCursor)
-                self.cacheNpcs(dicts, extractSpawns)
+                self.cacheNpcs(getNpcTables(cursor, dictCursor), extractSpawns)
 
     def cacheNpcs(self, dicts, extractSpawns=True):
         count = len(dicts['npc_template'])
@@ -34,7 +41,7 @@ class NpcList():
             if (count % 1000) == 0:
                 print(str(count)+"...")
             count -= 1
-        with open(f'data/{self.version}/npcs.pkl', 'wb') as f:
+        with open(f'data/{self.version}/{self.flavor}/npcs.pkl', 'wb') as f:
             pickle.dump(self.nList, f, protocol=pickle.HIGHEST_PROTOCOL)
         print("Done caching NPCs.")
 
@@ -56,97 +63,6 @@ class NpcList():
 
     def __iterNpc(self, **kwargs):
         return (self.nList[npc] for npc in self.nList if self.nList[npc].match(**kwargs))
-
-    def getNpcTables(self, cursor, dictCursor):
-        print("Selecting NPC related MySQL tables...")
-
-        print("  SELECT creature_template")
-        cursor.execute("SELECT entry, name, minlevel, maxlevel, minlevelhealth, maxlevelhealth, rank, Faction, SubName, NpcFlags, KillCredit1, KillCredit2 FROM creature_template")
-        npc_tpl = []
-        for a in cursor.fetchall():
-            npc_tpl.append(a)
-
-        print('  SELECT creature_spawn_entry')
-        cursor.execute('SELECT * FROM creature_spawn_entry')
-        npc_spawn_entry = {}
-        for guid, entry in cursor.fetchall():
-            if guid not in npc_spawn_entry:
-                npc_spawn_entry[guid] = []
-            npc_spawn_entry[guid].append(entry)
-
-        print("  SELECT creature")
-        cursor.execute("SELECT id, map, position_x, position_y, guid FROM creature")
-        npc = {}
-        for a in cursor.fetchall():
-            if (a[0] == 0):
-                if a[4] in npc_spawn_entry:
-                    for entry in npc_spawn_entry[a[4]]:
-                        if entry not in npc:
-                            npc[entry] = []
-                        npc[entry].append(a)
-                #else:
-                    #print(f'Missing entry for GUID {a[4]}')
-                continue
-            elif(a[0] not in npc):
-                npc[a[0]] = []
-            npc[a[0]].append(a)
-
-        print("  SELECT creature_questrelation")
-        cursor.execute("SELECT * FROM creature_questrelation")
-        npc_start = {}
-        for a in cursor.fetchall():
-            if(a[0] in npc_start):
-                npc_start[a[0]].append(a)
-            else:
-                npc_start[a[0]] = []
-                npc_start[a[0]].append(a)
-
-        print("  SELECT creature_involvedrelation")
-        cursor.execute("SELECT * FROM creature_involvedrelation")
-        npc_end = {}
-        for a in cursor.fetchall():
-            if(a[0] in npc_end):
-                npc_end[a[0]].append(a)
-            else:
-                npc_end[a[0]] = []
-                npc_end[a[0]].append(a)
-
-        print("  SELECT creature_movement")
-        cursor.execute("SELECT point, id, PositionX, PositionY FROM creature_movement")
-        npc_mov = {}
-        for a in cursor.fetchall():
-            if(a[1] in npc_mov):
-                npc_mov[a[1]].append(a)
-            else:
-                npc_mov[a[1]] = []
-                npc_mov[a[1]].append(a)
-
-        print("  SELECT creature_movement_template")
-        cursor.execute("SELECT point, entry, PositionX, PositionY, PathId FROM creature_movement_template")
-        npc_mov_tpl = {}
-        for a in cursor.fetchall():
-            if(a[1] in npc_mov_tpl):
-                npc_mov_tpl[a[1]].append(a)
-            else:
-                npc_mov_tpl[a[1]] = []
-                npc_mov_tpl[a[1]].append(a)
-
-        print("  SELECT locales_creature")
-        count = dictCursor.execute("SELECT * FROM locales_creature")
-        loc_npc = {}
-        for _ in range(0, count):
-            q = dictCursor.fetchone()
-            loc_npc[q['entry']] = q
-
-        print("Done.")
-        return {'npc_template':npc_tpl,
-                'npc':npc,
-                'npc_start':npc_start,
-                'npc_end':npc_end,
-                'npc_movement':npc_mov,
-                'npc_movement_template':npc_mov_tpl,
-                'locales_npc':loc_npc,
-                }
 
     def printNpcFile(self, file='output/spawnDB.lua', locale='enGB'):
         print("  Printing NPC file '%s'" % file)
