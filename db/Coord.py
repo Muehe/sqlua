@@ -24,17 +24,16 @@ class Coord():
             if (not (zoneId == False)) and (zone != zoneId):
                 continue
             mId = int(mapSet[2])
-            x_min = float(mapSet[5])
-            x_max = float(mapSet[6])
-            y_min = float(mapSet[3])
-            y_max = float(mapSet[4])
-            is_in_map_boundary = (x_min < x < x_max) and (y_min < y < y_max)
-            if mapId == mId and not is_in_map_boundary: # No clue why this is "not"
+            x_max = float(mapSet[5])
+            x_min = float(mapSet[6])
+            y_max = float(mapSet[3])
+            y_min = float(mapSet[4])
+            if (mapId == mId) and (x_min < x < x_max) and (y_min < y < y_max):
                 if x_max == x_min or y_max == y_min:
                     print("WARNING: Map " + str(mapId) + " has no valid coordinates! " + str(mapSet))
                     continue
-                xCoord = round(abs(((x - x_min) / (x_max - x_min)) * 100), 2)
-                yCoord = round(abs(((y - y_min) / (y_max - y_min)) * 100), 2)
+                xCoord = round(abs(((x - x_max) / (x_min - x_max)) * 100), 2)
+                yCoord = round(abs(((y - y_max) / (y_min - y_max)) * 100), 2)
                 if 1 < phase_id < 4294967295:
                     self.zoneList[zone] = (yCoord, xCoord, phase_id)
                     self.pointList.append((zone, yCoord, xCoord, phase_id))
@@ -57,10 +56,7 @@ class Coord():
                 print("No zone! " + str(mapId) + " " + str(zoneId))
 
     def __repr__(self):
-        points = ""
-        for c in self.zoneList:
-            points += "("+str(c)+": "+str(self.zoneList[c])+")"
-        return points
+        return str(self.pointList[0]) if not self.noZone > 0 else "()"
 
 
 def worldToZone(mapId, x, y, version, zone=False):
