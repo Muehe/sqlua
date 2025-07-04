@@ -10,6 +10,8 @@ localesMap = {
 'ruRU': 8,
 }
 
+nil = [0, None, '']
+
 def escapeDoubleQuotes(inp):
     if inp is None:
         return inp

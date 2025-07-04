@@ -31,35 +31,35 @@ class Quest():
                 continue
             self.locales_Title[x] = dicts['locales_quest'][self.id]['Title_loc'+str(x)]
         self.Method = quest[44]
-        if (quest[40] != 0):
+        if (quest[40] not in nil):
             self.StartScript = quest[40]
-        if (quest[41] != 0):
+        if (quest[41] not in nil):
             self.CompleteScript = quest[41]
-        if (quest[4] != 0):
+        if (quest[4] not in nil):
             self.RequiredClasses = quest[4]
-        if (quest[6] != 0):
+        if (quest[6] not in nil):
             self.RequiredSkill = quest[6]
             self.RequiredSkillValue = quest[7]
-        if (quest[8] != 0):
+        if (quest[8] not in nil):
             self.RepObjectiveFaction = quest[8]
             self.RepObjectiveValue = quest[9]
-        if (quest[10] != 0):
+        if (quest[10] not in nil):
             self.RequiredMinRepFaction = quest[10]
             self.RequiredMinRepValue = quest[11]
-        if (quest[12] != 0):
+        if (quest[12] not in nil):
             self.RequiredMaxRepFaction = quest[12]
             self.RequiredMaxRepValue = quest[13]
-        if (quest[14] & pow(2, 24) - 1 != 0):
+        if ((quest[14] & pow(2, 24) - 1) not in nil):
             self.QuestFlags = quest[14] & pow(2, 24) - 1
-        if (quest[15] != 0):
+        if (quest[15] not in nil):
             self.PrevQuestId = quest[15]
-        if (quest[16] != 0):
+        if (quest[16] not in nil):
             self.NextQuestId = quest[16]
-        if (quest[17] != 0):
+        if (quest[17] not in nil):
             self.NextQuestInChain = quest[17]
-        if (quest[18] != 0):
+        if (quest[18] not in nil):
             self.ExclusiveGroup = quest[18]
-        if (quest[20] != '' and quest[20] != None):
+        if (quest[20] not in nil):
             self.Objectives = self.objectivesText(quest[20])
             self.locales_Objectives = {}
             for x in range(1, 9):
@@ -72,32 +72,32 @@ class Quest():
         self.ObjectiveList[2]['text'] = escapeDoubleQuotes(quest[47])
         self.ObjectiveList[3]['text'] = escapeDoubleQuotes(quest[48])
         self.ReqItemId = []
-        if ((quest[21] != 0) and (quest[21] != quest[42])):
+        if ((quest[21] not in nil) and (quest[21] != quest[42])):
             self.ReqItemId.append(quest[21])
             self.ObjectiveList[0]['type'] = 'item'
             self.ObjectiveList[0]['id'] = quest[21]
-        if ((quest[22] != 0) and (quest[22] != quest[42])):
+        if ((quest[22] not in nil) and (quest[22] != quest[42])):
             self.ReqItemId.append(quest[22])
             self.ObjectiveList[1]['type'] = 'item'
             self.ObjectiveList[1]['id'] = quest[22]
-        if ((quest[23] != 0) and (quest[23] != quest[42])):
+        if ((quest[23] not in nil) and (quest[23] != quest[42])):
             self.ReqItemId.append(quest[23])
             self.ObjectiveList[2]['type'] = 'item'
             self.ObjectiveList[2]['id'] = quest[23]
-        if ((quest[24] != 0) and (quest[24] != quest[42])):
+        if ((quest[24] not in nil) and (quest[24] != quest[42])):
             self.ReqItemId.append(quest[24])
             self.ObjectiveList[3]['type'] = 'item'
             self.ObjectiveList[3]['id'] = quest[24]
         if (self.ReqItemId == []):
             del self.ReqItemId
         self.ReqSourceId = []
-        if (quest[25] != 0):
+        if (quest[25] not in nil):
             self.ReqSourceId.append(quest[25])
-        if (quest[26] != 0):
+        if (quest[26] not in nil):
             self.ReqSourceId.append(quest[26])
-        if (quest[27] != 0):
+        if (quest[27] not in nil):
             self.ReqSourceId.append(quest[27])
-        if (quest[28] != 0):
+        if (quest[28] not in nil):
             self.ReqSourceId.append(quest[28])
         if (self.ReqSourceId == []):
             del self.ReqSourceId
@@ -166,16 +166,16 @@ class Quest():
         
         #ReqSpellCast
         self.ReqSpellCast = []
-        if (quest[33] != 0):
+        if (quest[33] not in nil):
             self.ReqSpellCast.append((quest[33], quest[29], escapeDoubleQuotes(quest[45]), self.locales_ObjectiveTexts[1]))
             self.ObjectiveList[0]['reqSpellCast'] = quest[33]
-        if (quest[34] != 0):
+        if (quest[34] not in nil):
             self.ReqSpellCast.append((quest[34], quest[30], escapeDoubleQuotes(quest[46]), self.locales_ObjectiveTexts[2]))
             self.ObjectiveList[1]['reqSpellCast'] = quest[34]
-        if (quest[35] != 0):
+        if (quest[35] not in nil):
             self.ReqSpellCast.append((quest[35], quest[31], escapeDoubleQuotes(quest[47]), self.locales_ObjectiveTexts[3]))
             self.ObjectiveList[2]['reqSpellCast'] = quest[35]
-        if (quest[36] != 0):
+        if (quest[36] not in nil):
             self.ReqSpellCast.append((quest[36], quest[32], escapeDoubleQuotes(quest[48]), self.locales_ObjectiveTexts[4]))
             self.ObjectiveList[3]['reqSpellCast'] = quest[36]
         if (self.ReqSpellCast == []):
@@ -186,13 +186,13 @@ class Quest():
                 self.ObjectiveList[i] = False
 
         
-        if (quest[37] != 0):
+        if (quest[37] not in nil):
             self.PointMapId = quest[37]
             self.PointX = quest[38]
             self.PointY = quest[39]
-        if (quest[42] != 0):
+        if (quest[42] not in nil):
             self.SrcItemId = quest[42]
-        if (quest[43] != 0):
+        if (quest[43] not in nil):
             self.ZoneOrSort = quest[43]
 
         #CreatureEnd
@@ -290,9 +290,9 @@ class Quest():
         self.PreQuestGroup = []
         self.PreQuestSingle = []
         self.ChildQuests = []
-        if (quest[51] != 0):
+        if (quest[51] not in nil):
             self.SpecialFlags = quest[51]
-        if (quest[52] != 0 and quest[52] != None):
+        if (quest[52] not in nil):
             self.BreadcrumbForQuestId = quest[52]
         self.Breadcrumbs = []
 
@@ -304,14 +304,14 @@ class Quest():
         if self.version == "wotlk":
             data = [0, 10, 25, 75, 150, 250, 350, 500, 1000, 5]
             for i in range(0, 5):
-                if (quest[53+i] != 0):  #RewRepFaction
-                    if quest[58+i] != 0 and quest[58+i] > 1000: #RewRepValue
+                if (quest[53+i] not in nil):  #RewRepFaction
+                    if quest[58+i] not in nil and quest[58+i] > 1000: #RewRepValue
                         self.RepReward[quest[53+i]] = int(quest[58+i]/100)
-                    elif(quest[58+5+i] != 0): #RewRepValueId
+                    elif(quest[58+5+i] not in nil): #RewRepValueId
                         self.RepReward[quest[53+i]] = int(data[abs(quest[58+5+i])] * (quest[58+5+i] / abs(quest[58+5+i])))
         else:
             for i in range(0, 5):
-                if (quest[53+i] != 0): #RewRepFaction
+                if (quest[53+i] not in nil): #RewRepFaction
                     self.RepReward[quest[53+i]] = quest[58+i] #RewRepValueId
 
         return self.RepReward
