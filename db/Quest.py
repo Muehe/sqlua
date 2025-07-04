@@ -184,8 +184,9 @@ class Quest():
         for i in range(0, 4):
             if len(self.ObjectiveList[i]) == 1:
                 self.ObjectiveList[i] = False
+        for i in range(0, 4):
+            self.ObjectiveList.remove(False)
 
-        
         if (quest[37] not in nil):
             self.PointMapId = quest[37]
             self.PointX = quest[38]
@@ -263,6 +264,8 @@ class Quest():
                                 triggers.append((trigger[1], trigger[2], trigger[3]))
         if (triggers == []):
             del self.triggerEnd
+            if len(self.ObjectiveList) == 1:
+                del self.ObjectiveList
         else:
             if version == 'cata' and quest[62]:  # AreaDescription
                 text = quest[62]
@@ -271,7 +274,7 @@ class Quest():
             else:
                 text = escapeDoubleQuotes(quest[49])
             self.triggerEnd = (text, CoordList(triggers, version))
-            self.ObjectiveList[4] = {'text': text, 'type': 'areaTrigger', 'coords': CoordList(triggers, version)}
+            self.ObjectiveList.append({'text': text, 'type': 'areaTrigger', 'coords': CoordList(triggers, version)})
             self.locales_EndText = {}
             for x in range(1, 9):
                 if not translations:
