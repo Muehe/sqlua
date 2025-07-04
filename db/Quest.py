@@ -185,7 +185,8 @@ class Quest():
             if len(self.ObjectiveList[i]) == 1:
                 self.ObjectiveList[i] = False
         for i in range(0, 4):
-            self.ObjectiveList.remove(False)
+            if False in self.ObjectiveList:
+                self.ObjectiveList.remove(False)
 
         if (quest[37] not in nil):
             self.PointMapId = quest[37]

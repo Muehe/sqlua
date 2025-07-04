@@ -44,3 +44,14 @@ class CoordList():
 
     def __iterCoord(self, **kwargs):
         return (coord for coord in self.cList if coord.match(**kwargs))
+
+    def __repr__(self):
+        points = "{"
+        for z in self.cByZone:
+            points += f'{z}:['
+            for c in self.cByZone[z]:
+                points += str(c) + ','
+            points += '],'
+        points += "},"
+        return points
+    
