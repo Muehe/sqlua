@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table>
+    <thead>
+        <tr>
+            <th>FlavorVersion</th>
+            {% for field in data.fields %}
+            <th>{{ field }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for vf in data.quests %}
+        {% if data.quests[vf] == "Missing from DB" %}
+        <tr><td>{{ vf }}</td><td>Missing</td></tr>
+        {% else %}
+        <tr>
+            <td>{{ vf }}</td>
+            {% for field in data.fields %}
+                {% if data.quests[vf][field] is undefined %}
+                    <th>-</th>
+                {% elif data.quests[vf][field][1] != 0 %}
+                    <th><div class="tooltip">{{ data.quests[vf][field][1] }}<span class="tooltiptext">{{ data.quests[vf][field][0] }}</span></div></th>
+                {% else %}
+                    <th>{{ data.quests[vf][field][0] }}</th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock content %}

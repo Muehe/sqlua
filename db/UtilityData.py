@@ -301,3 +301,64 @@ QuestObjectiveFlags = {
     256: 'QUEST_OBJECTIVE_FLAG_NO_SHARE_PROGRESS',
     521: 'QUEST_OBJECTIVE_FLAG_IGNORE_SOULBOUND_ITEMS',
 }
+
+raceIDs = {
+    'NONE': 0,
+    'HUMAN': 1,
+    'ORC': 2,
+    'DWARF': 4,
+    'NIGHT_ELF': 8,
+    'UNDEAD': 16,
+    'TAUREN': 32,
+    'GNOME': 64,
+    'TROLL': 128,
+    'GOBLIN': 256,
+    'BLOOD_ELF': 512,
+    'DRAENEI': 1024,
+    'WORGEN': 2097152,
+    'PANDAREN_N': 8388608,
+    'PANDAREN_A': 16777216,
+    'PANDAREN_H': 33554432,
+}
+
+raceIDsByKey = {v: k for k, v in raceIDs.items()}
+
+raceCombos = {
+    'CLASSIC_ALLIANCE': 77,
+    'CLASSIC_HORDE': 178,
+    'CLASSIC_ALL': 255,
+    'TBC_ALLIANCE': 1101,
+    'TBC_HORDE': 690,
+    'TBC_ALL': 1791,
+    'CATA_ALLIANCE': 2098253,
+    'CATA_HORDE': 946,
+    'CATA_ALL': 2099199,
+    'MOP_ALLIANCE': 18875469,
+    'MOP_HORDE': 33555378,
+    'MOP_ALL': 60819455,
+}
+
+raceCombosByKey = {v: k for k, v in raceCombos.items()}
+
+classIDs = {
+
+}
+
+questType = {
+    "Elite": 1,
+    "Life": 21,
+    "PvP": 41,
+    "Raid": 62,
+    "Dungeon": 81,
+    "World Event": 82,
+    "Legendary": 83,
+    "Escort": 84,
+    "Heroic": 85,
+    "Raid (10)": 88,
+    "Raid (25)": 89,
+    "Scenario": 98,
+    "Account": 102,
+    "Celestial": 294,
+}
+
+questTypeByKey = {v: k for k, v in questType.items()}

@@ -24,42 +24,44 @@ if flavor not in flavors:
 
 debug = config.debug
 
-def getClassInstances(recache=False):
+def getClassInstances(recache=False, v=version, f=flavor):
     """Get new instances of the list classes"""
-    print("Reading data from {0} database...".format(flavor))
-    quests = QuestList(version, flavor, cursor, dictCursor, recache=recache)
-    npcs = NpcList(version, flavor, cursor, dictCursor, recache=recache, extractSpawns=True, debug=debug)
-    obj = ObjList(version, flavor, cursor, extractSpawns=True, recache=recache)
-    items = ItemList(version, flavor, dictCursor, locale='enUS', recache=recache)
+    print(f"Reading data from database {f} {v}...")
+    c, dc = getCursors(v, f)
+    quests = QuestList(v, f, c, dc, recache=recache)
+    npcs = NpcList(v, f, c, dc, recache=recache, extractSpawns=True, debug=debug)
+    obj = ObjList(v, f, c, extractSpawns=True, recache=recache)
+    items = ItemList(v, f, dc, locale='enUS', recache=recache)
     return quests, npcs, obj, items
 
 def recache():
     _, _, _, _ = getClassInstances(True)
 
-def main(recache):
+def main(recache=False, v=version, f=flavor):
     """Extracts and prints quest related data"""
     if not individualUpdates:
-        quests, npcs, objects, items = getClassInstances(recache)
+        quests, npcs, objects, items = getClassInstances(recache, v, f)
         print("Printing files...")
-        quests.printQuestFile(f'output/{version}/{flavor}/{version}QuestDB.lua')
-        npcs.printNpcFile(f'output/{version}/{flavor}/{version}NpcDB.lua')
-        objects.printObjFile(f'output/{version}/{flavor}/{version}ObjectDB.lua')
-        items.writeFile(f'output/{version}/{flavor}/{version}ItemDB.lua')
+        quests.printQuestFile(f'output/{v}/{f}/{v}QuestDB.lua')
+        npcs.printNpcFile(f'output/{v}/{f}/{v}NpcDB.lua')
+        objects.printObjFile(f'output/{v}/{f}/{v}ObjectDB.lua')
+        items.writeFile(f'output/{v}/{f}/{v}ItemDB.lua')
         print("Done.")
         return 0
     else:
+        c, dc = getCursors(v, f)
         if 'items' in sys.argv:
-            items = ItemList(version, flavor, dictCursor, locale='enUS', recache=recache)
-            items.writeFile(f'output/{version}/{flavor}/{version}ItemDB.lua')
+            items = ItemList(v, f, dc, locale='enUS', recache=recache)
+            items.writeFile(f'output/{v}/{f}/{v}ItemDB.lua')
         if 'npcs' in sys.argv:
-            npcs = NpcList(version, flavor, cursor, dictCursor, recache=recache, extractSpawns=True, debug=debug)
-            npcs.printNpcFile(f'output/{version}/{flavor}/{version}NpcDB.lua')
+            npcs = NpcList(v, f, c, dc, recache=recache, extractSpawns=True, debug=debug)
+            npcs.printNpcFile(f'output/{v}/{f}/{v}NpcDB.lua')
         if 'objects' in sys.argv:
-            objects = ObjList(version, flavor, cursor, extractSpawns=True, recache=recache)
-            objects.printObjFile(f'output/{version}/{flavor}/{version}ObjectDB.lua')
+            objects = ObjList(v, f, c, extractSpawns=True, recache=recache)
+            objects.printObjFile(f'output/{v}/{f}/{v}ObjectDB.lua')
         if 'quests' in sys.argv:
-            quests = QuestList(version, flavor, cursor, dictCursor, recache=recache)
-            quests.printQuestFile(f'output/{version}/{flavor}/{version}QuestDB.lua')
+            quests = QuestList(v, f, c, dc, recache=recache)
+            quests.printQuestFile(f'output/{v}/{f}/{v}QuestDB.lua')
         return 0
 
 def getCursors(v=version, f=flavor):
@@ -115,7 +117,7 @@ cursor, dictCursor = getCursors(version, flavor)
 
 if runMain:
     start_time = time.time()
-    main(reCache)
+    main(reCache, version, flavor)
     print("--- %s seconds ---" % (time.time() - start_time))
 else:
     print(f'Using version {version}')

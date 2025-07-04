@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class='header'><h1>{{data.quest.Title}} ({{data.quest.id}})</h1></div>
-<div class='col-100'>
+<div class='col-37-5'>
     <b>Required Level: </b> {{data.quest.MinLevel}}<br />
     <b>Quest Level: </b> {{data.quest.QuestLevel}}<br />
     <b>Quest Type: </b> {{data.quest.Type}}<br />
@@ -104,7 +104,7 @@
     {% if data.quest.NextQuestInChain is defined %}<b>NextQuestInChain: </b> <a href='/quest/{{data.quest.NextQuestInChain}}'>{{data.quests.qList[data.quest.NextQuestInChain].Title}} ({{data.quest.NextQuestInChain}})</a><br />{% endif %}
     <br />
 </div>
-<div class='col-100'>
+<div class='col-62-5'>
     {{ super() }}
 </div>
 {% endblock content %}
