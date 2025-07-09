@@ -76,12 +76,12 @@ def questsPage(questID, dbs):
                 qData[field] = (f, h)
         return qData
 
-    for flavor in dbs:
-        for version in dbs[flavor]:
-            if questID in dbs[flavor][version]['quests'].qList:
-                data['quests'][flavor+" "+version] = getQuestText(dbs[flavor][version]['quests'].qList[questID])
+    for version in dbs:
+        for flavor in dbs[version]:
+            if questID in dbs[version][flavor]['quests'].qList:
+                data['quests'][version+" "+flavor] = getQuestText(dbs[version][flavor]['quests'].qList[questID])
             else:
-                data['quests'][flavor+" "+version] = "Missing"
+                data['quests'][version+" "+flavor] = "Missing"
 
     for field in hasData:
         if not hasData[field]:

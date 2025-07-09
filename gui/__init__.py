@@ -22,13 +22,12 @@ if False: #isfile('gui/cache.pkl'):
         dbs = pickle.load(f)
 else:
     for f in flavors:
-        flavor = f
-        dbs[f] =  {}
         for v in config.dbInfo[f]:
-            version = v
-            cursor, dictCursor = getCursors(version, flavor)
+            if v not in dbs:
+                dbs[v] = {}
+            cursor, dictCursor = getCursors(v, f)
             quests, npcs, objects, items = getClassInstances(False, v, f)
-            dbs[f][v] = {'quests': quests, 'npcs': npcs, 'objects': objects, 'items': items}
+            dbs[v][f] = {'quests': quests, 'npcs': npcs, 'objects': objects, 'items': items}
     #with open('gui/cache.pkl', 'wb') as f:
     #    pickle.dump(dbs, f, protocol=pickle.HIGHEST_PROTOCOL)
 
