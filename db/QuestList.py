@@ -178,6 +178,9 @@ class QuestList:
 
     def __addQuest(self, quest, tables, areaTrigger):
         """only used by constructor"""
+        if quest[19] is None or quest[19] == '':
+            print("WARNING: Title is missing for quest ID", quest[0], "Quest not added to DB")
+            return
         newQuest = Quest(quest, tables, areaTrigger, self.version)
         self.qList[newQuest.id] = newQuest
 
