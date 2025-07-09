@@ -1,5 +1,7 @@
 from db.CoordList import *
 from db.Utilities import *
+from config import *
+from os.path import isfile
 import re
 import csv
 
@@ -13,31 +15,6 @@ def getCreatureZones(file):
         zoneDict[int(row[0])] = int(row[1])
     infile.close()
     return zoneDict
-
-def get_zones_from_spawn(spawn: tuple[any, str, int, float, float], version: str) -> dict[int, int]:
-    zoneDict = {}
-    guid = spawn[4]
-    mapId = spawn[1]
-    pos_x = spawn[2]
-    pos_y = spawn[3]
-
-    if len(spawn) == 7:
-        coord = Coord(mapId, pos_x, pos_y, version, spawn[6])
-    else:
-        coord = Coord(mapId, pos_x, pos_y, version)
-
-    if coord.pointList:
-        # Use the first found zoneID
-        zoneID = coord.pointList[0][0]
-        zoneDict[guid] = zoneID
-    else:
-        zoneDict[guid] = None
-    return zoneDict
-
-zonesClassic = getCreatureZones('data/classic/creature_preExtract.csvzone_and_area.csv')
-zonesTBC = getCreatureZones('data/tbc/creature_preExtract.csvzone_and_area.csv')
-zonesWotLK = getCreatureZones('data/wotlk/creature_preExtract.csvzone_and_area.csv')
-zonesCata = getCreatureZones('data/cata/creature_preExtract.csvzone_and_area.csv')
 
 def getCreatureWaypoints(file):
     infile = open(file, "r")
@@ -76,18 +53,6 @@ def getCreatureTemplateWaypoints(file):
     infile.close()
     return zoneDict
 
-movementZonesClassic = getCreatureWaypoints('data/classic/creature_movement_preExtract.csvzone_and_area.csv')
-movementTemplateZonesClassic = getCreatureTemplateWaypoints('data/classic/creature_movement_template_preExtract.csvzone_and_area.csv')
-
-movementZonesTBC = getCreatureWaypoints('data/tbc/creature_movement_preExtract.csvzone_and_area.csv')
-movementTemplateZonesTBC = getCreatureTemplateWaypoints('data/tbc/creature_movement_template_preExtract.csvzone_and_area.csv')
-
-movementZonesWotLK = getCreatureWaypoints('data/wotlk/creature_movement_preExtract.csvzone_and_area.csv')
-movementTemplateZonesWotLK = getCreatureTemplateWaypoints('data/wotlk/creature_movement_template_preExtract.csvzone_and_area.csv')
-
-movementZonesCata = getCreatureWaypoints('data/cata/creature_movement_preExtract.csvzone_and_area.csv')
-movementTemplateZonesCata = getCreatureTemplateWaypoints('data/cata/creature_movement_template_preExtract.csvzone_and_area.csv')
-
 def getFactionTemplate(fac):
     content = ""
     with open(fac, "r") as infile:
@@ -105,42 +70,41 @@ def getFactionTemplate(fac):
     print(f'Found {len(factionDict)} factions in {fac}')
     return factionDict
 
-factionTemplateClassic = getFactionTemplate('data/classic/FactionTemplate.dbc.CSV')
-factionTemplateTBC = getFactionTemplate('data/tbc/FactionTemplate.dbc.CSV')
-factionTemplateWotLK = getFactionTemplate('data/wotlk/FactionTemplate.dbc.CSV')
-factionTemplateCata = getFactionTemplate('data/cata/FactionTemplate.dbc.CSV')
-factionTemplateMop = getFactionTemplate('data/mop/FactionTemplate.dbc.CSV')
+zonesDict = {}
+movementZonesDict = {}
+movementTemplateZonesDict = {}
+factionTemplateDict = {}
+
+for version in versions:
+    zonesDict[version] = {}
+    movementZonesDict[version] = {}
+    movementTemplateZonesDict[version] = {}
+    factionTemplateDict[version] = getFactionTemplate(f'data/{version}/FactionTemplate.dbc.CSV')
+    for flavor in flavors:
+        if flavor in dbInfo and version in dbInfo[flavor]:
+            if isfile(f'data/{version}/{flavor}/creature_preExtract.csvzone_and_area.csv'):
+                zonesDict[version][flavor] = getCreatureZones(f'data/{version}/{flavor}/creature_preExtract.csvzone_and_area.csv')
+            else:
+                zonesDict[version][flavor] = {}
+            if isfile(f'data/{version}/{flavor}/creature_movement_preExtract.csvzone_and_area.csv'):
+                movementZonesDict[version][flavor] = getCreatureWaypoints(f'data/{version}/{flavor}/creature_movement_preExtract.csvzone_and_area.csv')
+            else:
+                movementZonesDict[version][flavor] = {}
+            if isfile(f'data/{version}/{flavor}/creature_movement_template_preExtract.csvzone_and_area.csv'):
+                movementTemplateZonesDict[version][flavor] = getCreatureTemplateWaypoints(f'data/{version}/{flavor}/creature_movement_template_preExtract.csvzone_and_area.csv')
+            else:
+                movementTemplateZonesDict[version][flavor] = {}
 
 class Npc():
     spawnErrors = [] # Holds IDs of NPCs without spawns
     waypointErrors = []
-    def __init__(self, npc, dicts, extractSpawns, version, translation=False, debug=False):
+    def __init__(self, npc, dicts, extractSpawns, version, flavor, translation=False, debug=False):
         self.version = version
-        if version == 'classic':
-            zones = zonesClassic
-            movementZones = movementZonesClassic
-            movementTemplateZones = movementTemplateZonesClassic
-            factionTemplate = factionTemplateClassic
-        elif version == 'tbc':
-            zones = zonesTBC
-            movementZones = movementZonesTBC
-            movementTemplateZones = movementTemplateZonesTBC
-            factionTemplate = factionTemplateTBC
-        elif version == 'wotlk':
-            zones = zonesWotLK
-            movementZones = movementZonesWotLK
-            movementTemplateZones = movementTemplateZonesWotLK
-            factionTemplate = factionTemplateWotLK
-        elif version == 'cata':
-            zones = zonesCata
-            movementZones = movementZonesCata
-            movementTemplateZones = movementTemplateZonesCata
-            factionTemplate = factionTemplateCata
-        elif version == 'mop': # TODO: Use MoP data
-            # zones = zonesCata # Set further below
-            movementZones = movementZonesCata
-            movementTemplateZones = movementTemplateZonesCata
-            factionTemplate = factionTemplateMop
+        self.flavor = flavor
+        zones = zonesDict[version][flavor]
+        movementZones = movementZonesDict[version][flavor]
+        movementTemplateZones = movementTemplateZonesDict[version][flavor]
+        factionTemplate = factionTemplateDict[version]
         self.id = npc[0]
         self.debug = debug
         self.name = escapeQuotes(npc[1])
@@ -174,9 +138,6 @@ class Npc():
                 for spawn in rawSpawns:
                     # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
-                        if version == 'mop':
-                            zones = get_zones_from_spawn(spawn, version)
-
                         # get spawns
                         if spawn[4] in zones:
                             if version == 'cata':

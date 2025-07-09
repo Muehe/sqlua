@@ -1,0 +1,86 @@
+diff --git a/src/server/scripts/Commands/cs_server.cpp b/src/server/scripts/Commands/cs_server.cpp
+index 0d9c04c428..dbb5e83e26 100644
+--- a/src/server/scripts/Commands/cs_server.cpp
++++ b/src/server/scripts/Commands/cs_server.cpp
+@@ -18,6 +18,60 @@ EndScriptData */
+ #include "ScriptMgr.h"
+ #include "SystemConfig.h"
+ 
++#include "MapManager.h"
++#include <iostream>
++#include <fstream>
++#include <string>
++#include <cstring>
++
++struct CoordinateSet
++{
++    std::string id;
++    std::string map;
++    std::string x;
++    std::string y;
++    std::string z;
++};
++
++std::istream& read_line(std::istream& in, CoordinateSet& cs)
++{
++    getline(in, cs.id, ',');
++    getline(in, cs.map, ',');
++    getline(in, cs.x, ',');
++    getline(in, cs.y, ',');
++    getline(in, cs.z, ',');
++    return in;
++}
++
++void getZoneAndArea(const char* fileName)
++{
++    using namespace std;
++    ifstream csvread(fileName);
++    if (!csvread.is_open())
++    {
++        cerr<<"Error opening the file"<<endl;
++        return;
++    }
++    char zoneAndArea[] = "zone_and_area.csv";
++    char * newFileName = new char[strlen(fileName)+strlen(zoneAndArea)+1];
++    strcpy(newFileName, fileName);
++    strcat(newFileName, zoneAndArea);
++    ofstream csvwrite(newFileName);
++    csvwrite<<"--uniqueID,zoneID,areaID,\n";
++    for (CoordinateSet cs; read_line(csvread, cs); )
++    {
++        uint mapid = stoul(cs.map);
++        float ax = stof(cs.x);
++        float ay = stof(cs.y);
++        float az = stof(cs.z);
++        uint zone, area;
++        sMapMgr->GetZoneAndAreaId(zone, area, mapid, ax, ay, az);
++        csvwrite<<cs.id<<","<<zone<<","<<area<<",";
++    }
++    csvread.close();
++    csvwrite.close();
++}
++
+ class server_commandscript : public CommandScript
+ {
+ public:
+@@ -59,6 +113,7 @@ public:
+ 
+         static std::vector<ChatCommand> serverCommandTable =
+         {
++            { "zone",         rbac::RBAC_PERM_COMMAND_SERVER_CORPSES,      true, &HandleZoneAndAreaRequest,   "", },
+             { "corpses",      rbac::RBAC_PERM_COMMAND_SERVER_CORPSES,      true, &HandleServerCorpsesCommand, "", },
+             { "exit",         rbac::RBAC_PERM_COMMAND_SERVER_EXIT,         true, &HandleServerExitCommand,    "", },
+             { "idlerestart",  rbac::RBAC_PERM_COMMAND_SERVER_IDLERESTART,  true, NULL,                        "", serverIdleRestartCommandTable },
+@@ -79,6 +134,12 @@ public:
+         return commandTable;
+     }
+ 
++    static bool HandleZoneAndAreaRequest(ChatHandler* /*handler*/, char const* args)
++    {
++        getZoneAndArea(args);
++        return true;
++    }
++
+     // Triggering corpses expire check in world
+     static bool HandleServerCorpsesCommand(ChatHandler* /*handler*/, char const* /*args*/)
+     {

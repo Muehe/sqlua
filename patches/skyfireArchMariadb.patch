@@ -1,0 +1,128 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4344aed93a..a5729f1249 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -23,7 +23,7 @@ endif()
+ project(Project_Skyfire)
+ 
+ # CMake policies (can not be handled elsewhere)
+-cmake_policy(SET CMP0005 OLD)
++# cmake_policy(SET CMP0005 OLD)
+ 
+ # add this options before PROJECT keyword
+ set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+diff --git a/dep/g3dlite/include/G3D/platform.h b/dep/g3dlite/include/G3D/platform.h
+index 439495ab13..e3dd37b7c4 100644
+--- a/dep/g3dlite/include/G3D/platform.h
++++ b/dep/g3dlite/include/G3D/platform.h
+@@ -360,7 +360,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw) {\
+ 
+ // Bring in shared_ptr and weak_ptr
+ #if (defined(__GNUC__) && defined(__APPLE__)) || defined(__linux__)
+-#include <ciso646> // Defines _LIBCC_VERSION if linking against libc++ or does nothing
++#include <version> // Defines _LIBCC_VERSION if linking against libc++ or does nothing
+ #endif
+ #if (!defined(_LIBCPP_VERSION) && defined(__APPLE__)) || (!defined(_LIBCPP_VERSION) && defined(__linux__))
+ #   include <tr1/memory>
+diff --git a/sql/create/create_mysql.sql b/sql/create/create_mysql.sql
+index 0f410d490d..22adb052e7 100644
+--- a/sql/create/create_mysql.sql
++++ b/sql/create/create_mysql.sql
+@@ -1,12 +1,12 @@
+ 
+-CREATE DATABASE `world` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
++CREATE DATABASE `skyfire` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+ 
+-CREATE DATABASE `characters` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
++CREATE DATABASE `skyfire_characters` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+ 
+-CREATE DATABASE `auth` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
++CREATE DATABASE `skyfire_auth` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+ 
+-GRANT ALL PRIVILEGES ON `world` . * TO 'root'@'localhost' WITH GRANT OPTION;
++GRANT ALL PRIVILEGES ON `skyfire` . * TO 'mangos'@'localhost' WITH GRANT OPTION;
+ 
+-GRANT ALL PRIVILEGES ON `characters` . * TO 'root'@'localhost' WITH GRANT OPTION;
++GRANT ALL PRIVILEGES ON `skyfire_characters` . * TO 'mangos'@'localhost' WITH GRANT OPTION;
+ 
+-GRANT ALL PRIVILEGES ON `auth` . * TO 'root'@'localhost' WITH GRANT OPTION;
++GRANT ALL PRIVILEGES ON `skyfire_auth` . * TO 'mangos'@'localhost' WITH GRANT OPTION;
+diff --git a/src/server/shared/Database/DatabaseWorkerPool.h b/src/server/shared/Database/DatabaseWorkerPool.h
+index cc191c4cba..9a7d7da1f4 100644
+--- a/src/server/shared/Database/DatabaseWorkerPool.h
++++ b/src/server/shared/Database/DatabaseWorkerPool.h
+@@ -43,7 +43,7 @@ public:
+         _connections.resize(IDX_SIZE);
+ 
+         WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
+-        WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "SkyFire does not support MySQL versions below 5.1");
++        //WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "SkyFire does not support MySQL versions below 5.1");
+     }
+ 
+     ~DatabaseWorkerPool()
+@@ -64,8 +64,8 @@ public:
+         {
+             T* t = new T(_queue, *_connectionInfo);
+             res &= t->Open();
+-            if (res) // only check mysql version if connection is valid
+-                WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "SkyFire does not support MySQL versions below 5.1");
++            //if (res) // only check mysql version if connection is valid
++                //WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "SkyFire does not support MySQL versions below 5.1");
+             _connections[IDX_ASYNC][i] = t;
+             ++_connectionCount[IDX_ASYNC];
+         }
+@@ -103,8 +103,8 @@ public:
+         {
+             T* t = new T(_queue, *_connectionInfo);
+             res &= t->Open();
+-            if (res) // only check mysql version if connection is valid
+-                WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "Skyfire does not support MySQL versions below 5.1");
++            //if (res) // only check mysql version if connection is valid
++                //WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "Skyfire does not support MySQL versions below 5.1");
+             _connections[IDX_ASYNC][i] = t;
+             ++_connectionCount[IDX_ASYNC];
+         }
+diff --git a/src/server/shared/Database/MySQLConnection.cpp b/src/server/shared/Database/MySQLConnection.cpp
+index 6f60fa5880..d813c6e00c 100644
+--- a/src/server/shared/Database/MySQLConnection.cpp
++++ b/src/server/shared/Database/MySQLConnection.cpp
+@@ -185,7 +185,7 @@ bool MySQLConnection::Execute(PreparedStatement* stmt)
+ 
+         uint32 _s = getMSTime();
+ 
+-#if MYSQL_VERSION_ID >= 80300
++#if MYSQL_VERSION_ID >= 180300
+         if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->m_paramCount, nullptr))
+ #else
+         if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
+@@ -239,7 +239,7 @@ bool MySQLConnection::_Query(PreparedStatement* stmt, MYSQL_RES** pResult, uint6
+ 
+         uint32 _s = getMSTime();
+ 
+-#if MYSQL_VERSION_ID >= 80300
++#if MYSQL_VERSION_ID >= 180300
+         if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->m_paramCount, nullptr))
+ #else
+         if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
+@@ -476,7 +476,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
+     {
+         case CR_SERVER_GONE_ERROR:
+         case CR_SERVER_LOST:
+-        case CR_INVALID_CONN_HANDLE:
++        case 2048: //CR_INVALID_CONN_HANDLE
+         case CR_SERVER_LOST_EXTENDED:
+         {
+             m_reconnecting = true;
+diff --git a/src/server/shared/Database/QueryResult.cpp b/src/server/shared/Database/QueryResult.cpp
+index c0f94a8439..c0d1f2d01a 100644
+--- a/src/server/shared/Database/QueryResult.cpp
++++ b/src/server/shared/Database/QueryResult.cpp
+@@ -65,7 +65,7 @@ PreparedResultSet::PreparedResultSet(MYSQL_STMT* stmt, MYSQL_RES* result, uint64
+         memset(m_rBind[i].buffer, 0, size);
+         m_rBind[i].buffer_length = size;
+         m_rBind[i].length = &m_length[i];
+-        m_rBind[i].is_null = &m_isNull[i];
++        m_rBind[i].is_null = reinterpret_cast<my_bool*>(&m_isNull[i]);
+         m_rBind[i].error = NULL;
+         m_rBind[i].is_unsigned = field->flags & UNSIGNED_FLAG;
+ 

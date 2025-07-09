@@ -46,7 +46,7 @@ class NpcList():
         print("Done caching NPCs.")
 
     def addNpc(self, npc, tables, extractSpawns):
-        newNpc = Npc(npc, tables, extractSpawns, self.version, debug=self.debug)
+        newNpc = Npc(npc, tables, extractSpawns, self.version, self.flavor, debug=self.debug)
         self.nList[newNpc.id] = newNpc
 
     def findNpc(self, **kwargs):

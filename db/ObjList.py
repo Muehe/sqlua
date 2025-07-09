@@ -46,7 +46,7 @@ class ObjList():
         print("Done caching objects.")
 
     def addObj(self, obj, dicts, extractSpawns):
-        newObj = Obj(obj, dicts, extractSpawns, self.version)
+        newObj = Obj(obj, dicts, extractSpawns, self.version, self.flavor)
         self.objectList[newObj.id] = newObj
 
     def findObj(self, **kwargs):

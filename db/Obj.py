@@ -1,5 +1,7 @@
 from db.CoordList import *
 from db.Utilities import *
+from config import *
+from os.path import isfile
 import csv
 
 def getObjectZones(file):
@@ -13,40 +15,23 @@ def getObjectZones(file):
     infile.close()
     return zoneDict
 
-def get_zones_from_spawn(spawn: tuple[any, str, int, float, float], version: str) -> dict[int, int]:
-    zoneDict = {}
-    guid = spawn[4]
-    mapId = spawn[1]
-    pos_x = spawn[2]
-    pos_y = spawn[3]
+objectZonesDict = {}
 
-    coord = Coord(mapId, pos_x, pos_y, version)
-
-    if coord.pointList:
-        # Use the first found zoneID
-        zoneID = coord.pointList[0][0]
-        zoneDict[guid] = zoneID
-    else:
-        zoneDict[guid] = None
-    return zoneDict
-
-objectZonesClassic = getObjectZones('data/classic/gameobject_preExtract.csvzone_and_area.csv')
-objectZonesTBC = getObjectZones('data/tbc/gameobject_preExtract.csvzone_and_area.csv')
-objectZonesWotLK = getObjectZones('data/wotlk/gameobject_preExtract.csvzone_and_area.csv')
-objectZonesCata = getObjectZones('data/cata/gameobject_preExtract.csvzone_and_area.csv')
+for version in versions:
+    objectZonesDict[version] = {}
+    for flavor in flavors:
+        if flavor in dbInfo and version in dbInfo[flavor]:
+            if isfile(f'data/{version}/{flavor}/gameobject_preExtract.csvzone_and_area.csv'):
+                objectZonesDict[version][flavor] = getObjectZones(f'data/{version}/{flavor}/gameobject_preExtract.csvzone_and_area.csv')
+            else:
+                objectZonesDict[version][flavor] = {}
 
 class Obj():
     spawnErrors = [] # Holds IDs of objects without spawns entry, name, type, faction, data1
-    def __init__(self, obj, dicts, extractSpawns, version, translation=False, debug=False):
+    def __init__(self, obj, dicts, extractSpawns, version, flavor, translation=False, debug=False):
         self.version = version
-        if version == 'classic':
-            objectZones = objectZonesClassic
-        elif version == 'tbc':
-            objectZones = objectZonesTBC
-        elif version == 'wotlk':
-            objectZones = objectZonesWotLK
-        elif version == 'cata':
-            objectZones = objectZonesCata
+        self.flavor = flavor
+        objectZones = objectZonesDict[version][flavor]
         self.id = obj[0]
         self.name = escapeDoubleQuotes(obj[1])
         self.type = obj[2]
@@ -59,9 +44,6 @@ class Obj():
                 for spawn in rawSpawn:
                     # id, map, position_x, position_y, guid, PhaseId
                     if (spawn[0] == self.id) or (spawn[0] == 0):
-                        if version == 'mop':
-                            objectZones = get_zones_from_spawn(spawn, version)
-
                         if spawn[4] in objectZones:
                             if version == 'cata':
                                 spawns.append((spawn[1], spawn[2], spawn[3], objectZones[spawn[4]], spawn[5]))

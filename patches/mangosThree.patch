@@ -1,0 +1,115 @@
+diff --git a/src/game/ChatCommands/CliAddons.h b/src/game/ChatCommands/CliAddons.h
+new file mode 100644
+index 000000000..479cef1c0
+--- /dev/null
++++ b/src/game/ChatCommands/CliAddons.h
+@@ -0,0 +1,21 @@
++#ifndef __CLIADDON_H
++#define __CLIADDON_H
++
++#include <iostream>
++#include <fstream>
++#include <string>
++#include <cstring>
++
++struct CoordinateSet
++{
++    std::string id;
++    std::string map;
++    std::string x;
++    std::string y;
++    std::string z;
++};
++
++std::istream& read_line(std::istream& in, CoordinateSet& cs);
++void getZoneAndArea(char* fileName);
++
++#endif
+diff --git a/src/game/ChatCommands/ServerCommands.cpp b/src/game/ChatCommands/ServerCommands.cpp
+index b6307e638..11c587fb4 100644
+--- a/src/game/ChatCommands/ServerCommands.cpp
++++ b/src/game/ChatCommands/ServerCommands.cpp
+@@ -34,6 +34,10 @@
+ #include "ObjectAccessor.h"
+ #include "revision_data.h"
+ 
++#include "CliAddons.h"
++#include "MapManager.h"
++#include "GridMap.h"
++
+  /**********************************************************************
+      CommandTable : serverCommandTable
+  /***********************************************************************/
+@@ -363,3 +367,48 @@ bool ChatHandler::HandleServerPLimitCommand(char* args)
+ 
+     return true;
+ }
++
++std::istream& read_line(std::istream& in, CoordinateSet& cs)
++{
++    getline(in, cs.id, ',');
++    getline(in, cs.map, ',');
++    getline(in, cs.x, ',');
++    getline(in, cs.y, ',');
++    getline(in, cs.z, ',');
++    return in;
++}
++
++void getZoneAndArea(char* fileName)
++{
++    using namespace std;
++    ifstream csvread(fileName);
++    if (!csvread.is_open())
++    {
++        cerr<<"Error opening the file"<<endl;
++        return;
++    }
++    char zoneAndArea[] = "zone_and_area.csv";
++    char * newFileName = new char[strlen(fileName)+strlen(zoneAndArea)+1];
++    strcpy(newFileName, fileName);
++    strcat(newFileName, zoneAndArea);
++    ofstream csvwrite(newFileName);
++    csvwrite<<"--uniqueID,zoneID,areaID,\n";
++    for (CoordinateSet cs; read_line(csvread, cs); )
++    {
++        uint mapid = stoul(cs.map);
++        float ax = stof(cs.x);
++        float ay = stof(cs.y);
++        float az = stof(cs.z);
++        uint zone, area;
++        sTerrainMgr.LoadTerrain(mapid)->GetZoneAndAreaId(zone, area, ax, ay, az);
++        csvwrite<<cs.id<<","<<zone<<","<<area<<",";
++    }
++    csvread.close();
++    csvwrite.close();
++}
++
++bool ChatHandler::HandleZoneAndAreaRequest(char* args)
++{
++    getZoneAndArea(args);
++    return true;
++}
+diff --git a/src/game/WorldHandlers/Chat.cpp b/src/game/WorldHandlers/Chat.cpp
+index f7f2c0bee..2f5d6f151 100644
+--- a/src/game/WorldHandlers/Chat.cpp
++++ b/src/game/WorldHandlers/Chat.cpp
+@@ -695,6 +695,7 @@ ChatCommand* ChatHandler::getCommandTable()
+ 
+     static ChatCommand serverCommandTable[] =
+     {
++        { "zone",           SEC_CONSOLE,        true,  &ChatHandler::HandleZoneAndAreaRequest,         "", NULL },
+         { "corpses",        SEC_GAMEMASTER,     true,  &ChatHandler::HandleServerCorpsesCommand,       "", NULL },
+         { "exit",           SEC_CONSOLE,        true,  &ChatHandler::HandleServerExitCommand,          "", NULL },
+         { "idlerestart",    SEC_ADMINISTRATOR,  true,  NULL,                                           "", serverIdleRestartCommandTable },
+diff --git a/src/game/WorldHandlers/Chat.h b/src/game/WorldHandlers/Chat.h
+index 9630b23e1..6612bf8fe 100644
+--- a/src/game/WorldHandlers/Chat.h
++++ b/src/game/WorldHandlers/Chat.h
+@@ -559,6 +559,7 @@ class ChatHandler
+         bool HandleSendMassMailCommand(char* args);
+         bool HandleSendMassMoneyCommand(char* args);
+ 
++        bool HandleZoneAndAreaRequest(char* args);
+         bool HandleServerCorpsesCommand(char* args);
+         bool HandleServerExitCommand(char* args);
+         bool HandleServerIdleRestartCommand(char* args);

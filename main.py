@@ -11,13 +11,11 @@ import config
 import time
 
 version = config.version
-versions = ['classic', 'tbc', 'wotlk', 'cata', 'mop']
 if version not in versions:
     print(f'Unknown version {version}')
     sys.exit(1)
 
 flavor = config.flavor
-flavors = ['cmangos', 'mangos', 'trinity', 'skyfire']
 if flavor not in flavors:
     print(f'Unknown flavor {flavor}')
     sys.exit(1)
@@ -84,7 +82,7 @@ def getCursors(v=version, f=flavor):
 
 def preExtract(v=version, f=flavor):
     c, dc = getCursors(v, f)
-    printCoordFiles(c, v)
+    printCoordFiles(c, v, f)
 
 # DB connection needs to be set up first and globally, but after CLI 
 # arguments are checked, in case the argument differs from the config
