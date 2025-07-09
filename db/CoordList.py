@@ -54,4 +54,3 @@ class CoordList():
             points += '],'
         points += "},"
         return points
-    
