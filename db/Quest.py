@@ -251,7 +251,8 @@ class Quest():
             reader = csv.reader(infile)
             next(reader)
             for row in reader:
-                triggerZoneDict[int(row[0])] = int(row[1])
+                if len(row) > 1:
+                    triggerZoneDict[int(row[0])] = int(row[1])
             infile.close()
                 
         if self.id in dicts['areatrigger_involvedrelation']:
