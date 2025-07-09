@@ -7,6 +7,7 @@ def getItemTemplate(version):
         'wotlk':'3.4.4.61187',
         'cata': '4.4.2.60895',
         'mop':'5.5.0.61208',
+        'tww':'5.5.0.61208',
     }
 
     items = {}

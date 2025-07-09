@@ -3,7 +3,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
     quest_ids_for_where_clause = ', '.join(map(str, quest_ids)) if quest_ids else ''
     print("Selecting quest related MySQL tables...")
     print("  SELECT quest_template")
-    cursor.execute(f"""
+    exe = f"""
         SELECT
         qt.ID,  # 0
         qt.MinLevel as MinLevel,  # 1
@@ -72,8 +72,85 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
         
         FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
         {('WHERE qt.ID IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}
-    """)
+    """
 
+    if version == 'tww':
+        exe = f"""
+        SELECT
+        qt.ID,  # 0
+        ct.MinLevel as MinLevel,  # 1
+        -1 as QuestLevel,  # 2
+        qt.QuestType,  # 3
+        qta.AllowableClasses,  # 4
+        qt.AllowableRaces,  # 5
+        qta.RequiredSkillID,  # 6
+        qta.RequiredSkillPoints,  # 7
+        0 as RepObjectiveFaction,  # 8
+        0 as RepObjectiveValue,  # 9
+        qta.RequiredMinRepFaction,  # 10
+        qta.RequiredMinRepValue,  # 11
+        qta.RequiredMaxRepFaction,  # 12
+        qta.RequiredMaxRepValue,  # 13
+        qt.Flags,  # 14
+        qta.PrevQuestId,  # 15
+        qta.NextQuestId,  # 16
+        0 as NextQuestInChain,  # 17
+        qta.ExclusiveGroup,  # 18
+        qt.LogTitle,  # 19
+        qt.LogDescription,  # 20
+        0 as ReqItemId1,  # 21
+        0 as ReqItemId2,  # 22
+        0 as ReqItemId3,  # 23
+        0 as ReqItemId4,  # 24
+        0 as ReqSourceId1,  # 25
+        0 as ReqSourceId2,  # 26
+        0 as ReqSourceId3,  # 27
+        0 as ReqSourceId4,  # 28
+        0 as ReqCreatureOrGOId1,  # 29
+        0 as ReqCreatureOrGOId2,  # 30
+        0 as ReqCreatureOrGOId3,  # 31
+        0 as ReqCreatureOrGOId4,  # 32
+        0 as ReqSpellCast1,  # 33
+        0 as ReqSpellCast2,  # 34
+        0 as ReqSpellCast3,  # 35
+        0 as ReqSpellCast4,  # 36
+        qt.POIContinent,  # 37
+        qt.POIx,  # 38
+        qt.POIy,  # 39
+        NULL as StartScript,  # 40
+        NULL as CompleteScript,  # 41
+        qt.StartItem,  # 42
+        qt.QuestSortID as ZoneOrSort,  # 43
+        2 as Method,  # 44
+        '' as ObjectiveText1,  # 45
+        '' as ObjectiveText2,  # 46
+        '' as ObjectiveText3,  # 47
+        '' as ObjectiveText4,  # 48
+        '' as EndText,  # 49
+        qt.QuestDescription,  # 50
+        qta.SpecialFlags,  # 51
+        qta.BreadcrumbForQuestId, # 52
+        qt.RewardFactionID1,  # 53
+        qt.RewardFactionID2,  # 54
+        qt.RewardFactionID3,  # 55
+        qt.RewardFactionID4,  # 56
+        qt.RewardFactionID5,  # 57
+        qt.RewardFactionValue1,  # 58
+        qt.RewardFactionValue2,  # 59
+        qt.RewardFactionValue3,  # 60
+        qt.RewardFactionValue4,  # 61
+        qt.RewardFactionValue5,  # 62
+        qt.AreaDescription  # 63
+        
+        FROM quest_template as qt
+        LEFT JOIN quest_template_addon as qta
+        ON qt.ID = qta.ID
+        LEFT JOIN content_tuning as ct
+        ON qt.ContentTuningID = ct.ID
+        {('WHERE qt.ID IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}
+    """
+
+    cursor.execute(exe)
     # TODO: Use BreadcrumbForQuestId to mark quests as breadcrumb
 
     quest_template_cache = {}

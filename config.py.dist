@@ -1,6 +1,6 @@
 # Database version
 version = 'classic'
-versions = ['classic', 'tbc', 'wotlk', 'cata', 'mop']
+versions = ['classic', 'tbc', 'wotlk', 'cata', 'mop', 'tww']
 # Database flavor
 flavor = 'cmangos'
 flavors = ['cmangos', 'mangos', 'trinity', 'skyfire']
@@ -23,6 +23,7 @@ dbInfo = {
     },
     'trinity': {
         'cata': 'world',
+        'tww': 'retailworld',
     },
     'skyfire': {
         'mop': 'skyfire',

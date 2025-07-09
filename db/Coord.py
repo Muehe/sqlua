@@ -19,6 +19,8 @@ class Coord():
             mapBorders = mapBordersCata
         elif version == 'mop':
             mapBorders = mapBordersMoP
+        elif version == 'tww':
+            mapBorders = mapBordersTWW
         for mapSet in mapBorders:
             zone = int(mapSet[0])
             if (not (zoneId == False)) and (zone != zoneId):
