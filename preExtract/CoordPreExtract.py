@@ -58,7 +58,7 @@ def printCoordFiles(cursor, version, flavor):
             else:
                 print("No spawn for creature_movement_template with id "+str(point[1])+" point "+str(point[0])+". Skipped!", file=log)
         outfile.close()
-    elif flavor in ['trinity','skyfire']:
+    elif flavor in ['trinity', 'skyfire']:
         if flavor == 'trinity':
             cursor.execute("""
                 SELECT c.guid, ca.PathId, wa.NodeId, c.map, wa.PositionX, wa.PositionY, wa.PositionZ
@@ -119,8 +119,6 @@ def printCoordFiles(cursor, version, flavor):
             if None not in l:
                 outfile.write(f"{l[0]}#{l[2]}#{l[1]},{l[3]},{l[4]},{l[5]},{l[6]},\n")
         outfile.close()
-    elif flavor == 'skyfire':
-        pass
 
     # gameobjects
     cursor.execute("SELECT id, map, position_x, position_y, position_z, guid FROM gameobject")
