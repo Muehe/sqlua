@@ -66,6 +66,7 @@ class NpcList():
 
     def printNpcFile(self, file='output/spawnDB.lua', locale='enGB'):
         print("  Printing NPC file '%s'" % file)
+        log = open(f'output/{self.version}/{self.flavor}/print.log', 'w')
         outfile = open(file, "w", encoding='utf-8')
         outfile.write("""-- AUTO GENERATED FILE! DO NOT EDIT!
 
@@ -158,7 +159,7 @@ QuestieDB.npcData = [[return {
                     path = []
                     for coord in route.cList:
                         if coord.isMulti:
-                            print(f'Found waypoint with ambigous zone for NPC {npc.name} ({npc.id}). Skipping path.')
+                            print(f'Found waypoint with ambigous zone for NPC {npc.name} ({npc.id}). Skipping path.', file=log)
                             path = []
                             break
                         zone = coord.pointList[0][0]
