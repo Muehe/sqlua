@@ -197,3 +197,35 @@ QuestieDB.itemData = [[return {
         else:
             fd += ('nil,')
         return fd
+
+    def getDict(self):
+        d = {}
+        fields = [
+            "id",
+            "name",
+            "flags",
+            "startquest",
+            "foodtype",
+            "itemLevel",
+            "requiredLevel",
+            "ammoType",
+            "cls",
+            "subClass",
+            "npcs",
+            "objects",
+            "items",
+            "vendors",
+            "quests",
+        ]
+        for i in self.itemList:
+            itm = self.itemList[i]
+            d[i] = {}
+            for field in fields:
+                if hasattr(itm, field):
+                    d[i][field] = getattr(itm, field)
+        return d
+
+    def writeDict(self, filepath=None):
+        if filepath == None:
+            filepath = f'output/{self.version}/{self.flavor}/itemDump.py'
+        writeDict(self.getDict(), filepath)

@@ -38,3 +38,11 @@ def read_id_file(file_path: str) -> list[int]:
     print("Reading IDs from", file_path)
     with open(file_path, 'r') as file:
         return [int(line.strip()) for line in file if line.strip().isdigit()]
+
+def writeDict(d, filepath='output/writeDict.py'):
+    f = open(filepath, 'w')
+    print('data = {', file=f)
+    for i in sorted(d.keys()):
+        print(f'{i}:{d[i]},', file=f)
+    print('}', file=f)
+    f.close()

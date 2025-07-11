@@ -157,3 +157,28 @@ QuestieDB.objectData = [[return {
         outfile.write("local meetingStones = ")
         outfile.write("{" + ",".join(map(str, sorted(meetingStones))) + "}\n")
         outfile.close()
+
+    def getDict(self):
+        d = {}
+        fields = [
+            "id",
+            "name",
+            "type",
+            "faction",
+            "data1",
+            "spawns",
+            "start",
+            "end",
+        ]
+        for o in self.objectList:
+            obj = self.objectList[o]
+            d[o] = {}
+            for field in fields:
+                if hasattr(obj, field):
+                    d[o][field] = getattr(obj, field)
+        return d
+
+    def writeDict(self, filepath=None):
+        if filepath == None:
+            filepath = f'output/{self.version}/{self.flavor}/objectDump.py'
+        writeDict(self.getDict(), filepath)

@@ -728,3 +728,65 @@ QuestieDB.questData = [[return {
                 outfile.write(str(id))
                 outfile.write("},\n")
             outfile.write(" },\n")
+
+    def getDict(self):
+        d = {}
+        fields = [
+            "id",
+            "Title",
+            "MinLevel",
+            "QuestLevel",
+            "ZoneOrSort",
+            "Type",
+            "QuestFlags",
+            "SpecialFlags",
+            "Method",
+            "RequiredRaces",
+            "RequiredClasses",
+            "RequiredSkill",
+            "RequiredSkillValue",
+            "RequiredMinRepFaction",
+            "RequiredMinRepValue",
+            "RepObjectiveFaction",
+            "RepObjectiveValue",
+            "PrevQuestId",
+            "NextQuestId",
+            "NextQuestInChain",
+            "ExclusiveGroup",
+            "ExclusiveTo",
+            "InGroupWith",
+            "PreQuestGroup",
+            "PreQuestSingle",
+            "ParentQuest",
+            "ChildQuests",
+            "ObjectiveList",
+            "ReqItemId",
+            "ReqSourceId",
+            "ReqCreatureId",
+            "ReqGOId",
+            "ReqSpellCast",
+            "SrcItemId",
+            "creatureStart",
+            "goStart",
+            "itemStart",
+            "creatureEnd",
+            "goEnd",
+            "triggerEnd",
+            "BreadcrumbForQuestId",
+            "Breadcrumbs",
+            "RepReward",
+            "Details",
+            "Objectives",
+        ]
+        for q in self.qList:
+            quest = self.qList[q]
+            d[q] = {}
+            for field in fields:
+                if hasattr(quest, field):
+                    d[q][field] = getattr(quest, field)
+        return d
+
+    def writeDict(self, filepath=None):
+        if filepath == None:
+            filepath = f'output/{self.version}/{self.flavor}/questDump.py'
+        writeDict(self.getDict(), filepath)

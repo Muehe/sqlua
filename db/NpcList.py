@@ -239,3 +239,36 @@ QuestieDB.npcData = [[return {
         outfile.write(removeTrailingData(outString))
         outfile.close()
         #print(f"Skipped waypoint IDs ({len(skippedWaypoints)}):", skippedWaypoints)
+
+    def getDict(self):
+        d = {}
+        fields = [
+            "id",
+            "name",
+            "subname",
+            "rank",
+            "minlevel",
+            "maxlevel",
+            "minlevelhealth",
+            "maxlevelhealth",
+            "faction",
+            "hostileToA",
+            "hostileToH",
+            "npcFlags",
+            "start",
+            "end",
+            "spawns",
+            "waypoints",
+        ]
+        for o in self.nList:
+            obj = self.nList[o]
+            d[o] = {}
+            for field in fields:
+                if hasattr(obj, field):
+                    d[o][field] = getattr(obj, field)
+        return d
+
+    def writeDict(self, filepath=None):
+        if filepath == None:
+            filepath = f'output/{self.version}/{self.flavor}/npcDump.py'
+        writeDict(self.getDict(), filepath)
