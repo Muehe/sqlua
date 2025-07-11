@@ -180,13 +180,6 @@ class Quest():
             self.ObjectiveList[3]['reqSpellCast'] = quest[36]
         if (self.ReqSpellCast == []):
             del self.ReqSpellCast
-        #??? what is this
-        for i in range(0, 4):
-            if len(self.ObjectiveList[i]) == 1:
-                self.ObjectiveList[i] = False
-        for i in range(0, 4):
-            if False in self.ObjectiveList:
-                self.ObjectiveList.remove(False)
 
         if (quest[37] not in nil):
             self.PointMapId = quest[37]
@@ -266,7 +259,7 @@ class Quest():
                                 triggers.append((trigger[1], trigger[2], trigger[3]))
         if (triggers == []):
             del self.triggerEnd
-            if len(self.ObjectiveList) == 1:
+            if len(self.ObjectiveList[0]) == 1 and len(self.ObjectiveList[1]) == 1 and len(self.ObjectiveList[2]) == 1 and len(self.ObjectiveList[3]) == 1:
                 del self.ObjectiveList
         else:
             if version == 'cata' and quest[62]:  # AreaDescription
