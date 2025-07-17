@@ -1,5 +1,6 @@
 from db.CoordList import *
 from db.Utilities import *
+from db.UtilityData import *
 
 class Quest():
     def __init__(self, quest, dicts, areaTrigger, version, translations=False):
@@ -8,19 +9,12 @@ class Quest():
         self.MinLevel = quest[1]
         self.QuestLevel = quest[2]
         self.Type = quest[3]
-        self.RequiredRaces = quest[5] & 2099199
-        # Fix TBC+ masks in Classic data, change quests available to all races to 0 (no requirements)
-        if version == 'cata':
-            if self.RequiredRaces == 2099199:
-                self.RequiredRaces = 0
-        elif version == 'classic':
-            self.RequiredRaces = self.RequiredRaces & 255
-            if self.RequiredRaces == 255:
-                self.RequiredRaces = 0
-        else: # tbc + cata
-            self.RequiredRaces = self.RequiredRaces & 1791
-            if self.RequiredRaces == 1791:
-                self.RequiredRaces = 0
+        # CHECKME new expansion
+        # Cut down to supported race IDs
+        self.RequiredRaces = quest[5] & raceCombos['MOP_ALL']
+        # Change race requirement to 0 for quests available to all races
+        if self.RequiredRaces in [raceCombos['MOP_ALL'], raceCombos['CATA_ALL'], raceCombos['TBC_ALL'], raceCombos['CLASSIC_ALL']]:
+            self.RequiredRaces = 0
         self.Title = escapeDoubleQuotes(quest[19])
         if self.Title is None or self.Title == '':
             print("WARNING: Title is missing for quest ID", self.id)
