@@ -226,7 +226,7 @@ mapBordersWotLK = getMapBorders('wotlk')
 
 mapBordersCata = getMapBorders('cata')
 
-mapBordersMoP = getMapBorders('mop')
+mapBordersMoP = get_retail_like_map_borders('mop')
 
 mapBordersTWW = getMapBorders('tww')
 
