@@ -45,18 +45,23 @@ class QuestList:
             8731: {'cata'}, # Why the hell did I want to skip this? Some weird data in TrinityDB I think?
         }
 
+        quest_ids = None
         if flavor == 'cmangos':
             from db.flavor.readCmangosQuestList import getQuestTables
         elif flavor == 'mangos':
             from db.flavor.readMangosQuestList import getQuestTables
         elif flavor == 'trinity':
+            quest_ids = read_id_file('data/mop/mopQuestIds.txt')
             from db.flavor.readTrinityQuestList import getQuestTables
         elif flavor == 'skyfire':
             from db.flavor.readSkyfireQuestList import getQuestTables
 
         if not os.path.isfile(f'data/{self.version}/{flavor}/quests.pkl') or recache:
             print('Caching quests...')
-            self.cacheQuests(getQuestTables(cursor, dictCursor, self.version))
+            if quest_ids:
+                self.cacheQuests(getQuestTables(cursor, dictCursor, self.version, quest_ids))
+            else:
+                self.cacheQuests(getQuestTables(cursor, dictCursor, self.version))
         else:
             try:
                 with open(f'data/{self.version}/{flavor}/quests.pkl', 'rb') as f:
