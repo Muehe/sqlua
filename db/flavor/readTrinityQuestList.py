@@ -1,6 +1,6 @@
+HIGHEST_MOP_QUEST_ID = 34062
 
-def getQuestTables(cursor, dictCursor, version, quest_ids=None):
-    quest_ids_for_where_clause = ', '.join(map(str, quest_ids)) if quest_ids else ''
+def getQuestTables(cursor, dictCursor, version):
     print("Selecting quest related MySQL tables...")
     print("  SELECT quest_template")
     exe = f"""
@@ -71,7 +71,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
         qt.AreaDescription  # 63
         
         FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
-        {('WHERE qt.ID IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}
+        WHERE qt.ID <= {HIGHEST_MOP_QUEST_ID}
     """
 
     if version == 'tww':
@@ -145,7 +145,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
         FROM quest_template as qt
         LEFT JOIN quest_template_addon as qta
         ON qt.ID = qta.ID
-        {('WHERE qt.ID IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}
+        WHERE qt.ID <= {HIGHEST_MOP_QUEST_ID}
     """
 
     cursor.execute(exe)
@@ -159,7 +159,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
 
     print("  SELECT quest_objectives")
     # Type: 0 = creature, 1 = item, 2 = object, 3 = creature, 4 = currency, 5 = spell, 6 = reputation (positive), 7 = reputation (negative), 8 = money, 9 = killPlayer, 10 = areatrigger/event
-    cursor.execute(f"SELECT QuestID, Type, `Order`, ObjectID, Amount FROM quest_objectives {('WHERE QuestID IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
+    cursor.execute(f"SELECT QuestID, Type, `Order`, ObjectID, Amount FROM quest_objectives WHERE QuestID <= {HIGHEST_MOP_QUEST_ID}")
     
     quest_objectives = {}
     for a in cursor.fetchall():
@@ -235,7 +235,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
 
     print("  SELECT creature_queststarter")
     creature_quest_starter = {}
-    cursor.execute(f"SELECT id, quest FROM creature_queststarter {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
+    cursor.execute(f"SELECT id, quest FROM creature_queststarter WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -245,7 +245,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
 
     print("  SELECT creature_questender")
     creature_quest_ender = {}
-    cursor.execute(f"SELECT id, quest FROM creature_questender {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
+    cursor.execute(f"SELECT id, quest FROM creature_questender WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -255,7 +255,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
 
     print("  SELECT gameobject_queststarter")
     gameobject_quest_starter = {}
-    cursor.execute(f"SELECT id, quest FROM gameobject_queststarter {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
+    cursor.execute(f"SELECT id, quest FROM gameobject_queststarter WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -265,7 +265,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
 
     print("  SELECT gameobject_questender")
     gameobject_quest_ender = {}
-    cursor.execute(f"SELECT id, quest FROM gameobject_questender {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
+    cursor.execute(f"SELECT id, quest FROM gameobject_questender WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -285,7 +285,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
     #         item_questrelation[a[1]].append(a)
 
     print("  SELECT areatrigger_involvedrelation")
-    cursor.execute(f"SELECT id, quest FROM areatrigger_involvedrelation {('WHERE quest IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}")
+    cursor.execute(f"SELECT id, quest FROM areatrigger_involvedrelation WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
     areatrigger_involvedrelation = {}
     for a in cursor.fetchall():
         if a[1] in areatrigger_involvedrelation:
