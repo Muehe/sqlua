@@ -78,7 +78,7 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
         exe = f"""
         SELECT
         qt.ID,  # 0
-        ct.MinLevel as MinLevel,  # 1
+        0 as MinLevel,  # 1
         -1 as QuestLevel,  # 2
         qt.QuestType,  # 3
         qta.AllowableClasses,  # 4
@@ -145,8 +145,6 @@ def getQuestTables(cursor, dictCursor, version, quest_ids=None):
         FROM quest_template as qt
         LEFT JOIN quest_template_addon as qta
         ON qt.ID = qta.ID
-        LEFT JOIN content_tuning as ct
-        ON qt.ContentTuningID = ct.ID
         {('WHERE qt.ID IN (' + quest_ids_for_where_clause + ')') if quest_ids else ''}
     """
 
