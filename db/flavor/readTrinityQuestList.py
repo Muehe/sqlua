@@ -1,4 +1,7 @@
+from data.mop.invalidTrinityIDs import TRINITY_IDS_TO_SKIP
+
 HIGHEST_MOP_QUEST_ID = 34062
+QUEST_IDS_TO_SKIP = ', '.join(map(str, TRINITY_IDS_TO_SKIP))
 
 def getQuestTables(cursor, dictCursor, version):
     print("Selecting quest related MySQL tables...")
@@ -71,7 +74,7 @@ def getQuestTables(cursor, dictCursor, version):
         qt.AreaDescription  # 63
         
         FROM quest_template as qt LEFT JOIN quest_template_addon as qta ON qt.ID = qta.ID
-        WHERE qt.ID <= {HIGHEST_MOP_QUEST_ID}
+        WHERE qt.ID <= {HIGHEST_MOP_QUEST_ID} AND qt.ID NOT IN ({QUEST_IDS_TO_SKIP})
     """
 
     if version == 'tww':
@@ -145,7 +148,7 @@ def getQuestTables(cursor, dictCursor, version):
         FROM quest_template as qt
         LEFT JOIN quest_template_addon as qta
         ON qt.ID = qta.ID
-        WHERE qt.ID <= {HIGHEST_MOP_QUEST_ID}
+        WHERE qt.ID <= {HIGHEST_MOP_QUEST_ID} AND qt.ID NOT IN ({QUEST_IDS_TO_SKIP})
     """
 
     cursor.execute(exe)
@@ -159,7 +162,7 @@ def getQuestTables(cursor, dictCursor, version):
 
     print("  SELECT quest_objectives")
     # Type: 0 = creature, 1 = item, 2 = object, 3 = creature, 4 = currency, 5 = spell, 6 = reputation (positive), 7 = reputation (negative), 8 = money, 9 = killPlayer, 10 = areatrigger/event
-    cursor.execute(f"SELECT QuestID, Type, `Order`, ObjectID, Amount FROM quest_objectives WHERE QuestID <= {HIGHEST_MOP_QUEST_ID}")
+    cursor.execute(f"SELECT QuestID, Type, `Order`, ObjectID, Amount FROM quest_objectives WHERE QuestID <= {HIGHEST_MOP_QUEST_ID} AND QuestID NOT IN ({QUEST_IDS_TO_SKIP})")
     
     quest_objectives = {}
     for a in cursor.fetchall():
@@ -235,7 +238,7 @@ def getQuestTables(cursor, dictCursor, version):
 
     print("  SELECT creature_queststarter")
     creature_quest_starter = {}
-    cursor.execute(f"SELECT id, quest FROM creature_queststarter WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
+    cursor.execute(f"SELECT id, quest FROM creature_queststarter WHERE quest <= {HIGHEST_MOP_QUEST_ID} AND quest NOT IN ({QUEST_IDS_TO_SKIP})")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -245,7 +248,7 @@ def getQuestTables(cursor, dictCursor, version):
 
     print("  SELECT creature_questender")
     creature_quest_ender = {}
-    cursor.execute(f"SELECT id, quest FROM creature_questender WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
+    cursor.execute(f"SELECT id, quest FROM creature_questender WHERE quest <= {HIGHEST_MOP_QUEST_ID} AND quest NOT IN ({QUEST_IDS_TO_SKIP})")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -255,7 +258,7 @@ def getQuestTables(cursor, dictCursor, version):
 
     print("  SELECT gameobject_queststarter")
     gameobject_quest_starter = {}
-    cursor.execute(f"SELECT id, quest FROM gameobject_queststarter WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
+    cursor.execute(f"SELECT id, quest FROM gameobject_queststarter WHERE quest <= {HIGHEST_MOP_QUEST_ID} AND quest NOT IN ({QUEST_IDS_TO_SKIP})")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -265,7 +268,7 @@ def getQuestTables(cursor, dictCursor, version):
 
     print("  SELECT gameobject_questender")
     gameobject_quest_ender = {}
-    cursor.execute(f"SELECT id, quest FROM gameobject_questender WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
+    cursor.execute(f"SELECT id, quest FROM gameobject_questender WHERE quest <= {HIGHEST_MOP_QUEST_ID} AND quest NOT IN ({QUEST_IDS_TO_SKIP})")
     for a in cursor.fetchall():
         entry = a[0]
         quest = a[1]
@@ -285,7 +288,7 @@ def getQuestTables(cursor, dictCursor, version):
     #         item_questrelation[a[1]].append(a)
 
     print("  SELECT areatrigger_involvedrelation")
-    cursor.execute(f"SELECT id, quest FROM areatrigger_involvedrelation WHERE quest <= {HIGHEST_MOP_QUEST_ID}")
+    cursor.execute(f"SELECT id, quest FROM areatrigger_involvedrelation WHERE quest <= {HIGHEST_MOP_QUEST_ID} AND quest NOT IN ({QUEST_IDS_TO_SKIP})")
     areatrigger_involvedrelation = {}
     for a in cursor.fetchall():
         if a[1] in areatrigger_involvedrelation:
