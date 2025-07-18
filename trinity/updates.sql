@@ -8,6 +8,7 @@ DELETE FROM `creature_questender` WHERE `id` > 80674;
 UPDATE `quest_template` SET `AllowableRaces` = 33555378 WHERE `AllowableRaces` = 12261800583900083122; -- Horde
 UPDATE `quest_template` SET `AllowableRaces` = 18875469 WHERE `AllowableRaces` = 6130900294268439629; -- Alliance
 UPDATE `quest_template` SET `AllowableRaces` = 0 WHERE `AllowableRaces` = 18446744073709551615; -- Both
+UPDATE `quest_template` SET `AllowableRaces` = 0 WHERE `AllowableRaces` = 52430847; -- Both
 UPDATE `quest_template` SET `AllowableRaces` = 33554432 WHERE `AllowableRaces` = 31012; -- Pandaren Horde
 UPDATE `quest_template` SET `AllowableRaces` = 16777216 WHERE `AllowableRaces` = 16777216; -- Pandaren Alliance
 UPDATE `quest_template` SET `AllowableRaces` = 8388608 WHERE `AllowableRaces` = 58720256; -- Pandaren Neutral
