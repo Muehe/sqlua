@@ -202,6 +202,8 @@ class Npc():
             else:
                 self.spawns = CoordList(spawns, version)
                 # use npcZoneIdMap to remove invalid spawn entries
+                """
+                # With updated pre-extract data this code should be obsolete, but if its to be used it needs to be only for Cata
                 correct_zone = npcZoneIdMap.get(self.id)
                 if correct_zone and correct_zone in self.spawns.cByZone:
                     cleaned_cList = []
@@ -222,6 +224,7 @@ class Npc():
                                 break
                     self.spawns.cList = cleaned_cList
                     self.spawns.cByZone = {first_zone: self.spawns.cByZone[first_zone]}
+                """
 
 
             if (waypoints != []):

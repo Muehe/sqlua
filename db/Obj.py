@@ -60,6 +60,8 @@ class Obj():
             self.spawns = CoordList([], version)
         elif extractSpawns:
             self.spawns = CoordList(spawns, version, debug=debug)
+            """
+            # With updated pre-extract data this code should be obsolete, but if its to be used it needs to be only for Cata
             correct_zone = objectZoneIdMap.get(self.id)
             if correct_zone and correct_zone in self.spawns.cByZone:
                 cleaned_cList = []
@@ -80,6 +82,7 @@ class Obj():
                             break
                 self.spawns.cList = cleaned_cList
                 self.spawns.cByZone = {first_zone: self.spawns.cByZone[first_zone]}
+            """
         
         #Start
         self.start = []
