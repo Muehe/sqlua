@@ -158,7 +158,7 @@ QuestieDB.npcData = [[return {
                     lastZone = route.cList[0].pointList[0][0]
                     path = []
                     for coord in route.cList:
-                        if coord.isMulti:
+                        if coord.isMulti or coord.noZone or coord.isInstance:
                             print(f'Found waypoint with ambigous zone for NPC {npc.name} ({npc.id}). Skipping path.', file=log)
                             path = []
                             break

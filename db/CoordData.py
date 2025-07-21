@@ -230,11 +230,9 @@ mapBordersMoP = getMapBorders('mop')
 
 mapBordersTWW = getMapBorders('tww')
 
-def isInstance(zoneID=-1, mapID=-1):
+def isInstance(zoneID=False, mapID=False):
     for zID, n, mID in instanceIds:
-        if zoneID != -1 and zoneID == zID:
-            return True
-        if mapID != -1 and mapID == mID:
+        if (zoneID and zoneID == zID) or (mapID and mapID == mID):
             return True
     return False
 

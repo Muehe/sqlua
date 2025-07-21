@@ -52,7 +52,7 @@ class Coord():
 
         if len(self.pointList) > 1:
             self.isMulti = True
-        elif len(self.pointList) == 0:
+        elif len(self.pointList) == 0 and not self.isInstance:
             self.noZone = True
             if debug:
                 print("No zone! " + str(mapId) + " " + str(zoneId))
