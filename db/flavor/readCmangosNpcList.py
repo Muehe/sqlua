@@ -32,6 +32,23 @@ def getNpcTables(cursor, dictCursor):
             npc[a[0]] = []
         npc[a[0]].append(a)
 
+    print("  SELECT spawn_group")
+    cursor.execute("""
+        SELECT sge.entry, s.map, s.position_x, s.position_y, s.guid
+        FROM spawn_group_entry AS sge
+        INNER JOIN spawn_group AS sg
+        ON (sg.id = sge.id AND sg.Type = 0)
+        INNER JOIN spawn_group_spawn AS sgs
+        ON sge.id = sgs.id
+        INNER JOIN creature as s
+        ON sgs.guid = s.guid;
+    """)
+    for a in cursor.fetchall():
+        if a[0] not in npc:
+            npc[a[0]] = [a]
+        else:
+            npc[a[0]].append(a)
+
     print("  SELECT creature_questrelation")
     cursor.execute("SELECT * FROM creature_questrelation")
     npc_start = {}
