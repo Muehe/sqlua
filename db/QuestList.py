@@ -385,7 +385,7 @@ QuestieDB.questData = [[return {
             if hasattr(quest, "triggerEnd") and quest.triggerEnd is not None: #trigger = 9
                 outString += ("{\""+quest.triggerEnd[0]+"\",{")
                 for zone in quest.triggerEnd[1].cByZone:
-                    if zone not in validZoneList:
+                    if isInstance(zone):
                         continue
                     outString += ("["+str(zone)+"]={")
                     for c in quest.triggerEnd[1].cByZone[zone]:

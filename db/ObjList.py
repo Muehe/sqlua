@@ -123,7 +123,7 @@ QuestieDB.objectData = [[return {
             if hasattr(obj, "spawns") and len(obj.spawns.cList) > 0: #4
                 outString += ("{")
                 for zone in obj.spawns.cByZone:
-                    if not zone in validZoneList:
+                    if isInstance(zone):
                         if zoneId == 0:
                             zoneId = zone
                         outString += ("["+str(zone)+"]={{-1,-1}},") # ,"+str(len(obj.spawns.cByZone[zone]))+"

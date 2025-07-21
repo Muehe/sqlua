@@ -127,7 +127,7 @@ QuestieDB.npcData = [[return {
             if hasattr(npc, "spawns") and len(npc.spawns.cList) > 0: #7
                 outString += ("{")
                 for zone in npc.spawns.cByZone:
-                    if not zone in validZoneList:
+                    if isInstance(zone):
                         if zoneId == 0:
                             zoneId = zone
                         outString += ("["+str(zone)+"]={{-1,-1}},")
