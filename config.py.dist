@@ -23,7 +23,8 @@ dbInfo = {
     },
     'trinity': {
         'cata': 'world',
-        'tww': 'retailworld',
+        'tww': 'twwworld',
+        #'df': 'retailworld',
     },
     'skyfire': {
         'mop': 'skyfire',

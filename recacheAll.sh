@@ -6,4 +6,5 @@ python -m main -r mangos cata &&
 python -m main -r trinity cata &&
 python -m main -r mangos mop &&
 python -m main -r skyfire mop &&
+python -m main -r trinity tww &&
 echo "Done reacaching")
