@@ -15,6 +15,12 @@ class Quest():
         # Change race requirement to 0 for quests available to all races
         if self.RequiredRaces in [raceCombos['MOP_ALL'], raceCombos['CATA_ALL'], raceCombos['TBC_ALL'], raceCombos['CLASSIC_ALL']]:
             self.RequiredRaces = 0
+        if version == 'classic':
+            self.RequiredRaces = self.RequiredRaces & raceCombos['CLASSIC_ALL']
+        elif version in ['tbc', 'wotlk']:
+            self.RequiredRaces = self.RequiredRaces & raceCombos['TBC_ALL']
+        elif version == 'cata':
+            self.RequiredRaces = self.RequiredRaces & raceCombos['CATA_ALL']
         self.Title = escapeDoubleQuotes(quest[19])
         if self.Title is None or self.Title == '':
             print("WARNING: Title is missing for quest ID", self.id)
