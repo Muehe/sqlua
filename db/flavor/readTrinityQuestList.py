@@ -12,7 +12,7 @@ def getQuestTables(cursor, dictCursor, version):
         qt.ID,  # 0
         qt.MinLevel as MinLevel,  # 1
         qt.QuestLevel as QuestLevel,  # 2
-        qt.QuestInfoID,  # 3
+        qt.QuestInfoID as QuestType,  # 3
         qta.AllowableClasses,  # 4
         qt.AllowableRaces,  # 5
         qta.RequiredSkillID,  # 6
@@ -84,7 +84,7 @@ def getQuestTables(cursor, dictCursor, version):
         qt.ID,  # 0
         0 as MinLevel,  # 1
         -1 as QuestLevel,  # 2
-        qt.QuestInfoID,  # 3
+        qt.QuestInfoID as QuestType,  # 3
         qta.AllowableClasses,  # 4
         qt.AllowableRaces,  # 5
         qta.RequiredSkillID,  # 6
