@@ -6,12 +6,13 @@ QUEST_IDS_TO_SKIP = ', '.join(map(str, TRINITY_IDS_TO_SKIP))
 def getQuestTables(cursor, dictCursor, version):
     print("Selecting quest related MySQL tables...")
     print("  SELECT quest_template")
+    # version = 'cata'
     exe = f"""
         SELECT
         qt.ID,  # 0
         qt.MinLevel as MinLevel,  # 1
         qt.QuestLevel as QuestLevel,  # 2
-        qt.QuestType,  # 3
+        qt.QuestInfoID,  # 3
         qta.AllowableClasses,  # 4
         qt.AllowableRaces,  # 5
         qta.RequiredSkillID,  # 6
@@ -25,7 +26,7 @@ def getQuestTables(cursor, dictCursor, version):
         qt.Flags,  # 14
         qta.PrevQuestId,  # 15
         qta.NextQuestId,  # 16
-        0 as NextQuestInChain,  # 17
+        qt.RewardNextQuest as NextQuestInChain,  # 17
         qta.ExclusiveGroup,  # 18
         qt.LogTitle,  # 19
         qt.LogDescription,  # 20
@@ -52,7 +53,7 @@ def getQuestTables(cursor, dictCursor, version):
         NULL as CompleteScript,  # 41
         qt.StartItem,  # 42
         qt.QuestSortID as ZoneOrSort,  # 43
-        2 as Method,  # 44
+        qt.QuestType as Method,  # 44
         '' as ObjectiveText1,  # 45
         '' as ObjectiveText2,  # 46
         '' as ObjectiveText3,  # 47
@@ -83,7 +84,7 @@ def getQuestTables(cursor, dictCursor, version):
         qt.ID,  # 0
         0 as MinLevel,  # 1
         -1 as QuestLevel,  # 2
-        qt.QuestType,  # 3
+        qt.QuestInfoID,  # 3
         qta.AllowableClasses,  # 4
         qt.AllowableRaces,  # 5
         qta.RequiredSkillID,  # 6
@@ -97,7 +98,7 @@ def getQuestTables(cursor, dictCursor, version):
         qt.Flags,  # 14
         qta.PrevQuestId,  # 15
         qta.NextQuestId,  # 16
-        0 as NextQuestInChain,  # 17
+        qt.RewardNextQuest as NextQuestInChain,  # 17
         qta.ExclusiveGroup,  # 18
         qt.LogTitle,  # 19
         qt.LogDescription,  # 20
@@ -124,7 +125,7 @@ def getQuestTables(cursor, dictCursor, version):
         NULL as CompleteScript,  # 41
         qt.StartItem,  # 42
         qt.QuestSortID as ZoneOrSort,  # 43
-        2 as Method,  # 44
+        qt.QuestType as Method,  # 44
         '' as ObjectiveText1,  # 45
         '' as ObjectiveText2,  # 46
         '' as ObjectiveText3,  # 47
@@ -152,7 +153,6 @@ def getQuestTables(cursor, dictCursor, version):
     """
 
     cursor.execute(exe)
-    # TODO: Use BreadcrumbForQuestId to mark quests as breadcrumb
 
     quest_template_cache = {}
     for a in cursor.fetchall():
